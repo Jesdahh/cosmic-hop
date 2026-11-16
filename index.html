@@ -25,6 +25,10 @@ html,body{margin:0;height:100%;overflow:hidden;background:var(--space);color:var
 #spd i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--sky),var(--pop))}
 #passport{right:max(12px,env(safe-area-inset-right,0px));top:max(12px,env(safe-area-inset-top,0px));transform:rotate(2deg);background:var(--sun);font-size:20px;text-align:right}
 #passport small{display:block;font-size:12px;opacity:.75}
+#bSound{position:absolute;right:max(12px,env(safe-area-inset-right,0px));top:calc(max(12px,env(safe-area-inset-top,0px)) + 68px);pointer-events:auto;font-family:var(--display);letter-spacing:.05em;font-size:15px;
+  color:var(--ink);background:var(--paper);border:3px solid var(--ink);border-radius:10px;box-shadow:3px 3px 0 var(--ink);padding:3px 10px;cursor:pointer;touch-action:none;-webkit-tap-highlight-color:transparent}
+#bSound:focus-visible{outline:3px solid #fff;outline-offset:3px}
+#bSound[aria-pressed="false"]{opacity:.7}
 .mk{position:absolute;left:0;top:0;font-size:13px;color:#fff;text-shadow:0 0 3px var(--ink),1px 1px 0 var(--ink),-1px -1px 0 var(--ink),1px -1px 0 var(--ink),-1px 1px 0 var(--ink);white-space:nowrap;will-change:transform;text-align:center;line-height:1.05}
 .mk b{display:block;width:12px;height:12px;border-radius:50%;border:2px solid var(--ink);margin:0 auto 2px;box-sizing:border-box}
 .mk.off{opacity:.8}
@@ -71,7 +75,7 @@ html,body{margin:0;height:100%;overflow:hidden;background:var(--space);color:var
 #play:focus-visible{outline:3px solid #fff;outline-offset:4px}
 #err{color:#fff;background:var(--pop);border:3px solid var(--ink);border-radius:8px;padding:6px 12px;font-size:16px;max-width:90vw;white-space:pre-wrap}
 @media (max-width:480px){#btns{transform:scale(.84);transform-origin:100% 100%}#stick{width:132px;height:132px}}
-@media (max-width:640px){#loc{font-size:19px}#passport{font-size:16px}#prompt{font-size:16px;bottom:auto;top:max(84px,env(safe-area-inset-top,0px));max-width:80vw}}
+@media (max-width:640px){#loc{font-size:19px}#passport{font-size:16px}#prompt{font-size:16px;bottom:auto;top:calc(126px + env(safe-area-inset-top,0px));max-width:80vw}}
 @media (prefers-reduced-motion:reduce){#lines{animation:none}.btn.pulse{animation:none}}
 </style>
 </head>
@@ -82,9 +86,10 @@ html,body{margin:0;height:100%;overflow:hidden;background:var(--space);color:var
   <div id="markers"></div>
   <div id="panel" class="box"><div id="loc">DEEP SPACE</div><div id="sub">&nbsp;</div><div id="spd"><i id="spdBar"></i></div></div>
   <div id="passport" class="box">★ <span id="pcount">0</span>/<span id="ptotal">0</span><small>WORLDS VISITED</small></div>
+  <button id="bSound" type="button" aria-pressed="true">♪ SOUND ON</button>
   <div id="prompt" class="box"></div>
   <div id="toast"></div>
-  <div id="help" class="box"><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> fly / walk · <kbd>MOUSE</kbd> steer · <kbd>SHIFT</kbd> boost<br><kbd>L</kbd> land / take off · <kbd>E</kbd> exit / enter ship · <kbd>SPACE</kbd> climb / jump</div>
+  <div id="help" class="box"><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> fly / walk · <kbd>MOUSE</kbd> steer · <kbd>SHIFT</kbd> boost<br><kbd>L</kbd> land / take off · <kbd>E</kbd> exit / enter ship · <kbd>SPACE</kbd> climb / jump · <kbd>M</kbd> sound</div>
   <div id="stick"><div id="knob"></div></div>
   <div id="btns">
     <button id="bExit" class="btn" type="button" hidden>EXIT</button>
@@ -537,7 +542,7 @@ function buildPropGeos(){
 
 function buildLiving(b,cfg){
   const R=b.R,rnd=mulberry32(cfg.seed),n1=makeNoise(cfg.seed+1),n2=makeNoise(cfg.seed+2),n3=makeNoise(cfg.seed+3);
-  b.liquid=true;b.liquidSolid=false;
+  b.liquid=true;b.liquidSolid=false;b.alive=true;
   // multi-octave base terrain: ocean basins, shelves, beaches, rolling hills, ridged mountains
   const hBase=(x,y,z)=>{
     const c=fbm(n1,x*1.25+7.1,y*1.25+1.3,z*1.25-3.3,5)*cfg.cAmp+cfg.bias;
@@ -999,7 +1004,7 @@ const MOUSE_S=0.0023,TOUCH_S=0.0058;
 addEventListener('keydown',e=>{
   if(e.code==='Space'||e.code.startsWith('Arrow'))e.preventDefault();
   if(e.repeat||!started)return;keys[e.code]=true;
-  if(e.code==='KeyL'||e.code==='Enter')actLand();else if(e.code==='KeyE'||e.code==='KeyF')actExit();else if(e.code==='Space')actSpace();
+  if(e.code==='KeyL'||e.code==='Enter')actLand();else if(e.code==='KeyE'||e.code==='KeyF')actExit();else if(e.code==='Space')actSpace();else if(e.code==='KeyM')SFX.toggle();
 });
 addEventListener('keyup',e=>{keys[e.code]=false;});
 addEventListener('blur',()=>{for(const k in keys)keys[k]=false;boostHeld=false;});
@@ -1030,7 +1035,7 @@ canvas.addEventListener('contextmenu',e=>e.preventDefault());
 const bBoost=$('bBoost'),bLand=$('bLand'),bExit=$('bExit');
 function tap(el,fn){el.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();if(e.pointerType==='touch')useTouch();if(started)fn();});
   el.addEventListener('keydown',e=>{if((e.code==='Enter'||e.code==='Space')&&started){e.preventDefault();e.stopPropagation();fn();}});}
-tap(bLand,()=>actLand());tap(bExit,()=>actExit());
+tap(bLand,()=>actLand());tap(bExit,()=>actExit());tap($('bSound'),()=>SFX.toggle());
 bBoost.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();if(e.pointerType==='touch')useTouch();boostHeld=true;bBoost.classList.add('held');try{bBoost.setPointerCapture(e.pointerId);}catch(_){}});
 for(const ev of ['pointerup','pointercancel','lostpointercapture'])bBoost.addEventListener(ev,()=>{boostHeld=false;bBoost.classList.remove('held');});
 function readInput(){
@@ -1039,9 +1044,91 @@ function readInput(){
   input.boost=!!(keys.ShiftLeft||keys.ShiftRight||boostHeld);input.up=!!keys.Space;
 }
 
+/* ---------- 9b. SOUND (all synthesised with WebAudio — no audio files) ---------- */
+const SFX=(()=>{
+  let ctx=null,master,nbuf,eng,engF,o1,o2,wind,windF,musicG,muted=false,nextNote=0,beat=0;
+  try{muted=localStorage.getItem('cosmic-hop-mute')==='1';}catch(_){}
+  const btn=$('bSound');
+  const label=()=>{btn.textContent=muted?'♪ SOUND OFF':'♪ SOUND ON';btn.setAttribute('aria-pressed',String(!muted));};
+  label();
+  function init(){
+    if(ctx)return;const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return;
+    try{ctx=new AC();}catch(_){ctx=null;return;}
+    master=ctx.createGain();master.gain.value=muted?0:0.7;
+    const comp=ctx.createDynamicsCompressor();master.connect(comp);comp.connect(ctx.destination);
+    // two seconds of soft noise, shared by the engine, the wind and every percussive sound
+    nbuf=ctx.createBuffer(1,ctx.sampleRate*2,ctx.sampleRate);const d=nbuf.getChannelData(0);let l=0;
+    for(let i=0;i<d.length;i++){const w=Math.random()*2-1;l=(l+0.03*w)/1.03;d[i]=l*1.5+w*0.3;}
+    const loop=()=>{const s=ctx.createBufferSource();s.buffer=nbuf;s.loop=true;s.start();return s;};
+    // engine: rumbling noise + two detuned saws through a low-pass that opens with thrust
+    engF=ctx.createBiquadFilter();engF.type='lowpass';engF.frequency.value=220;engF.Q.value=1.4;
+    eng=ctx.createGain();eng.gain.value=0;engF.connect(eng);eng.connect(master);
+    loop().connect(engF);
+    const og=ctx.createGain();og.gain.value=0.22;og.connect(engF);
+    o1=ctx.createOscillator();o1.type='sawtooth';o1.frequency.value=48;o1.connect(og);o1.start();
+    o2=ctx.createOscillator();o2.type='sawtooth';o2.frequency.value=48.6;o2.connect(og);o2.start();
+    // wind / boost whoosh
+    windF=ctx.createBiquadFilter();windF.type='bandpass';windF.frequency.value=700;windF.Q.value=0.7;
+    wind=ctx.createGain();wind.gain.value=0;loop().connect(windF);windF.connect(wind);wind.connect(master);
+    // music bus with a soft echo
+    musicG=ctx.createGain();musicG.gain.value=0.55;musicG.connect(master);
+    const dl=ctx.createDelay(1.5),fb=ctx.createGain(),lp=ctx.createBiquadFilter();dl.delayTime.value=0.42;fb.gain.value=0.4;lp.type='lowpass';lp.frequency.value=2000;
+    musicG.connect(dl);dl.connect(lp);lp.connect(fb);fb.connect(dl);lp.connect(master);
+  }
+  function tone(type,f0,f1,dur,vol,when=0,dest){
+    if(!ctx)return;const t=ctx.currentTime+when,o=ctx.createOscillator(),g=ctx.createGain();
+    o.type=type;o.frequency.setValueAtTime(f0,t);if(f1!==f0)o.frequency.exponentialRampToValueAtTime(Math.max(f1,1),t+dur);
+    g.gain.setValueAtTime(0.0001,t);g.gain.exponentialRampToValueAtTime(vol,t+0.012);g.gain.exponentialRampToValueAtTime(0.0001,t+dur);
+    o.connect(g);g.connect(dest||master);o.start(t);o.stop(t+dur+0.05);
+  }
+  function burst(freq,q,dur,vol,when=0,type='bandpass'){
+    if(!ctx)return;const t=ctx.currentTime+when,s=ctx.createBufferSource(),f=ctx.createBiquadFilter(),g=ctx.createGain();
+    s.buffer=nbuf;f.type=type;f.frequency.value=freq;f.Q.value=q;
+    g.gain.setValueAtTime(0.0001,t);g.gain.exponentialRampToValueAtTime(vol,t+0.01);g.gain.exponentialRampToValueAtTime(0.0001,t+dur);
+    s.connect(f);f.connect(g);g.connect(master);s.start(t,Math.random()*1.5);s.stop(t+dur+0.05);
+  }
+  const play={
+    click(){tone('square',520,780,0.08,0.05);},
+    deny(){tone('square',150,120,0.14,0.08);tone('square',150,110,0.16,0.08,0.17);},
+    landStart(){tone('sine',880,330,0.55,0.08);tone('sine',660,247,0.55,0.05,0.12);},
+    thud(){tone('sine',130,42,0.38,0.5);burst(260,0.7,0.28,0.7,0,'lowpass');},
+    discover(){[523.25,659.25,783.99,1046.5,1318.5].forEach((f,i)=>tone('triangle',f,f,0.34,0.13,0.3+i*0.09,musicG));},
+    liftoff(){tone('sawtooth',60,300,1.7,0.09);burst(500,0.5,1.9,0.5);},
+    jump(){tone('sine',280,640,0.2,0.13);},
+    step(){burst(700+Math.random()*500,1.4,0.07,0.28);},
+    door(){burst(1700,2,0.1,0.4);tone('triangle',392,523.25,0.16,0.09,0.07);},
+    aboard(){tone('triangle',523.25,523.25,0.12,0.1);tone('triangle',783.99,783.99,0.22,0.1,0.11);},
+    bump(){tone('sine',95,48,0.2,0.4);burst(200,0.8,0.14,0.4,0,'lowpass');},
+    chirp(){const f=2300+Math.random()*1500;tone('sine',f,f*1.35,0.09,0.03);tone('sine',f*1.2,f*0.9,0.1,0.026,0.13);}
+  };
+  const SCALES={space:[220,261.63,293.66,329.63,392,440,523.25],near:[392,440,523.25,587.33,659.25,783.99],walk:[523.25,587.33,659.25,783.99,880,1046.5]};
+  const ROOTS={space:55,near:98,walk:130.81};
+  // called every frame: engine + wind follow the ship, and a slow generative tune follows where you are
+  function update(dt,s){
+    if(!ctx||ctx.state!=='running')return;const t=ctx.currentTime;
+    eng.gain.setTargetAtTime(s.engine?0.05+s.flame*0.17:0,t,0.12);
+    engF.frequency.setTargetAtTime(170+s.flame*850+s.speedF*750,t,0.08);
+    const f=46+s.speedF*72+s.flame*16;o1.frequency.setTargetAtTime(f,t,0.08);o2.frequency.setTargetAtTime(f*1.012,t,0.08);
+    wind.gain.setTargetAtTime(s.wind,t,0.25);windF.frequency.setTargetAtTime(450+s.speedF*1900,t,0.25);
+    if(s.birds&&Math.random()<dt*0.45)play.chirp();
+    if(s.on&&t>=nextNote){
+      const sc=SCALES[s.mood],walk=s.mood==='walk',n=sc[(Math.random()*sc.length)|0];
+      tone(walk?'triangle':'sine',n,n,walk?0.55:1.5,0.05,0,musicG);
+      if(beat%4===0){const r=ROOTS[s.mood];tone('triangle',r,r,3.4,0.06,0,musicG);tone('sine',r*1.5,r*1.5,3.4,0.035,0,musicG);}
+      beat++;nextNote=t+(walk?0.42:0.85)*(Math.random()<0.3?2:1);
+    }
+  }
+  function toggle(){muted=!muted;label();try{localStorage.setItem('cosmic-hop-mute',muted?'1':'0');}catch(_){}
+    if(ctx){master.gain.setTargetAtTime(muted?0:0.7,ctx.currentTime,0.05);if(!muted)play.click();}}
+  function resume(){if(ctx&&ctx.state==='suspended'&&!document.hidden)ctx.resume().catch(()=>{});}
+  document.addEventListener('visibilitychange',()=>{if(!ctx)return;if(document.hidden)ctx.suspend().catch(()=>{});else ctx.resume().catch(()=>{});});
+  addEventListener('pointerdown',resume,true);addEventListener('keydown',resume,true);
+  return {init,play,update,toggle};
+})();
+
 /* ---------- 10. GAME STATES, CAMERA, HUD, LOOP ---------- */
 let ship,astro;
-const PL={mode:'fly',vel:new V3(),speed:0,near:null,alt:1e9,body:null,local:new V3(),L:null,T:null,lookIdle:9,jumpQ:false,hotT:0};
+const PL={mode:'fly',vel:new V3(),speed:0,near:null,alt:1e9,body:null,local:new V3(),L:null,T:null,lookIdle:9,jumpQ:false,hotT:0,bumpT:0};
 const orbit={yaw:0,pitch:0.4};
 const camUp=new V3(0,1,0),carry=new V3();
 const _f=new V3(),_u=new V3(),_r=new V3(),_a=new V3(),_b=new V3(),_c=new V3(),_e=new V3(),_g=new V3(),_q=new Q(),_q2=new Q(),_m=new M4();
@@ -1078,7 +1165,8 @@ function updateFly(dt){
   if(b){_a.subVectors(g.position,b.center);const r=_a.length();_a.multiplyScalar(1/r);
     const min=b.kind==='rocky'?b.groundR(_a.x,_a.y,_a.z)+1.4:b.kind==='sun'?b.R*1.14:b.R+2.5;
     if(r<min){g.position.copy(b.center).addScaledVector(_a,min);const vn=PL.vel.dot(_a);if(vn<0)PL.vel.addScaledVector(_a,-vn);PL.speed*=Math.exp(-dt*1.5);
-      if(b.kind==='sun'&&uTime.value-PL.hotT>3){PL.hotT=uTime.value;toast('TOO HOT!');}}}
+      if(vn<-8&&uTime.value-PL.bumpT>0.6){PL.bumpT=uTime.value;SFX.play.bump();}
+      if(b.kind==='sun'&&uTime.value-PL.hotT>3){PL.hotT=uTime.value;toast('TOO HOT!');SFX.play.deny();}}}
   ship.model.rotation.z=lerp(ship.model.rotation.z,clamp(yaw/Math.max(dt,1e-3)*0.4,-0.7,0.7),1-Math.exp(-dt*5));
   ship.model.rotation.x=lerp(ship.model.rotation.x,clamp(pitch/Math.max(dt,1e-3)*0.15,-0.3,0.3),1-Math.exp(-dt*5));
   ship.flameT=0.28+Math.max(thr,0)*0.75+(input.boost&&thr>0?0.9:0);
@@ -1101,17 +1189,17 @@ function findSite(b,d0){
 }
 function tryLand(){
   const b=PL.near;if(!b||PL.mode!=='fly')return;
-  if(b.kind==='sun'){toast('WAY TOO HOT!');return;}
-  if(!b.landable){toast('NO SOLID GROUND — TRY A MOON!');return;}
-  if(PL.alt>landRange(b)){toast('FLY CLOSER TO LAND');return;}
+  if(b.kind==='sun'){toast('WAY TOO HOT!');SFX.play.deny();return;}
+  if(!b.landable){toast('NO SOLID GROUND — TRY A MOON!');SFX.play.deny();return;}
+  if(PL.alt>landRange(b)){toast('FLY CLOSER TO LAND');SFX.play.deny();return;}
   const d0=new V3().subVectors(ship.group.position,b.center),r0=d0.length();d0.multiplyScalar(1/r0);
-  const site=findSite(b,d0);if(!site){toast('NO SAFE SPOT — FIND SOME LAND');return;}
+  const site=findSite(b,d0);if(!site){toast('NO SAFE SPOT — FIND SOME LAND');SFX.play.deny();return;}
   _f.set(0,0,-1).applyQuaternion(ship.group.quaternion);_f.addScaledVector(site,-_f.dot(site));
   if(_f.lengthSq()<0.01)_f.copy(tangentBasis(site)[0]);_f.normalize();
   const q1=new Q().setFromRotationMatrix(setBasis(_m,_a.set(0,0,0),_f,site));
   const r1=b.groundR(site.x,site.y,site.z)+ship.restH;
   PL.L={b,d0,d1:site,r0,r1,q0:ship.group.quaternion.clone(),q1,t:0,dur:clamp((r0-r1)/16+Math.acos(clamp(d0.dot(site),-1,1))*b.R/22,2.4,7)};
-  PL.body=b;PL.mode='landing';PL.speed=0;PL.vel.set(0,0,0);orbit.yaw=0;orbit.pitch=0.42;ship.gear.visible=true;
+  SFX.play.landStart();PL.body=b;PL.mode='landing';PL.speed=0;PL.vel.set(0,0,0);orbit.yaw=0;orbit.pitch=0.42;ship.gear.visible=true;
 }
 function updateLanding(dt){
   const L=PL.L,b=L.b;L.t=Math.min(1,L.t+dt/L.dur);const e=sstep(0,1,L.t);
@@ -1122,11 +1210,11 @@ function updateLanding(dt){
   ship.gear.scale.y=Math.max(0.01,sstep(0.15,0.8,L.t));ship.flameT=0.55*(1-sstep(0.85,1,L.t));
   ship.model.rotation.z*=Math.exp(-dt*4);ship.model.rotation.x*=Math.exp(-dt*4);
   if(L.t>=1){PL.mode='landed';PL.local.copy(L.d1).multiplyScalar(L.r1);PL.L=null;
-    if(!b.visited){b.visited=true;updatePassport();toast('NEW WORLD: '+b.name+'!');}else toast('TOUCHDOWN!');}
+    SFX.play.thud();if(!b.visited){b.visited=true;updatePassport();toast('NEW WORLD: '+b.name+'!');SFX.play.discover();}else toast('TOUCHDOWN!');}
 }
 function takeOff(){
   if(PL.mode!=='landed')return;
-  PL.T={t:0,p0:PL.local.clone(),up:PL.local.clone().normalize(),q0:ship.group.quaternion.clone()};PL.mode='takeoff';toast('LIFTOFF!');
+  PL.T={t:0,p0:PL.local.clone(),up:PL.local.clone().normalize(),q0:ship.group.quaternion.clone()};PL.mode='takeoff';toast('LIFTOFF!');SFX.play.liftoff();
 }
 function updateTakeoff(dt){
   const T=PL.T,b=PL.body;T.t=Math.min(1,T.t+dt/2.1);
@@ -1144,11 +1232,11 @@ function exitShip(){
     const h=b.heightAt(_a.x,_a.y,_a.z);if(b.liquid&&!b.liquidSolid&&h<-0.2)continue;A.dir.copy(_a);placed=true;break;}
   if(!placed)A.dir.copy(PL.local).addScaledVector(_r,2.5).normalize();
   A.view.copy(_f).addScaledVector(A.dir,-_f.dot(A.dir)).normalize();A.face.copy(A.view);A.yOff=0;A.vy=0;A.pitch=0.32;
-  b.group.add(A.group);A.group.visible=true;PL.mode='walk';placeAstro(b);
+  b.group.add(A.group);A.group.visible=true;PL.mode='walk';placeAstro(b);SFX.play.door();
 }
 function enterShip(){
   if(PL.mode!=='walk'||!astro.nearShip)return;
-  astro.group.visible=false;PL.mode='landed';orbit.yaw=0;orbit.pitch=0.42;toast('ALL ABOARD!');
+  astro.group.visible=false;PL.mode='landed';orbit.yaw=0;orbit.pitch=0.42;toast('ALL ABOARD!');SFX.play.aboard();
 }
 function placeAstro(b){
   const A=astro,gr=b.groundR(A.dir.x,A.dir.y,A.dir.z);
@@ -1176,11 +1264,12 @@ function updateWalk(dt){
   }
   A.view.addScaledVector(A.dir,-A.view.dot(A.dir)).normalize();A.face.addScaledVector(A.dir,-A.face.dot(A.dir)).normalize();
   // low-gravity hop
-  if(PL.jumpQ&&A.yOff<=0.001){A.vy=5.2;}PL.jumpQ=false;
+  if(PL.jumpQ&&A.yOff<=0.001){A.vy=5.2;SFX.play.jump();}PL.jumpQ=false;
   if(A.yOff>0||A.vy>0){A.yOff+=A.vy*dt;A.vy-=7.5*dt;if(A.yOff<=0){A.yOff=0;A.vy=0;}}
   placeAstro(b);
   // walk cycle
-  const air=A.yOff>0.01;A.phase+=dt*(moving?(input.boost?15:10.5):0);
+  const air=A.yOff>0.01,st0=Math.floor(A.phase/Math.PI);A.phase+=dt*(moving?(input.boost?15:10.5):0);
+  if(moving&&!air&&Math.floor(A.phase/Math.PI)!==st0)SFX.play.step();
   const sw=moving&&!air?Math.sin(A.phase)*0.85:0,k=1-Math.exp(-dt*14);
   A.legL.rotation.x=lerp(A.legL.rotation.x,air?0.5:sw,k);A.legR.rotation.x=lerp(A.legR.rotation.x,air?-0.3:-sw,k);
   A.armL.rotation.x=lerp(A.armL.rotation.x,air?-2.4:-sw*0.8,k);A.armR.rotation.x=lerp(A.armR.rotation.x,air?-2.4:sw*0.8,k);
@@ -1310,6 +1399,12 @@ function frame(dt){
   skyGroup.position.copy(camera.position);
   const camAlt=PL.near?Math.max(0,camera.position.distanceTo(PL.near.center)-PL.near.R):1e3;
   camera.near=clamp(camAlt*0.03,0.14,2.5);camera.updateProjectionMatrix();
+  // sound follows the ship and where you are
+  const md=PL.mode,flying=md==='fly'||md==='landing'||md==='takeoff',nb=PL.near,spF=clamp(Math.abs(PL.speed)/390,0,1);
+  const inAir=nb&&nb.atmoS&&nb.sky&&g.position.distanceTo(nb.center)<nb.atmoS;
+  SFX.update(dt,{on:started,engine:started&&flying,flame:ship.flameS,speedF:md==='fly'?spF:0,
+    wind:!started?0:md==='fly'?spF*0.09+(inAir?clamp(PL.speed/50,0,1)*0.05:0):(PL.body&&PL.body.sky?0.022:0),
+    mood:!flying?'walk':(nb&&PL.alt<nb.R*2?'near':'space'),birds:started&&md==='walk'&&!!PL.body.alive});
   updateHUD(dt);updateMarkers(ref);
   renderer.render(scene,camera);
 }
@@ -1336,13 +1431,14 @@ async function boot(){
   renderer.setAnimationLoop(()=>{const now=performance.now(),dt=Math.min((now-last)/1000,0.05);last=now;frame(dt);});
   playBtn.disabled=false;playBtn.textContent='PLAY!';playBtn.focus();
   playBtn.addEventListener('click',()=>{
+    SFX.init();SFX.play.click();
     started=true;$('start').classList.add('bye');$('ui').classList.add('live');canvas.focus();PL.speed=30;
     toast('FLY TO TERRA!');
   });
 }
 boot().catch(err=>{console.error(err);const e=$('err');e.hidden=false;e.textContent='Could not start: '+(err&&err.message||err);playBtn.textContent='OOPS';});
 // debug / testing hook
-window.__game={PL,bodies,get ship(){return ship;},get astro(){return astro;},actLand,actExit,keys,look,camera,frame};
+window.__game={SFX,PL,bodies,get ship(){return ship;},get astro(){return astro;},actLand,actExit,keys,look,camera,frame};
 </script>
 </body>
 </html>
