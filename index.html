@@ -578,8 +578,8 @@ body.photoMode #ui{opacity:0!important}
           <li><b>FACTIONS</b>: rescues, salvage, photos and discoveries earn reputation and daily / weekly contracts. Claim them in <b>LOG → FACTIONS</b>.</li>
           <li><b>BASES</b>: press <kbd>E</kbd> at an outpost for storage, farms and teleporters. Visit your bases from the <b>MAP</b>.</li>
           <li><b>STORM RUSH</b>: when a solar storm hits, glowing storm crystals erupt nearby. Mine them before the storm passes!</li>
-          <li><b>ALIEN RAIDERS</b>: raider packs ambush you in deep space after a short warning. Hold <kbd>F</kbd> (or <b>FIRE</b> on phone) — your laser auto-locks the nearest raider. Their hits also chew through hull HP. Destroy them for coins, ore, Guild rep and contracts, or boost away until they jump out.</li>
-          <li><b>UNKNOWN VESSELS</b>: friendly alien ships from other star systems cruise deep space. Fly close and press <kbd>E</kbd> (or tap <b>HAIL</b>) to talk — first contact with each species pays credits, Cartographer rep and codex data.</li></ul></section>
+          <li><b>ALIEN RAIDERS</b>: raider packs hunt you while you fly between worlds, arriving after a short warning. Hold <kbd>F</kbd> (or <b>FIRE</b> on phone) — your laser auto-locks the nearest raider. Their hits also chew through hull HP. Destroy them for coins, ore, Guild rep and contracts, or boost away until they jump out.</li>
+          <li><b>UNKNOWN VESSELS</b>: friendly alien ships from other star systems cruise the spacelanes. Fly close and press <kbd>E</kbd> (or tap <b>HAIL</b>) to talk — first contact with each species pays credits, Cartographer rep and codex data.</li></ul></section>
         <section><h3>📱 PHONE &amp; TABLET</h3><ul>
           <li>Left side: drag the <b>joystick</b> to fly or walk.</li>
           <li>Right side: <b>swipe</b> to look and steer.</li>
@@ -4685,7 +4685,7 @@ const raiderBodyGeo=merge([
 ]);
 const raiderEyeGeo=new THREE.OctahedronGeometry(0.34,0);
 const raiderGlowGeo=new THREE.OctahedronGeometry(0.5,0);
-const RAIDER={active:false,warnT:0,fightT:0,nextIn:68+Math.random()*32,list:[],bolts:[],fx:[],uid:0,audioT:0,chatterT:0,
+const RAIDER={active:false,warnT:0,fightT:0,nextIn:16+Math.random()*18,list:[],bolts:[],fx:[],uid:0,audioT:0,chatterT:0,
   boltGeo:new THREE.OctahedronGeometry(0.3,0),
   boltMat:new THREE.MeshBasicMaterial({color:0xff5ccf,transparent:true,opacity:.95,blending:THREE.AdditiveBlending,depthWrite:false})};
 const _rv0=new V3(),_rv1=new V3(),_rv2=new V3(),_rv3=new V3(),_rvx=new V3(),_rvp=new V3(),_rnp=new V3(),_rm=new M4();
@@ -4711,7 +4711,7 @@ function makeRaider(i,count){
   const right=new V3().crossVectors(fwd,AY);if(right.lengthSq()<1e-4)right.set(1,0,0);right.normalize();
   const up=new V3().crossVectors(right,fwd).normalize();
   g.position.copy(ship.group.position)
-    .addScaledVector(fwd,148+Math.random()*45)
+    .addScaledVector(fwd,118+Math.random()*38)
     .addScaledVector(right,(i-(count-1)/2)*52)
     .addScaledVector(up,(Math.random()-.5)*26);
   g.scale.setScalar(0.05);
@@ -4746,7 +4746,7 @@ function endRaiderWave(retreat=true,silent=false){
   }
   for(const r of RAIDER.list){if(r.mk)r.mk.remove();if(r.group.parent)r.group.parent.remove(r.group);}
   RAIDER.list.length=0;clearRaiderBolts();
-  RAIDER.active=false;RAIDER.warnT=0;RAIDER.fightT=0;RAIDER.nextIn=92+Math.random()*58;
+  RAIDER.active=false;RAIDER.warnT=0;RAIDER.fightT=0;RAIDER.nextIn=45+Math.random()*35;
   if(!silent&&retreat)toast('🛸 THE RAIDERS JUMPED OUT — SPACE IS QUIET AGAIN');
 }
 function boom(pos,color,scale=1){
@@ -4825,11 +4825,11 @@ function destroyRaider(r){
   saveGame(true);
 }
 function canSpawnRaider(){
-  if(!started||PL.mode!=='fly'||modalOpen||photoMode||CINE.open||tutActive())return false;
+  if(!started||PL.mode!=='fly'||modalOpen||photoMode||CINE.open||tutStep===0)return false;
   if(PL.stormActive||PL.pollenActive)return false;
   const b=PL.near;
   if(b&&(b.kind==='sun'||b.kind==='blackhole'))return false;
-  if(b&&PL.alt<landRange(b)+45)return false;
+  if(b&&PL.alt<landRange(b)+10)return false;
   return true;
 }
 function updateRaiders(dt){
@@ -4851,8 +4851,7 @@ function updateRaiders(dt){
   const sp=ship.group.position;
   if(!RAIDER.active){
     SFX.setAlien(false,0,0);
-    if(tutActive())RAIDER.nextIn=Math.max(RAIDER.nextIn,35);
-    else RAIDER.nextIn-=dt;
+    RAIDER.nextIn-=dt;
     if(RAIDER.nextIn<=0&&canSpawnRaider())startRaiderWave();
     return;
   }
@@ -4877,7 +4876,8 @@ function updateRaiders(dt){
       .addScaledVector(_rv3,Math.sin(r.ang)*r.R*0.34);
     const dx=_rv0.x-r.group.position.x,dy=_rv0.y-r.group.position.y,dz=_rv0.z-r.group.position.z;
     const dd=Math.hypot(dx,dy,dz)||1;
-    const step=Math.min(dd,108*dt);
+    const chase=dd>95?190:dd>45?135:108;
+    const step=Math.min(dd,chase*dt);
     r.group.position.x+=dx/dd*step;r.group.position.y+=dy/dd*step;r.group.position.z+=dz/dd*step;
     _rv0.copy(sp).sub(r.group.position);
     const dist=_rv0.length()||1;_rv0.multiplyScalar(1/dist);
@@ -4944,7 +4944,7 @@ const NPC_SPECIES=[
   {species:'MORROW KIN',color:0x76a8ff,ring:true,lines:['Morrow watches the frontier. The raiders grow bold near the rim.','Carry light into the empty places. We will know your name.']},
   {species:'XEN-9',color:0xffd23f,ring:false,lines:['Unit XEN-9 acknowledges a non-hostile carbon vessel.','Our charts end here. Perhaps yours continue.']}
 ];
-const NPC={list:[],nextIn:28+Math.random()*30,uid:0};
+const NPC={list:[],nextIn:20+Math.random()*24,uid:0};
 
 function ensureNpcMarker(n){
   if(n.mk||!markersEl)return;
@@ -4989,11 +4989,11 @@ function makeNpc(i,count,sp){
   return npc;
 }
 function canSpawnNpc(){
-  if(!started||PL.mode!=='fly'||modalOpen||photoMode||CINE.open||tutActive())return false;
+  if(!started||PL.mode!=='fly'||modalOpen||photoMode||CINE.open)return false;
   if(RAIDER.active||PL.stormActive||PL.pollenActive)return false;
   const b=PL.near;
   if(b&&(b.kind==='sun'||b.kind==='blackhole'))return false;
-  if(b&&PL.alt<landRange(b)+40)return false;
+  if(b&&PL.alt<landRange(b)+12)return false;
   return true;
 }
 function spawnNpcConvoy(){
@@ -5058,8 +5058,7 @@ function updateNpcs(dt){
   if(modalOpen||photoMode||CINE.open)return;
   const sp=ship.group.position;
   if(!NPC.list.length){
-    if(tutActive())NPC.nextIn=Math.max(NPC.nextIn,25);
-    else NPC.nextIn-=dt;
+    NPC.nextIn-=dt;
     if(NPC.nextIn<=0&&canSpawnNpc())spawnNpcConvoy();
     return;
   }
