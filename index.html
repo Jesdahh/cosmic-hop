@@ -99,6 +99,8 @@ html,body{margin:0;height:100%;overflow:hidden;background:var(--space);color:var
 #reticle{position:fixed;left:50%;top:46%;width:26px;height:26px;margin:-13px 0 0 -13px;border:2.5px solid rgba(255,247,224,.7);border-radius:50%;pointer-events:none;z-index:4;display:none;transition:transform .1s,border-color .1s}
 #reticle::after{content:'';position:absolute;left:50%;top:50%;width:4px;height:4px;margin:-2px 0 0 -2px;background:var(--sun);border-radius:50%}
 #reticle.lock{display:block;border-color:var(--mint);transform:scale(1.25);box-shadow:0 0 10px var(--mint)}
+#reticle.foe{border-color:#ff4d6d;box-shadow:0 0 12px #ff4d6d}
+#reticle.foe::after{background:#ff4d6d}
 #reticle.show{display:block}
 
 /* World Markers */
@@ -108,6 +110,8 @@ html,body{margin:0;height:100%;overflow:hidden;background:var(--space);color:var
 .mk.off b{border-radius:3px;transform:rotate(45deg)}
 .mk.bh b{width:15px;height:15px;background:#140c1f!important;box-shadow:0 0 0 2px #ff922b}
 .mk.wp b{background:var(--sun)!important;border-radius:2px;transform:rotate(45deg)}
+.mk.foe b{background:#ff4d6d!important;border-radius:3px;transform:rotate(45deg);box-shadow:0 0 8px #ff4d6d}
+.mk.foe span{color:#ffd1ec}
 
 /* Prompt & Comic Toasts & Floating Popups */
 #prompt{position:absolute;left:50%;bottom:calc(96px + env(safe-area-inset-bottom,0px));transform:translateX(-50%) rotate(-1deg);font-size:18px;text-align:center;max-width:min(620px,88vw);opacity:0;transition:opacity .2s;z-index:7}
@@ -571,7 +575,8 @@ body.photoMode #ui{opacity:0!important}
           <li><b>PHOTO MODE</b>: <kbd>P</kbd> hides the HUD, <kbd>ENTER</kbd> captures. Photograph creatures for Star Cartographer contracts.</li>
           <li><b>FACTIONS</b>: rescues, salvage, photos and discoveries earn reputation and daily / weekly contracts. Claim them in <b>LOG → FACTIONS</b>.</li>
           <li><b>BASES</b>: press <kbd>E</kbd> at an outpost for storage, farms and teleporters. Visit your bases from the <b>MAP</b>.</li>
-          <li><b>STORM RUSH</b>: when a solar storm hits, glowing storm crystals erupt nearby. Mine them before the storm passes!</li></ul></section>
+          <li><b>STORM RUSH</b>: when a solar storm hits, glowing storm crystals erupt nearby. Mine them before the storm passes!</li>
+          <li><b>ALIEN RAIDERS</b>: raider packs ambush you in deep space after a short warning. Hold <kbd>F</kbd> (or <b>FIRE</b> on phone) — your laser auto-locks the nearest raider. Destroy them for coins, ore, Guild rep and contracts, or boost away until they jump out.</li></ul></section>
         <section><h3>📱 PHONE &amp; TABLET</h3><ul>
           <li>Left side: drag the <b>joystick</b> to fly or walk.</li>
           <li>Right side: <b>swipe</b> to look and steer.</li>
@@ -861,7 +866,11 @@ const SFX=(()=>{
     eat(){if(fx('eat'))return;tone(320,200,0.08,'square',0.09);tone(300,180,0.08,'square',0.09,0.13);tone(520,780,0.18,'triangle',0.1,0.28);},
     hurt(){if(fx('hurt'))return;thump();tone(260,70,0.35,'sawtooth',0.14);},
     splash(){if(fx('splash'))return;if(!ctx||muted)return;tone(500,140,0.25,'sine',0.08);},
-    coin(){if(fx('coin'))return;tone(988,988,0.07,'square',0.07);tone(1319,1319,0.2,'square',0.07,0.06);}
+    coin(){if(fx('coin'))return;tone(988,988,0.07,'square',0.07);tone(1319,1319,0.2,'square',0.07,0.06);},
+    raiderShot(){if(fx('raiderShot'))return;tone(540,120,0.16,'sawtooth',0.06);},
+    raiderHit(){if(fx('raiderHit'))return;tone(1500,340,0.09,'square',0.07);},
+    shieldHit(){if(fx('shieldHit'))return;tone(190,90,0.24,'sawtooth',0.1);tone(940,300,0.18,'triangle',0.05,0.02);},
+    explode(){if(fx('explode'))return;thump();tone(170,38,0.5,'sawtooth',0.16);tone(64,28,0.6,'sine',0.18,0.02);}
   };
 })();
 
@@ -1178,7 +1187,7 @@ function recordDiscovery(cat,name,planet,detail){
 
 /* ---- ELYSIAN VEIL: living-system state, HUD, titles & restoration ---- */
 const GAME={title:'',achievements:[],milestones:[],contracts:[],contractSeed:0,outposts:[],sysVisited:['solara'],seenElysian:false,
-  rep:{guild:0,veilkeepers:0,cartographers:0},factionContracts:[],factionSeed:{day:0,week:0},tamed:[],photoLog:[],catReward:{},poiState:{},treasure:[],crew:0};
+  rep:{guild:0,veilkeepers:0,cartographers:0},factionContracts:[],factionSeed:{day:0,week:0},tamed:[],photoLog:[],catReward:{},poiState:{},treasure:[],crew:0,raiderKills:0};
 const ELYS={nodes:[],beams:[],bloom:null,core:null,petals:[],plantMats:[],restored:false,beamGroup:null};
 const CINE={open:false,t:0};
 const ELYS_NODE_COST={fe:15,ae:5,lum:3};
@@ -1189,7 +1198,8 @@ const ACH_LIST=[
   {id:'grid',name:'POWER GRID',desc:'Bring all 5 Energy Network nodes online.'},
   {id:'biologist',name:'VEIL BIOLOGIST',desc:'Catalogue all 25 Elysian species.'},
   {id:'explorer',name:'GALACTIC EXPLORER',desc:'Complete every expedition mission.'},
-  {id:'eternal',name:'ETERNAL EXPLORER',desc:'Restore the Eternal Bloom.'}
+  {id:'eternal',name:'ETERNAL EXPLORER',desc:'Restore the Eternal Bloom.'},
+  {id:'raider',name:'VOID HUNTER',desc:'Destroy an alien raider in ship-to-ship combat.'}
 ];
 const MILESTONES=[
   {id:'ms_d10',name:'FIELD NOTES',desc:'Log 10 discoveries.',req:()=>DISCOVERIES.length>=10,reward:{gold:80,rp:2}},
@@ -1214,6 +1224,7 @@ function checkAchievements(){
   if(elysSpeciesCount()>=25)grantAch('biologist');
   if(MISSIONS.every(m=>m.done))grantAch('explorer');
   if(ELYS.restored)grantAch('eternal');
+  if((GAME.raiderKills||0)>=1)grantAch('raider');
 }
 function checkMilestones(){
   let changed=false;
@@ -1260,6 +1271,7 @@ const FACTION_POOL={
     {type:'salvage',goal:3,label:'SALVAGE 3 WRECKS OR PROBES',desc:'Recover frontier technology from crash sites and derelicts.'},
     {type:'rescue',goal:1,label:'RESCUE 1 STRANDED SURVIVOR',desc:'Bring a lost colonist back to the Guild relay.'},
     {type:'build',goal:1,label:'CONSTRUCT 1 OUTPOST',desc:'Establish a permanent Guild foothold on any world.'},
+    {type:'combat',goal:2,label:'DESTROY 2 ALIEN RAIDERS',desc:'Defend the frontier shipping lanes from alien raider packs.'},
     {type:'deliver',k:'fe',goal:25,label:'DELIVER 25 FERRITE',desc:'Stockpile structural ferrite for Guild repair yards.'}
   ],
   veilkeepers:[
@@ -3806,7 +3818,7 @@ function readInput(){
 let ship,astro;
 const PL={mode:'fly',vel:new V3(),speed:0,near:null,alt:1e9,body:null,local:new V3(),L:null,T:null,lookIdle:9,jumpQ:false,hotT:0,
   shield:100,jetFuel:100,stormActive:false,stormTimer:240,stormDur:0,stormWarned:false,pollenActive:false,pollenTimer:300,pollenDur:0,pollenWarned:false,
-  hazardExposed:false,hazUiT:0,rebootGrace:0,currentSys:SYSTEMS[0],mineTimer:0,targetNode:null,nearInteract:null,sheltered:false};
+  hazardExposed:false,hazUiT:0,rebootGrace:0,currentSys:SYSTEMS[0],mineTimer:0,targetNode:null,targetFoe:null,nearInteract:null,sheltered:false};
 const orbit={yaw:0,pitch:0.4};
 const camUp=new V3(0,1,0),carry=new V3();
 const _f=new V3(),_u=new V3(),_r=new V3(),_a=new V3(),_b=new V3(),_c=new V3(),_e=new V3(),_g=new V3(),_q=new Q(),_m=new M4();
@@ -4355,6 +4367,7 @@ function renderStarMap(){
 /* ---- 2.2s Hyperspace Tunnel Transition & Active System Switching ---- */
 function switchActiveSystem(sysId){
   activeSystemId=sysId;
+  endRaiderWave(false,true);
   clearAllStormCrystals();
   const sys=SYSTEMS.find(s=>s.id===sysId)||SYSTEMS[0];
   PL.currentSys=sys;
@@ -4400,6 +4413,7 @@ function triggerHyperspaceTransition(b,interSystem){
 }
 
 function warpToBody(b){
+  endRaiderWave(false,true);
   if(PL.mode==='walk'||PL.mode==='rover'){astro.group.visible=false;rover.active=false;}
   PL.mode='fly';PL.L=null;PL.T=null;ship.gear.visible=false;
   const outDir=new V3(0.6,0.35,0.7).normalize();
@@ -4426,7 +4440,7 @@ function saveGame(silent=false){
       vitals:{hp:Math.round(PL.hp),food:Math.round(PL.food)},
       elys:{nodes:ELYS.nodes.map(n=>({id:n.id,activated:n.activated,pylons:n.pylons.map(p=>p.lit)})),restored:ELYS.restored},
       game:{title:GAME.title,achievements:GAME.achievements,milestones:GAME.milestones,contracts:GAME.contracts,contractSeed:GAME.contractSeed,outposts:GAME.outposts,sysVisited:GAME.sysVisited,seenElysian:GAME.seenElysian,
-        rep:GAME.rep,factionContracts:GAME.factionContracts,factionSeed:GAME.factionSeed,tamed:GAME.tamed,photoLog:GAME.photoLog,catReward:GAME.catReward,poiState:GAME.poiState,treasure:GAME.treasure,crew:GAME.crew},
+        rep:GAME.rep,factionContracts:GAME.factionContracts,factionSeed:GAME.factionSeed,tamed:GAME.tamed,photoLog:GAME.photoLog,catReward:GAME.catReward,poiState:GAME.poiState,treasure:GAME.treasure,crew:GAME.crew,raiderKills:GAME.raiderKills},
       hazard:{stormActive:PL.stormActive,stormTimer:PL.stormTimer,stormWarned:PL.stormWarned,pollenActive:PL.pollenActive,pollenTimer:PL.pollenTimer,pollenWarned:PL.pollenWarned}
     };
     localStorage.setItem('cosmic_hop_gf_save',JSON.stringify(data));
@@ -4485,6 +4499,7 @@ function loadGame(){
       GAME.poiState=data.game.poiState&&typeof data.game.poiState==='object'?data.game.poiState:{};
       GAME.treasure=Array.isArray(data.game.treasure)?data.game.treasure.filter(t=>t&&t.id&&t.body&&Array.isArray(t.dir)):[];
       GAME.crew=clamp(+data.game.crew||0,0,999);
+      GAME.raiderKills=clamp(+data.game.raiderKills||0,0,99999);
       for(const op of GAME.outposts)ensureOutpostDefaults(op);
     }
     if(data.hazard){
@@ -4555,23 +4570,35 @@ function updateMining(dt){
   }
 
   PL.targetNode=bestTarget;
+  let foeTarget=null,foeDist=285;
+  if(PL.mode==='fly'&&RAIDER.active)for(const r of RAIDER.list){
+    if(r.dead)continue;
+    const d=ref.distanceTo(r.group.position);
+    if(d<foeDist){foeDist=d;foeTarget=r;}
+  }
+  PL.targetFoe=foeTarget;
+  const aim=foeTarget?{kind:'raider',raider:foeTarget,worldPos:foeTarget.group.position}:bestTarget;
   const ret=$('reticle');
-  ret.classList.toggle('show',started&&!modalOpen&&(PL.mode==='walk'||PL.mode==='rover'||!!bestTarget));
-  ret.classList.toggle('lock',!!bestTarget);
+  ret.classList.toggle('show',started&&!modalOpen&&(PL.mode==='walk'||PL.mode==='rover'||!!aim));
+  ret.classList.toggle('lock',!!aim);
+  ret.classList.toggle('foe',!!foeTarget);
 
-  if(input.mine && bestTarget){
+  if(input.mine && aim){
     SFX.setLaser(true,PL.mineTimer);
     const startPos=PL.mode==='walk'?ref.clone().addScaledVector(astro.dir,0.85):(PL.mode==='rover'?ref.clone().addScaledVector(rover.dir,1.0):ship.group.position.clone());
     laserBeam.visible=true;
     laserBeam.position.copy(startPos);
-    laserBeam.lookAt(bestTarget.worldPos);
-    laserBeam.scale.set(1,1,startPos.distanceTo(bestTarget.worldPos));
-    laserBeam.material.color.setHex(RES_META[bestTarget.type].color);
+    laserBeam.lookAt(aim.worldPos);
+    laserBeam.scale.set(1,1,startPos.distanceTo(aim.worldPos));
+    laserBeam.material.color.setHex(aim.kind==='raider'?0xff4d6d:RES_META[aim.type].color);
 
     const power=1+(UPGRADES.tool.lvl-1)*0.45;
     PL.mineTimer+=dt*power;
     if(PL.mineTimer>=0.52){
       PL.mineTimer=0;
+      if(aim.kind==='raider'){
+        damageRaider(aim.raider,1+(UPGRADES.tool.lvl>=3?1:0));
+      }else{
       const yieldAmt=1+Math.floor((UPGRADES.tool.lvl-1)*0.75);
       const meta=RES_META[bestTarget.type];
       INV[bestTarget.type]+=yieldAmt;
@@ -4600,11 +4627,258 @@ function updateMining(dt){
         bestTarget.ast.hp--;
         if(bestTarget.ast.hp<=0){bestTarget.ast.depleted=true;bestTarget.ast.mesh.visible=false;bestTarget.ast.respawnT=45;}
       }
+      }
     }
   }else{
     laserBeam.visible=false;
     SFX.setLaser(false,0);
     PL.mineTimer=Math.max(0,PL.mineTimer-dt*0.8);
+  }
+}
+
+/* ---- Alien raider waves: short warning, skirmish window, then they jump out ---- */
+const raiderBodyGeo=merge([
+  [new THREE.OctahedronGeometry(1,1),0x3a1d55,Mx(0,0,0,0,0,0,0.95,0.58,2.3)],
+  [new THREE.BoxGeometry(1.35,0.1,0.62),0x6b3d91,Mx(-0.92,0.02,0.35,0,0,0.32)],
+  [new THREE.BoxGeometry(1.35,0.1,0.62),0x6b3d91,Mx(0.92,0.02,0.35,0,0,-0.32)],
+  [new THREE.SphereGeometry(0.44,8,6),0x150a20,Mx(0,0.34,-0.9,0,0,0,1,0.72,1.5)],
+  [new THREE.BoxGeometry(0.09,0.72,0.95),0xff4d6d,Mx(0,0.5,1.15)],
+  [new THREE.ConeGeometry(0.14,1.1,6),0xff4d6d,Mx(-0.55,0,-2.05,-Math.PI/2,0,0)],
+  [new THREE.ConeGeometry(0.14,1.1,6),0xff4d6d,Mx(0.55,0,-2.05,-Math.PI/2,0,0)],
+  [new THREE.CylinderGeometry(0.2,0.2,0.72,8),0x2a1238,Mx(-0.62,0,1.55,Math.PI/2,0,0)],
+  [new THREE.CylinderGeometry(0.2,0.2,0.72,8),0x2a1238,Mx(0.62,0,1.55,Math.PI/2,0,0)]
+]);
+const raiderEyeGeo=new THREE.OctahedronGeometry(0.34,0);
+const raiderGlowGeo=new THREE.OctahedronGeometry(0.5,0);
+const RAIDER={active:false,warnT:0,fightT:0,nextIn:68+Math.random()*32,list:[],bolts:[],fx:[],uid:0,
+  boltGeo:new THREE.OctahedronGeometry(0.3,0),
+  boltMat:new THREE.MeshBasicMaterial({color:0xff5ccf,transparent:true,opacity:.95,blending:THREE.AdditiveBlending,depthWrite:false})};
+const _rv0=new V3(),_rv1=new V3(),_rv2=new V3(),_rv3=new V3(),_rvx=new V3(),_rvp=new V3(),_rm=new M4();
+
+function ensureRaiderMarker(r){
+  if(r.mk||!markersEl)return;
+  const el=document.createElement('div');
+  el.className='mk foe';el.innerHTML='<b></b><span></span>';el.style.display='none';
+  markersEl.appendChild(el);r.mk=el;
+}
+function makeRaider(i,count){
+  const g=new THREE.Group();
+  const hull=new THREE.Mesh(raiderBodyGeo,new THREE.MeshToonMaterial({vertexColors:true,gradientMap:gradTex,emissive:0x2d0b3a,emissiveIntensity:0.55}));
+  addOutline(hull,OL_PROP);g.add(hull);
+  const eye=new THREE.Mesh(raiderEyeGeo,new THREE.MeshBasicMaterial({color:0xff4d6d}));
+  eye.position.set(0,0.03,-2.75);g.add(eye);
+  const glows=[];
+  for(const sx of [-0.62,0.62]){
+    const gl=new THREE.Mesh(raiderGlowGeo,new THREE.MeshBasicMaterial({color:0xc77dff,transparent:true,opacity:.9}));
+    gl.position.set(sx,0,2.02);g.add(gl);glows.push(gl);
+  }
+  const fwd=new V3(0,0,-1).applyQuaternion(ship.group.quaternion);
+  const right=new V3().crossVectors(fwd,AY);if(right.lengthSq()<1e-4)right.set(1,0,0);right.normalize();
+  const up=new V3().crossVectors(right,fwd).normalize();
+  g.position.copy(ship.group.position)
+    .addScaledVector(fwd,148+Math.random()*45)
+    .addScaledVector(right,(i-(count-1)/2)*52)
+    .addScaledVector(up,(Math.random()-.5)*26);
+  g.scale.setScalar(0.05);
+  scene.add(g);
+  const hp=5+(UPGRADES.ship.lvl>=4?2:0);
+  return {id:++RAIDER.uid,group:g,glows,eye,hp,maxHp:hp,dead:false,spawnT:0,ang:Math.random()*TAU,
+    spin:(Math.random()<.5?-1:1)*(0.3+Math.random()*.28),R:52+Math.random()*34,
+    fireT:1.2+Math.random()*1.6,flashT:0,mk:null};
+}
+function startRaiderWave(){
+  if(RAIDER.active||!started||PL.mode!=='fly')return false;
+  const lvl=UPGRADES.ship.lvl;
+  const count=1+(lvl>=3?1:0)+(lvl>=5?1:0);
+  RAIDER.active=true;RAIDER.warnT=5;RAIDER.fightT=42;RAIDER.list=[];
+  for(let i=0;i<count;i++)RAIDER.list.push(makeRaider(i,count));
+  for(const r of RAIDER.list)ensureRaiderMarker(r);
+  SFX.warp();
+  comicPop('🚨 ALIEN RAIDERS INBOUND!','#ff4d6d',50,34);
+  toast(`🚨 ${count} ALIEN RAIDER${count>1?'S':''} INBOUND — ${touchUI?'HOLD FIRE':'HOLD F'} WHEN THEY ENGAGE`);
+  return true;
+}
+function clearRaiderBolts(){
+  for(const b of RAIDER.bolts)scene.remove(b.mesh);
+  RAIDER.bolts.length=0;
+}
+function endRaiderWave(retreat=true,silent=false){
+  if(!RAIDER.active){
+    for(const r of RAIDER.list){if(r.mk)r.mk.remove();if(r.group.parent)r.group.parent.remove(r.group);}
+    RAIDER.list.length=0;clearRaiderBolts();return;
+  }
+  for(const r of RAIDER.list){if(r.mk)r.mk.remove();if(r.group.parent)r.group.parent.remove(r.group);}
+  RAIDER.list.length=0;clearRaiderBolts();
+  RAIDER.active=false;RAIDER.warnT=0;RAIDER.fightT=0;RAIDER.nextIn=92+Math.random()*58;
+  if(!silent&&retreat)toast('🛸 THE RAIDERS JUMPED OUT — SPACE IS QUIET AGAIN');
+}
+function boom(pos,color,scale=1){
+  const m=new THREE.Mesh(new THREE.IcosahedronGeometry(1,1),new THREE.MeshBasicMaterial({color,transparent:true,opacity:.95,blending:THREE.AdditiveBlending,depthWrite:false}));
+  m.position.copy(pos);m.scale.setScalar(scale*0.4);scene.add(m);
+  RAIDER.fx.push({m,t:0,s:scale});
+}
+function spawnRaiderBolt(r){
+  const aim=ship.group.position.clone().addScaledVector(PL.vel,0.22);
+  aim.x+=(Math.random()-.5)*10;aim.y+=(Math.random()-.5)*8;aim.z+=(Math.random()-.5)*10;
+  const dir=aim.sub(r.group.position);
+  const len=dir.length()||1;dir.multiplyScalar(1/len);
+  const mesh=new THREE.Mesh(RAIDER.boltGeo,RAIDER.boltMat);
+  mesh.position.copy(r.group.position).addScaledVector(dir,3.2);
+  mesh.scale.set(1,1,2.4);
+  scene.add(mesh);
+  RAIDER.bolts.push({mesh,vel:dir.multiplyScalar(90),life:0});
+  SFX.raiderShot();
+}
+function raiderHitShip(n){
+  if(PL.mode!=='fly'||RAIDER.warnT>0)return;
+  const dmg=Math.max(6,n-UPGRADES.ship.lvl*1.2);
+  camShake=Math.max(camShake,0.55);
+  if(navigator.vibrate&&(!navigator.userActivation||navigator.userActivation.hasBeenActive))navigator.vibrate(20);
+  const absorbed=Math.min(PL.shield,dmg);
+  PL.shield=Math.max(0,PL.shield-absorbed);
+  const rest=dmg-absorbed;
+  if(absorbed>0)SFX.shieldHit();
+  if(rest>0.5){
+    const hf=$('hurtFx');hf.classList.remove('go');void hf.offsetWidth;hf.classList.add('go');
+    hurt(rest*0.6,null,true);SFX.hurt();
+  }
+  if(PL.shield<=0&&uTime.value-(PL.hullWarnT||-99)>7){PL.hullWarnT=uTime.value;toast('⚠️ SHIELDS DOWN — HULL EXPOSED! EVADE OR DESTROY THE RAIDERS');}
+}
+function updateRaiderBolts(dt){
+  for(let i=RAIDER.bolts.length-1;i>=0;i--){
+    const b=RAIDER.bolts[i];b.life+=dt;
+    b.mesh.position.addScaledVector(b.vel,dt);
+    b.mesh.rotation.z+=dt*6;b.mesh.rotation.x+=dt*3;
+    const hit=b.mesh.position.distanceTo(ship.group.position)<5.6;
+    if(hit){raiderHitShip(16);boom(b.mesh.position,0xff6b9a,0.45);}
+    if(hit||b.life>4.2){scene.remove(b.mesh);RAIDER.bolts.splice(i,1);}
+  }
+}
+function damageRaider(r,n){
+  if(!r||r.dead)return;
+  r.hp-=n;r.flashT=0.18;
+  boom(r.group.position,0xffd166,0.28);
+  if(r.hp<=0)destroyRaider(r);else SFX.raiderHit();
+}
+function destroyRaider(r){
+  if(r.dead)return;
+  r.dead=true;
+  if(r.mk){r.mk.remove();r.mk=null;}
+  r.group.visible=false;
+  boom(r.group.position,0xffb27a,1.1);
+  boom(_rvx.copy(r.group.position).add(_rv0.set(1.5,0.4,0)),0xff4d6d,0.6);
+  SFX.explode();
+  const first=!(GAME.raiderKills||0);
+  GAME.raiderKills=(GAME.raiderKills||0)+1;
+  const gold=Math.round(55+Math.random()*30+UPGRADES.ship.lvl*8);
+  earnGold(gold,true);
+  INV.rp=(INV.rp||0)+1;
+  if(Math.random()<0.55)INV.so=(INV.so||0)+1;else INV.ae=(INV.ae||0)+2;
+  if(Math.random()<0.18)INV.storm=(INV.storm||0)+1;
+  updateResHUD();
+  factionProgress('combat',1);grantRep('guild',7);
+  if(first)recordDiscovery('Combat','Alien Raider','Deep Space','A hostile alien raider skiff destroyed in ship-to-ship combat over the frontier.');
+  comicPop(`☠ RAIDER DOWN! +${gold} 🪙`,'#ff4d6d',50,36);
+  checkAchievements();checkMilestones();
+  if(RAIDER.list.every(x=>x.dead)){
+    const bonus=50+RAIDER.list.length*25;
+    earnGold(bonus,true);INV.rp=(INV.rp||0)+2;updateResHUD();
+    endRaiderWave(false,true);
+    comicPop('SECTOR SECURED!','#5df2c0',50,42);
+    toast(`✅ RAIDER PACK DESTROYED! +${bonus} 🪙 · +2 RP`);
+  }
+  saveGame(true);
+}
+function canSpawnRaider(){
+  if(!started||PL.mode!=='fly'||modalOpen||photoMode||CINE.open||tutActive())return false;
+  if(PL.stormActive||PL.pollenActive)return false;
+  const b=PL.near;
+  if(b&&(b.kind==='sun'||b.kind==='blackhole'))return false;
+  if(b&&PL.alt<landRange(b)+45)return false;
+  return true;
+}
+function updateRaiders(dt){
+  for(let i=RAIDER.fx.length-1;i>=0;i--){
+    const f=RAIDER.fx[i];f.t+=dt;
+    const k=Math.min(1,f.t/0.65);
+    f.m.scale.setScalar(f.s*(0.4+k*9));
+    f.m.material.opacity=Math.max(0,0.95*(1-k));
+    if(k>=1){scene.remove(f.m);f.m.material.dispose();f.m.geometry.dispose();RAIDER.fx.splice(i,1);}
+  }
+  if(!started)return;
+  if(PL.mode!=='fly'){
+    if(RAIDER.active)endRaiderWave(false,true);
+    if(RAIDER.bolts.length)clearRaiderBolts();
+    return;
+  }
+  if(modalOpen||photoMode||CINE.open)return;
+  const sp=ship.group.position;
+  if(!RAIDER.active){
+    if(tutActive())RAIDER.nextIn=Math.max(RAIDER.nextIn,35);
+    else RAIDER.nextIn-=dt;
+    if(RAIDER.nextIn<=0&&canSpawnRaider())startRaiderWave();
+    return;
+  }
+  if(RAIDER.warnT>0){
+    RAIDER.warnT-=dt;
+    if(RAIDER.warnT<=0){RAIDER.warnT=0;SFX.alarm();comicPop('RAIDERS ENGAGING!','#ff4d6d',50,34);toast('⚠️ RAIDERS ENGAGING — HOLD FIRE!');}
+  }else{
+    RAIDER.fightT-=dt;
+    if(RAIDER.fightT<=0){endRaiderWave(true);return;}
+  }
+  _rv1.set(0,0,-1).applyQuaternion(ship.group.quaternion);
+  _rv2.crossVectors(_rv1,AY);if(_rv2.lengthSq()<1e-4)_rv2.set(1,0,0);_rv2.normalize();
+  _rv3.crossVectors(_rv2,_rv1).normalize();
+  let alive=0;
+  const t=uTime.value;
+  for(const r of RAIDER.list){
+    if(r.dead)continue;
+    alive++;
+    r.spawnT+=dt;r.flashT=Math.max(0,r.flashT-dt);r.ang+=r.spin*dt;
+    _rv0.copy(sp).addScaledVector(_rv1,22)
+      .addScaledVector(_rv2,Math.cos(r.ang)*r.R)
+      .addScaledVector(_rv3,Math.sin(r.ang)*r.R*0.34);
+    const dx=_rv0.x-r.group.position.x,dy=_rv0.y-r.group.position.y,dz=_rv0.z-r.group.position.z;
+    const dd=Math.hypot(dx,dy,dz)||1;
+    const step=Math.min(dd,108*dt);
+    r.group.position.x+=dx/dd*step;r.group.position.y+=dy/dd*step;r.group.position.z+=dz/dd*step;
+    _rv0.copy(sp).sub(r.group.position);
+    const dist=_rv0.length()||1;_rv0.multiplyScalar(1/dist);
+    const up=Math.abs(_rv0.dot(AY))>0.94?AX:AY;
+    r.group.quaternion.setFromRotationMatrix(setBasis(_rm,_rvx.set(0,0,0),_rv0,up));
+    r.group.rotateZ(Math.sin(t*3+r.id)*0.15);
+    const sc=Math.min(1,r.spawnT/0.7);
+    const pop=r.flashT>0?1+r.flashT*0.9:1;
+    r.group.scale.setScalar((0.05+0.95*sc*sc)*pop);
+    for(let gi=0;gi<r.glows.length;gi++)r.glows[gi].scale.setScalar(0.85+Math.sin(t*11+gi*2.1+r.id)*0.25);
+    if(RAIDER.warnT<=0&&r.spawnT>1.1&&dist<210){
+      r.fireT-=dt;
+      if(r.fireT<=0){r.fireT=2.2+Math.random()*1.2;spawnRaiderBolt(r);}
+    }
+  }
+  if(alive===0){endRaiderWave(false,true);return;}
+  updateRaiderBolts(dt);
+}
+function updateRaiderMarkers(){
+  camera.updateMatrixWorld();
+  const show=started&&PL.mode==='fly'&&!photoMode;
+  for(const r of RAIDER.list){
+    if(r.dead){if(r.mk)r.mk.style.display='none';continue;}
+    ensureRaiderMarker(r);
+    const el=r.mk;if(!el)continue;
+    if(!show){el.style.display='none';continue;}
+    _rvp.copy(r.group.position).applyMatrix4(camera.matrixWorldInverse);
+    const behind=_rvp.z>0;
+    _rvp.applyMatrix4(camera.projectionMatrix);
+    let x=_rvp.x,y=_rvp.y;
+    if(behind){x=-x;y=-y;}
+    let off=behind||Math.abs(x)>0.95||Math.abs(y)>0.9;
+    if(off){const k=1/Math.max(Math.abs(x)/0.95,Math.abs(y)/0.88,1e-4);if(behind||k<1){x*=k;y*=k;}}
+    const d=r.group.position.distanceTo(ship.group.position);
+    el.style.display='';
+    el.className='mk foe'+(off?' off':'');
+    el.style.transform=`translate(${((x*0.5+0.5)*innerWidth).toFixed(1)}px,${((-y*0.5+0.5)*innerHeight).toFixed(1)}px) translate(-50%,${off?'-50%':'-135%'})`;
+    el.lastChild.textContent=`☠ ${Math.round(d)}`;
   }
 }
 
@@ -4761,7 +5035,7 @@ function updateEcosystemAndHazards(dt,t){
       hurt(10,null,true);
     }
   }else{
-    PL.shield=Math.min(100,PL.shield+(PL.sheltered?18:9)*dt);
+    PL.shield=Math.min(100,PL.shield+(PL.sheltered?18:(RAIDER.active?4:9))*dt);
   }
 
   // Quiet hazard HUD: chip with countdown + small note beside the HP bar
@@ -4928,6 +5202,7 @@ function tryLand(){
   if(_f.lengthSq()<0.01)_f.copy(tangentBasis(site)[0]);_f.normalize();
   const q1=new Q().setFromRotationMatrix(setBasis(_m,_a.set(0,0,0),_f,site));
   const r1=b.groundR(site.x,site.y,site.z)+ship.restH;
+  endRaiderWave(false,true);
   PL.D={b,d0:d0.clone(),site:site.clone(),r0,r1,q0:ship.group.quaternion.clone(),q1,t:0,dur:clamp((r0-r1)/22+2.2,2.8,7)};
   PL.body=b;PL.mode='descend';PL.speed=0;PL.vel.set(0,0,0);orbit.yaw=0;orbit.pitch=0.42;ship.gear.visible=true;
   $('entryFx').classList.add('on');
@@ -5202,6 +5477,7 @@ function hurt(n,msg,quiet){
 }
 function knockOut(){
   if(uTime.value-(PL.koT||-99)<2)return;PL.koT=uTime.value;
+  endRaiderWave(false,true);
   const lost=Math.floor((INV.gold||0)*0.1);INV.gold=(INV.gold||0)-lost;
   PL.hp=60;PL.food=Math.max(PL.food,50);
   if(PL.mode==='rover')exitRover();
@@ -5296,6 +5572,8 @@ function updateHUD(dt){
   if(m==='walk'||m==='rover'){locEl.textContent=PL.body.name;subEl.textContent=(m==='rover'?'ROVER':'ON FOOT')+(PL.sheltered?' · 🛡️ SHELTERED':' · '+(PL.body.blurb||''));}
   else if(m==='landed'){locEl.textContent=PL.body.name;subEl.textContent='LANDED · 🛡️ SHIP SHELTER';}
   else if(m==='descend'){locEl.textContent=PL.body.name;subEl.textContent='ATMOSPHERIC DESCENT · ALT '+Math.max(0,Math.round(PL.alt));}
+  else if(RAIDER.active&&RAIDER.warnT>0){locEl.textContent='⚠ RAIDERS INBOUND';subEl.textContent='ENGAGE IN '+Math.ceil(RAIDER.warnT)+'s · EVASIVE READY';}
+  else if(RAIDER.active){locEl.textContent='⚠ COMBAT ZONE';subEl.textContent=RAIDER.list.filter(r=>!r.dead).length+' HOSTILE'+(RAIDER.list.filter(r=>!r.dead).length===1?'':'S')+' · '+Math.ceil(RAIDER.fightT)+'s BEFORE THEY JUMP';}
   else if(b&&PL.alt<b.R*2.5+80){locEl.textContent=b.name;subEl.textContent='ALT '+Math.max(0,Math.round(PL.alt))+' · SPD '+Math.round(PL.speed);}
   else{locEl.textContent='DEEP SPACE';subEl.textContent='SPD '+Math.round(PL.speed)+(b?' · NEAREST '+b.name:'');}
   spdBar.style.width=(m==='fly'?clamp(Math.abs(PL.speed)/390,0,1)*100:0)+'%';
@@ -5308,8 +5586,12 @@ function updateHUD(dt){
   linesEl.style.opacity=(m==='fly'&&input.boost&&PL.speed>60)?clamp((PL.speed-60)/200,0,0.8):0;
 
   const canLand=m==='fly'&&b&&b.landable&&PL.alt<landRange(b);
-  if(m==='fly'){setBtn(bLand,'LAND',false,!canLand,canLand);setBtn(bExit,'EXIT',true);setBtn(bBoost,'BOOST',false);setBtn(bMine,'MINE',false,!PL.targetNode,!!PL.targetNode);
-    if(PL.targetNode)setPrompt(`${key('F')}HOLD TO MINE ${RES_META[PL.targetNode.type].label}`);
+  if(m==='fly'){const foes=RAIDER.active?RAIDER.list.filter(r=>!r.dead).length:0;
+    setBtn(bLand,'LAND',false,!canLand,canLand);setBtn(bExit,'EXIT',true);setBtn(bBoost,'BOOST',false);
+    setBtn(bMine,RAIDER.active?'FIRE':'MINE',false,!RAIDER.active&&!PL.targetNode,!!RAIDER.active||!!PL.targetNode);
+    if(RAIDER.active&&RAIDER.warnT>0)setPrompt(`🚨 ALIEN RAIDERS INBOUND — ENGAGE IN ${Math.ceil(RAIDER.warnT)}s`);
+    else if(RAIDER.active)setPrompt(`${key('F')}HOLD FIRE · ${foes} RAIDER${foes===1?'':'S'} · ${Math.ceil(RAIDER.fightT)}s`);
+    else if(PL.targetNode)setPrompt(`${key('F')}HOLD TO MINE ${RES_META[PL.targetNode.type].label}`);
     else if(canLand)setPrompt(`${key('L')}LAND ON ${b.name}`);
     else if(b&&b.kind==='blackhole'&&PL.alt<380)setPrompt(`ORBIT ACCRETION RIM & HOLD ${key('F')}TO MINE VOID SHARDS!`);
     else if(b&&!b.landable&&b.kind==='gas'&&PL.alt<b.R*0.6)setPrompt(`${b.name} IS ALL CLOUD — LAND ON ONE OF ITS MOONS`);
@@ -5390,6 +5672,7 @@ function frame(dt){
   if(started){
     updateVitals(dt);
     updateCoins(dt);
+    updateRaiders(dt);
     updateMining(dt);
     updateEcosystemAndHazards(dt,simT);
   }
@@ -5418,7 +5701,7 @@ function frame(dt){
   skyGroup.position.copy(camera.position);
   const camAlt=PL.near?Math.max(0,camera.position.distanceTo(PL.near.center)-PL.near.R):1e3;
   camera.near=clamp(camAlt*0.03,0.14,2.5);camera.updateProjectionMatrix();
-  updateHUD(dt);updateMarkers(ref);updatePoiMarker();
+  updateHUD(dt);updateMarkers(ref);updateRaiderMarkers();updatePoiMarker();
   renderer.render(scene,camera);
 }
 function resize(){renderer.setSize(innerWidth,innerHeight,false);camera.aspect=innerWidth/innerHeight;baseFov=camera.aspect<1?76:62;camera.updateProjectionMatrix();}
@@ -5544,7 +5827,7 @@ $('importFile').addEventListener('change',e=>{
 if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)){
   addEventListener('load',()=>{navigator.serviceWorker.register('./sw.js',{updateViaCache:'none'}).then(r=>r.update()).catch(()=>{});});
 }
-window.__game={COINS,SKIN,earnGold,PL,bodies,INV,UPGRADES,MISSIONS,DISCOVERIES,ELYS,GAME,get ship(){return ship;},get astro(){return astro;},actLand,actExit,warpToBody,switchActiveSystem,triggerScan,handleInteract,keys,look,camera,frame,spawnStormCrystals,clearAllStormCrystals,openBase,openVaultCode,tameCreature,readTreasureMap,placeOutpostOnPlanet};
+window.__game={COINS,SKIN,earnGold,PL,bodies,INV,UPGRADES,MISSIONS,DISCOVERIES,ELYS,GAME,RAIDER,get ship(){return ship;},get astro(){return astro;},actLand,actExit,warpToBody,switchActiveSystem,triggerScan,handleInteract,keys,look,camera,frame,spawnStormCrystals,clearAllStormCrystals,openBase,openVaultCode,tameCreature,readTreasureMap,placeOutpostOnPlanet,startRaiderWave,endRaiderWave,damageRaider,canSpawnRaider};
 </script>
 </body>
 </html>
