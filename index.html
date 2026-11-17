@@ -40,7 +40,7 @@ html,body{margin:0;height:100%;overflow:hidden;background:var(--space);color:var
 #jetBar{background:linear-gradient(90deg,#ffd23f,#ff922b)}
 
 /* Mission Tracker Pill under Panel */
-#missionCard{left:max(12px,env(safe-area-inset-left,0px));top:max(138px,calc(env(safe-area-inset-top,0px) + 132px));transform:rotate(0.8deg);max-width:255px;padding:6px 10px;pointer-events:auto;cursor:pointer}
+#missionCard{left:max(12px,env(safe-area-inset-left,0px));top:max(156px,calc(env(safe-area-inset-top,0px) + 150px));transform:rotate(0.8deg);max-width:255px;padding:6px 10px;pointer-events:auto;cursor:pointer}
 #mTitle{font-size:15px;color:var(--pop);line-height:1.1}
 #mDesc{font-family:var(--sans);font-size:11px;font-weight:700;margin-top:2px;line-height:1.3}
 #mProg{font-family:var(--sans);font-size:11px;font-weight:800;color:#2b7a5b;margin-top:2px}
@@ -70,6 +70,15 @@ html,body{margin:0;height:100%;overflow:hidden;background:var(--space);color:var
 .resDot{width:10px;height:10px;border-radius:50%;border:2px solid var(--ink)}
 
 /* Solar Storm & Gravity Warning Overlays */
+#hurtFx{position:fixed;inset:0;pointer-events:none;z-index:4;opacity:0;background:radial-gradient(ellipse at center,rgba(255,40,70,0) 45%,rgba(255,30,60,.6) 100%)}
+#hurtFx.go{animation:hurtA .7s ease-out}
+@keyframes hurtA{0%{opacity:1}100%{opacity:0}}
+#hpBar{background:linear-gradient(90deg,#ff4d6d,#ff8fa3)}
+#foodBar{background:linear-gradient(90deg,#ff922b,#ffd23f)}
+.barRow.low .meter{animation:lowA .6s infinite alternate}
+@keyframes lowA{to{border-color:#ff4d6d;box-shadow:0 0 6px #ff4d6d}}
+.tapPill{cursor:pointer;padding:1px 5px;border-radius:7px;background:#fff;border:2px solid var(--ink)}
+.tapPill:active{transform:translateY(1px)}
 #stormFx{position:fixed;inset:0;pointer-events:none;z-index:3;opacity:0;transition:opacity .35s;
   background:radial-gradient(circle at 50% 50%,transparent 48%,rgba(255,120,20,.25) 82%,rgba(255,40,70,.55) 100%)}
 #stormFx.on{opacity:1;animation:stormPulse 1.1s ease-in-out infinite alternate}
@@ -193,6 +202,12 @@ html,body{margin:0;height:100%;overflow:hidden;background:var(--space);color:var
 #contBtn{background:var(--sun);transform:rotate(-1.5deg)}
 #play:disabled{background:#cfc8c0;cursor:progress}
 #err{color:#fff;background:var(--pop);border:3px solid var(--ink);border-radius:8px;padding:6px 12px;font-size:15px;max-width:90vw;white-space:pre-wrap}
+#topRight{max-width:calc(100vw - 290px)}
+@media (max-width:900px){
+  .hudBtn .lbl{display:none}
+  #panel{min-width:0;max-width:190px}
+  #topRight{max-width:calc(100vw - 222px)}
+}
 @media (max-width:640px){
   #btns{transform:scale(.82);transform-origin:100% 100%}
   #stick{width:128px;height:128px}
@@ -200,6 +215,40 @@ html,body{margin:0;height:100%;overflow:hidden;background:var(--space);color:var
   #missionCard{top:max(122px,calc(env(safe-area-inset-top,0px) + 116px));max-width:210px}
   #resTray{font-size:10.5px;gap:6px;padding:4px 7px}
   .hudBtn{font-size:14px;padding:5px 7px}
+}
+.hudBtn#btnFull{display:none}
+.touch .hudBtn#btnFull.can{display:inline-flex}
+/* ---- Phones & short screens held sideways: compact full-screen landscape HUD ---- */
+@media (orientation:landscape) and (max-height:520px){
+  #panel{padding:4px 9px;min-width:0;max-width:200px}
+  #sysTag{font-size:9.5px}
+  #loc{font-size:16px}
+  #sub{font-size:10px}
+  .barRow{margin-top:2px}
+  .meter{height:6px}
+  #missionCard{max-width:210px;padding:4px 8px}
+  #mTitle{font-size:12.5px}
+  #mDesc{display:none}
+  #mProg{font-size:10px}
+  #topRight{gap:5px;max-width:calc(100vw - 250px)}
+  #btnRow{gap:4px}
+  .hudBtn{font-size:13px;padding:4px 7px;border-width:2.5px;box-shadow:2px 3px 0 var(--ink)}
+  .hudBtn .lbl{display:none}
+  #resTray{font-size:10px;gap:5px;padding:3px 7px}
+  #btns{transform:scale(.76);transform-origin:100% 100%}
+  #stick{transform:scale(.76)}
+  #prompt{bottom:calc(12px + env(safe-area-inset-bottom,0px));font-size:14px;max-width:44vw}
+  #toast{top:28%;font-size:clamp(20px,4.2vw,38px)}
+  .mCard{max-height:94vh;width:min(900px,90vw)}
+  .mHead{padding:5px 12px}
+  .mHead h2{font-size:19px}
+  .mBody{padding:9px}
+  .tabBtn{font-size:14px;padding:3px 9px}
+  .shopPrev{height:70px}.shopPrev svg{height:62px}
+  #start{gap:6px}
+  #start h1{font-size:clamp(38px,15vh,80px)}
+  #start .subTitle{font-size:18px}
+  #start p{font-size:13px}
 }
 .sRow{display:flex;align-items:center;justify-content:space-between;gap:14px;margin:10px 0;font-family:var(--display);font-size:20px;letter-spacing:.05em}
 .sRow input[type=range]{flex:1;max-width:280px;height:28px;accent-color:#ff4d6d;touch-action:none}
@@ -211,6 +260,7 @@ html,body{margin:0;height:100%;overflow:hidden;background:var(--space);color:var
 <body>
 <canvas id="game" tabindex="0" aria-label="Cosmic Hop Galactic Frontier"></canvas>
 <div id="stormFx"></div>
+<div id="hurtFx"></div>
 <div id="warpFx"></div>
 <div id="reticle"></div>
 <div id="popLayer"></div>
@@ -226,6 +276,7 @@ html,body{margin:0;height:100%;overflow:hidden;background:var(--space);color:var
     <div id="sub">&nbsp;</div>
     <div class="barRow"><span class="barLbl">SPD</span><div class="meter"><i id="spdBar"></i></div></div>
     <div class="barRow"><span class="barLbl">SHD</span><div class="meter"><i id="shdBar"></i></div></div>
+    <div class="barRow" id="vitRow"><span class="barLbl">HP</span><div class="meter"><i id="hpBar" style="width:100%"></i></div><span class="barLbl" style="width:auto">🍗</span><div class="meter"><i id="foodBar" style="width:100%"></i></div></div>
     <div class="barRow" id="jetRow" style="display:none"><span class="barLbl">JET</span><div class="meter"><i id="jetBar"></i></div></div>
   </div>
 
@@ -238,15 +289,18 @@ html,body{margin:0;height:100%;overflow:hidden;background:var(--space);color:var
   <div id="topRight">
     <div id="btnRow">
       <button class="hudBtn paper" id="btnMute" title="Mute Audio">🔊</button>
+      <button class="hudBtn paper" id="btnFull" title="Full screen">⛶</button>
       <button class="hudBtn paper" id="btnSettings" title="Sound &amp; performance (O)">⚙️</button>
-      <button class="hudBtn gold" id="btnShop" title="Coin Shop (K)">🪙 SHOP</button>
-      <button class="hudBtn void" id="btnCraft" title="Craft & Outposts (B)">🔨 BUILD</button>
-      <button class="hudBtn mint" id="btnUpgrade" title="Upgrade Tech Bay (U)">🛠️ TECH</button>
-      <button class="hudBtn paper" id="btnJournal" title="Discovery Journal & Settings (J)">📘 LOG</button>
-      <button class="hudBtn sky" id="btnMap" title="Galactic Star Map (M)">🌌 MAP · ★<span id="pcount">0</span>/<span id="ptotal">0</span></button>
+      <button class="hudBtn gold" id="btnShop" title="Coin Shop (K)">🪙<span class="lbl"> SHOP</span></button>
+      <button class="hudBtn void" id="btnCraft" title="Craft & Outposts (B)">🔨<span class="lbl"> BUILD</span></button>
+      <button class="hudBtn mint" id="btnUpgrade" title="Upgrade Tech Bay (U)">🛠️<span class="lbl"> TECH</span></button>
+      <button class="hudBtn paper" id="btnJournal" title="Discovery Journal & Settings (J)">📘<span class="lbl"> LOG</span></button>
+      <button class="hudBtn sky" id="btnMap" title="Galactic Star Map (M)">🌌<span class="lbl"> MAP ·</span> ★<span id="pcount">0</span>/<span id="ptotal">0</span></button>
     </div>
     <div id="resTray">
       <div class="resPill" id="goldPill" title="Gold Coins">🪙 <span id="rGold">0</span></div>
+      <div class="resPill tapPill" id="foodPill" title="Tap to eat (G)">🍎 <span id="rFood">0</span></div>
+      <div class="resPill tapPill" id="medPill" title="Tap to use medkit (H)">💊 <span id="rMed">0</span></div>
       <div class="resPill" title="Ferrite (Common)"><span class="resDot" style="background:#ff922b"></span>FE: <span id="rFe">0</span></div>
       <div class="resPill" title="Aetherium (Uncommon)"><span class="resDot" style="background:#39c6ff"></span>AE: <span id="rAe">0</span></div>
       <div class="resPill" title="Solarite (Rare)"><span class="resDot" style="background:#ffd23f"></span>SO: <span id="rSo">0</span></div>
@@ -259,7 +313,7 @@ html,body{margin:0;height:100%;overflow:hidden;background:var(--space);color:var
   <div id="help" class="box">
     <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> fly/walk/rover · <kbd>MOUSE</kbd> steer · <kbd>SHIFT</kbd> boost<br>
     <kbd>L</kbd> land/launch · <kbd>E</kbd> exit/board/interact · <kbd>SPACE</kbd> jump/jetpack<br>
-    <kbd>F</kbd>/<kbd>CLICK</kbd> mine · <kbd>C</kbd> scan · <kbd>U</kbd> tech · <kbd>B</kbd> craft/build · <kbd>M</kbd> map · <kbd>J</kbd> log · <kbd>K</kbd> 🪙 shop
+    <kbd>F</kbd>/<kbd>CLICK</kbd> mine · <kbd>C</kbd> scan · <kbd>U</kbd> tech · <kbd>B</kbd> craft/build · <kbd>M</kbd> map · <kbd>J</kbd> log · <kbd>K</kbd> 🪙 shop · <kbd>G</kbd> eat · <kbd>H</kbd> medkit
   </div>
 
   <div id="stick"><div id="knob"></div></div>
@@ -341,7 +395,7 @@ html,body{margin:0;height:100%;overflow:hidden;background:var(--space);color:var
     <div class="mTabs">
       <button class="tabBtn active" id="tabShopShip">🚀 ROCKETS</button>
       <button class="tabBtn" id="tabShopAstro">🧑‍🚀 SUITS</button>
-      <button class="tabBtn" id="tabShopTrade">💱 SELL ORE</button>
+      <button class="tabBtn" id="tabShopTrade">🍎 SUPPLIES &amp; SELL ORE</button>
     </div>
     <div class="mBody"><div class="uGrid" id="shopGrid"></div></div>
   </div>
@@ -534,6 +588,9 @@ const SFX=(()=>{
     discover(){if(fx('discover'))return;[523,659,784,1046].forEach((f,i)=>tone(f,f,0.22,'triangle',0.16,i*0.08));},
     land(){if(fx('land'))return;thump();},
     ui(){if(fx('ui'))return;tone(660,880,0.07,'square',0.08);},
+    eat(){if(fx('eat'))return;tone(320,200,0.08,'square',0.09);tone(300,180,0.08,'square',0.09,0.13);tone(520,780,0.18,'triangle',0.1,0.28);},
+    hurt(){if(fx('hurt'))return;thump();tone(260,70,0.35,'sawtooth',0.14);},
+    splash(){if(fx('splash'))return;if(!ctx||muted)return;tone(500,140,0.25,'sine',0.08);},
     coin(){if(fx('coin'))return;tone(988,988,0.07,'square',0.07);tone(1319,1319,0.2,'square',0.07,0.06);}
   };
 })();
@@ -745,7 +802,7 @@ function updateOrbits(t){
 }
 
 /* ---- Player Inventory, Consumables & Upgrades (Levels 1-5) ---- */
-const INV={fe:30,ae:12,so:5,vd:0,shieldCell:1,jetCell:1,scanMod:0,outpostKit:1,gold:0};
+const INV={fe:30,ae:12,so:5,vd:0,shieldCell:1,jetCell:1,scanMod:0,outpostKit:1,gold:0,berry:0,fruit:0,ration:2,medkit:1};
 const GOLD_RATE={fe:1,ae:2,so:4,vd:6};
 function earnGold(n,pop){
   if(!(n>0))return;INV.gold=(INV.gold||0)+n;updateResHUD();SFX.coin();
@@ -768,7 +825,7 @@ const UPGRADES={
 };
 function updateResHUD(){
   $('rFe').textContent=INV.fe;$('rAe').textContent=INV.ae;$('rSo').textContent=INV.so;$('rVd').textContent=INV.vd;
-  $('rGold').textContent=INV.gold||0;$('shopGold').textContent=INV.gold||0;
+  $('rGold').textContent=INV.gold||0;$('rFood').textContent=(INV.berry||0)+(INV.fruit||0)+(INV.ration||0);$('rMed').textContent=INV.medkit||0;$('shopGold').textContent=INV.gold||0;
 }
 
 /* ---- Exploration Missions & Discovery Journal ---- */
@@ -1243,6 +1300,7 @@ function buildLiving(b,cfg){
       bridgeM.push(setBasis(new M4(),_p.copy(_d).multiplyScalar(R+r.height(a)),_t,_d));}
   }
   if(bridgeM.length){const im=instanced(G.bridge(segLen),vcToonI,bridgeM);addOutline(im);D.add(im);}
+  b.roads=roads;
 
   const themes=[[0xff6b6b,0xffa94d,0xffd43b],[0x4dabf7,0x3bc9db,0x91a7ff],[0xb197fc,0xf783ac,0xe599f7],[0x69db7c,0xa9e34b,0x38d9a9],[0xffd43b,0xff922b,0xf06595]];
   const bM=[],bC=[],pM=[],pC=[],sM=[],lM=[],lC=[];
@@ -1820,11 +1878,23 @@ const coinGeo=new THREE.CylinderGeometry(0.42,0.42,0.1,18);coinGeo.rotateX(Math.
 let coinMat=null;
 const COINS=[];let coinSpawnT=3;
 const _cv=new V3(),_cf=new V3(),_cs=new V3(),_cq=new Q(),_cq2=new Q(),_cY=new V3(0,1,0),_cZero=new V3();
-function spawnCoin(body,local,scale,space){
+let berryGeo=null,fruitGeo=null;
+function foodMesh(kind){
+  if(!berryGeo){
+    berryGeo=merge([[new THREE.SphereGeometry(0.16,8,6),0xff2d55,Mx(-0.12,0.18,0)],[new THREE.SphereGeometry(0.16,8,6),0xff4d6d,Mx(0.12,0.18,0.04)],[new THREE.SphereGeometry(0.15,8,6),0xd6003a,Mx(0,0.2,-0.13)],
+      [new THREE.ConeGeometry(0.22,0.12,6),0x2ec46a,Mx(0,0.36,0)],[new THREE.CylinderGeometry(0.02,0.02,0.18,4),0x2b7a3b,Mx(0,0.46,0)]]);
+    fruitGeo=merge([[new THREE.SphereGeometry(0.26,10,8),0xffa94d,Mx(0,0.26,0,0,0,0,1,1.15,1)],[new THREE.ConeGeometry(0.17,0.3,8),0xffc078,Mx(0,0.6,0)],
+      [new THREE.CylinderGeometry(0.025,0.025,0.16,4),0x6b4226,Mx(0,0.78,0)],[new THREE.SphereGeometry(0.1,6,4),0x5df2c0,Mx(0.1,0.8,0,0,0,0,1.4,0.4,0.8)]]);
+  }
+  const m=new THREE.Mesh(kind==='berry'?berryGeo:fruitGeo,kind==='berry'?vcToon:new THREE.MeshToonMaterial({vertexColors:true,gradientMap:gradTex,emissive:0xff7a1e,emissiveIntensity:0.35}));
+  addOutline(m,OL_BIG);return m;
+}
+function spawnCoin(body,local,scale,space,kind='coin'){
   if(!coinMat)coinMat=toon(0xffd23f,{emissive:0xb07800,emissiveIntensity:0.55});
-  const m=new THREE.Mesh(coinGeo,coinMat);addOutline(m,OL_BIG);m.scale.setScalar(scale);scene.add(m);
+  const m=kind==='coin'?new THREE.Mesh(coinGeo,coinMat):foodMesh(kind);if(kind==='coin')addOutline(m,OL_BIG);m.scale.setScalar(kind==='coin'?scale:1.6);scene.add(m);
   const base=new Q();if(!space)base.setFromUnitVectors(_cY,_cv.copy(local).normalize());
-  COINS.push({mesh:m,body,local:local.clone(),base,spin:Math.random()*TAU,space,r:scale*1.9,t:0});
+  if(kind!=='coin')local=local.clone().addScaledVector(_cv,-0.75);
+  COINS.push({mesh:m,body,local:local.clone(),base,spin:Math.random()*TAU,space,r:kind==='coin'?scale*1.9:1.4,t:0,kind});
 }
 function dropCoin(i){scene.remove(COINS[i].mesh);COINS.splice(i,1);}
 const _cR=new V3();
@@ -1839,7 +1909,8 @@ function updateCoins(dt){
       if(COINS.filter(c=>c.body===b&&!c.space).length<7){
         const [e1,e2]=tangentBasis(up),ang=Math.random()*TAU,arc=(7+Math.random()*16)/b.R;
         const d=_cs.copy(up).multiplyScalar(Math.cos(arc)).addScaledVector(e1,Math.sin(arc)*Math.cos(ang)).addScaledVector(e2,Math.sin(arc)*Math.sin(ang)).normalize();
-        if(!(b.liquid&&!b.liquidSolid&&b.heightAt(d.x,d.y,d.z)<-0.28))spawnCoin(b,d.clone().multiplyScalar(b.groundR(d.x,d.y,d.z)+0.8),1,false);
+        const food=b.creatures&&b.creatures.length>0&&COINS.filter(c=>c.body===b&&c.kind!=='coin').length<4&&Math.random()<0.5;
+        if(!(b.liquid&&!b.liquidSolid&&b.heightAt(d.x,d.y,d.z)<-0.28))spawnCoin(b,d.clone().multiplyScalar(surfR(b,d)+0.8),1,false,food?(Math.random()<0.65?'berry':'fruit'):'coin');
       }
     }else if(m==='fly'&&Math.abs(PL.speed)>6&&!COINS.some(c=>c.space)){
       const an=PL.near&&PL.alt<PL.near.R*2.5+60?PL.near:null,ctr=an?an.center:_cZero;
@@ -1859,7 +1930,10 @@ function updateCoins(dt){
     c.spin+=dt*3;c.mesh.quaternion.copy(c.base).multiply(_cq2.setFromAxisAngle(_cY,c.spin));
     const d=c.mesh.position.distanceTo(refPos);
     if(d>260){dropCoin(i);continue;}
-    if(d<c.r+(m==='rover'?1.6:m==='fly'?2.5:0.6)){dropCoin(i);earnGold(5,true);comicPop('+5 🪙','#ffd23f',50,36);}
+    if(d<c.r+(m==='rover'?1.6:m==='fly'?2.5:0.6)){dropCoin(i);
+      if(c.kind==='coin'){earnGold(5,true);comicPop('+5 🪙','#ffd23f',50,36);}
+      else{INV[c.kind]=(INV[c.kind]||0)+1;SFX.eat();updateResHUD();comicPop(c.kind==='berry'?'+1 🍓 GLOW BERRIES':'+1 🍐 STAR FRUIT','#ff922b',50,36);
+        if(!PL.foodTip){PL.foodTip=1;toast('FOOD COLLECTED! PRESS [G] OR TAP 🍎 TO EAT');}}}
   }
 }
 
@@ -1936,7 +2010,7 @@ function deployRover(b,dir){
   toast('NOMAD ROVER DEPLOYED! [E] TO DRIVE');
 }
 function placeRover(b){
-  const gr=b.groundR(rover.dir.x,rover.dir.y,rover.dir.z);
+  const gr=surfR(b,rover.dir);
   rover.localPos.copy(rover.dir).multiplyScalar(gr);
   rover.mesh.position.copy(rover.localPos);
   rover.mesh.quaternion.setFromRotationMatrix(setBasis(_m,_a.set(0,0,0),rover.face,rover.dir));
@@ -2054,6 +2128,8 @@ addEventListener('keydown',e=>{
   if(e.code==='Space'||e.code.startsWith('Arrow')||e.code==='Tab')e.preventDefault();
   if(!started)return;
   if(e.code==='Escape'){closeModals();return;}
+  if(e.code==='KeyG'&&!modalOpen){eatFood();return;}
+  if(e.code==='KeyH'&&!modalOpen){useMedkit();return;}
   if(e.code==='KeyK'){if($('shopModal').classList.contains('open'))closeModals();else{SFX.init();renderShop();openModal('shopModal');}return;}
   if(e.code==='KeyU'){if($('upgradeModal').classList.contains('open'))closeModals();else{SFX.init();renderUpgrades();openModal('upgradeModal');}return;}
   if(e.code==='KeyB'){if($('craftModal').classList.contains('open'))closeModals();else{SFX.init();renderCraftModal();openModal('craftModal');}return;}
@@ -2167,6 +2243,11 @@ function renderShop(){
   updateResHUD();
   const grid=$('shopGrid');grid.innerHTML='';const gold=INV.gold||0;
   if(shopTab==='trade'){
+    const SUP=[{k:'ration',p:20,l:'🥫 SPACE RATION',d:'+50 FOOD. Essential on barren worlds with no fruit.'},{k:'medkit',p:40,l:'💊 MEDKIT',d:'+50 HEALTH instantly. Use with [H] or tap 💊.'}];
+    SUP.forEach((d,i)=>{const ok=gold>=d.p;const card=document.createElement('div');card.className='uCard';
+      card.innerHTML=`<div><div class="uTitle"><span>${d.l}</span><span class="uLvl">HAVE ${INV[d.k]||0}</span></div><div class="uDesc" style="margin-top:6px">${d.d}</div></div>
+      <div><button class="uBtn buy" data-sup="${i}" ${ok?'':'disabled'}>${ok?'BUY · '+d.p+' 🪙':'NEED '+(d.p-gold)+' MORE 🪙'}</button></div>`;grid.appendChild(card);});
+    grid.querySelectorAll('[data-sup]').forEach(b=>b.addEventListener('click',()=>{const d=SUP[+b.dataset.sup];if((INV.gold||0)<d.p)return;INV.gold-=d.p;INV[d.k]=(INV[d.k]||0)+1;SFX.coin();updateResHUD();saveGame(true);renderShop();}));
     const DEALS=[{k:'fe',n:10,g:10,l:'FERRITE'},{k:'ae',n:10,g:25,l:'AETHERIUM'},{k:'so',n:5,g:30,l:'SOLARITE'},{k:'vd',n:2,g:30,l:'VOID SHARD'}];
     DEALS.forEach((d,i)=>{const ok=INV[d.k]>=d.n;const card=document.createElement('div');card.className='uCard';
       card.innerHTML=`<div><div class="uTitle"><span>${d.l}</span><span class="uLvl">HAVE ${INV[d.k]}</span></div><div class="uDesc" style="margin-top:6px">Sell spare ore to the bazaar traders for gold coins.</div></div>
@@ -2478,7 +2559,8 @@ function saveGame(silent=false){
       discoveries:DISCOVERIES.slice(0,40),
       missions:MISSIONS.map(m=>({id:m.id,prog:m.prog,done:m.done})),
       sys:activeSystemId,
-      skins:SKIN
+      skins:SKIN,
+      vitals:{hp:Math.round(PL.hp),food:Math.round(PL.food)}
     };
     localStorage.setItem('cosmic_hop_gf_save',JSON.stringify(data));
     if(!silent)toast('EXPEDITION PROGRESS SAVED!');
@@ -2490,6 +2572,7 @@ function loadGame(){
     if(!raw)return false;
     const data=JSON.parse(raw);
     if(data.inv)Object.assign(INV,data.inv);
+    if(data.vitals){PL.hp=clamp(+data.vitals.hp||100,20,100);PL.food=clamp(+data.vitals.food||100,0,100);}
     if(data.skins){
       if(Array.isArray(data.skins.ownedShip))SKIN.ownedShip=data.skins.ownedShip.filter(id=>SHIP_SKINS.some(s=>s.id===id));
       if(Array.isArray(data.skins.ownedAstro))SKIN.ownedAstro=data.skins.ownedAstro.filter(id=>ASTRO_SKINS.some(s=>s.id===id));
@@ -2659,7 +2742,7 @@ function updateEcosystemAndHazards(dt,t){
     PL.shield=Math.max(0,PL.shield-4.5*shieldResist*dt);
     if(PL.shield<=0){
       PL.shield=55;
-      toast('⚠️ SHIELD OVERLOAD! EMERGENCY REBOOT!');
+      toast('⚠️ SHIELD OVERLOAD! EMERGENCY REBOOT!');hurt(20,null);
       if(PL.mode==='walk'||PL.mode==='rover')enterShip();
     }
   }else{
@@ -2739,6 +2822,7 @@ function updateFly(dt){
   if(b&&b.kind!=='blackhole'){_a.subVectors(g.position,b.center);const r=_a.length();_a.multiplyScalar(1/r);
     const min=b.kind==='rocky'?b.groundR(_a.x,_a.y,_a.z)+1.4:b.kind==='sun'?b.R*1.14:b.R+2.5;
     if(r<min){g.position.copy(b.center).addScaledVector(_a,min);const vn=PL.vel.dot(_a);if(vn<0)PL.vel.addScaledVector(_a,-vn);PL.speed*=Math.exp(-dt*1.5);
+      if(b.kind==='rocky')shipImpact(-vn,_a);
       if(b.kind==='sun'&&uTime.value-PL.hotT>3){PL.hotT=uTime.value;toast('TOO HOT! 🔥');}}}
   ship.model.rotation.z=lerp(ship.model.rotation.z,clamp(yaw/Math.max(dt,1e-3)*0.4,-0.7,0.7),1-Math.exp(-dt*5));
   ship.model.rotation.x=lerp(ship.model.rotation.x,clamp(pitch/Math.max(dt,1e-3)*0.15,-0.3,0.3),1-Math.exp(-dt*5));
@@ -2827,8 +2911,8 @@ function enterShip(){
   astro.group.visible=false;PL.mode='landed';orbit.yaw=0;orbit.pitch=0.42;toast('ALL ABOARD!');
 }
 function placeAstro(b){
-  const A=astro,gr=b.groundR(A.dir.x,A.dir.y,A.dir.z);
-  A.group.position.copy(A.dir).multiplyScalar(gr+A.yOff);
+  const A=astro,gr=surfR(b,A.dir);
+  A.group.position.copy(A.dir).multiplyScalar(gr+A.yOff+(A.swim&&A.yOff<0.3?-0.42+Math.sin(uTime.value*2.5)*0.05:0));
   A.group.quaternion.setFromRotationMatrix(setBasis(_m,_a.set(0,0,0),A.face,A.dir));
 }
 function updateWalk(dt){
@@ -2837,21 +2921,23 @@ function updateWalk(dt){
   _r.crossVectors(A.view,up).normalize();
   _a.set(0,0,0).addScaledVector(A.view,input.my).addScaledVector(_r,input.mx);
   const ml=_a.length();let moving=false;
-  const gr0=b.groundR(A.dir.x,A.dir.y,A.dir.z);
+  const gr0=surfR(b,A.dir);
   if(ml>0.06){moving=true;if(ml>1)_a.multiplyScalar(1/ml);
     _b.copy(_a).normalize();A.face.lerp(_b,1-Math.exp(-dt*12));if(A.face.lengthSq()<1e-4)A.face.copy(_b);A.face.normalize();
-    const sp=4.2*(input.boost?1.9:1);
+    const sp=4.2*(input.boost?1.9:1)*(A.swim?0.5:1);
     _c.copy(A.dir).multiplyScalar(gr0).addScaledVector(_a,sp*dt);
     for(const c of b.colliders){const dx=_c.x-c.p.x,dy=_c.y-c.p.y,dz=_c.z-c.p.z,d2=dx*dx+dy*dy+dz*dz,rr=c.r+0.22;if(d2<rr*rr&&d2>1e-6){const d=Math.sqrt(d2),k=rr/d;_c.set(c.p.x+dx*k,c.p.y+dy*k,c.p.z+dz*k);}}
     {const dx=_c.x-PL.local.x,dy=_c.y-PL.local.y,dz=_c.z-PL.local.z,d2=dx*dx+dy*dy+dz*dz;if(d2<1.9*1.9&&d2>1e-6){const k=1.9/Math.sqrt(d2);_c.set(PL.local.x+dx*k,PL.local.y+dy*k,PL.local.z+dz*k);}}
     _c.normalize();
-    const h=b.heightAt(_c.x,_c.y,_c.z);
-    if(!(b.liquid&&!b.liquidSolid&&h<-0.28)){
-      _q.setFromUnitVectors(A.dir,_c);A.view.applyQuaternion(_q);A.face.applyQuaternion(_q);A.dir.copy(_c);}
+    {_q.setFromUnitVectors(A.dir,_c);A.view.applyQuaternion(_q);A.face.applyQuaternion(_q);A.dir.copy(_c);}
   }
   A.view.addScaledVector(A.dir,-A.view.dot(A.dir)).normalize();A.face.addScaledVector(A.dir,-A.face.dot(A.dir)).normalize();
 
-  if(PL.jumpQ&&A.yOff<=0.001){A.vy=5.5;SFX.jump();}PL.jumpQ=false;
+  {const hh=b.heightAt(A.dir.x,A.dir.y,A.dir.z),sw=b.liquid&&!b.liquidSolid&&hh<-0.28&&!onRoad(b,A.dir);
+    if(sw&&!A.swim&&A.yOff<0.3){SFX.splash();comicPop(b.hot?'SIZZLE!':'SPLASH!',b.hot?'#ff7a1e':'#39c6ff',50,46);}
+    A.swim=sw;
+    if(sw&&b.hot&&A.yOff<0.3)hurt(dt*22,uTime.value-(PL.lavaT||-9)>3?(PL.lavaT=uTime.value,'🔥 LAVA! GET OUT FAST!'):null,true);}
+  if(PL.jumpQ&&A.yOff<=0.001){A.vy=A.swim?3.2:5.5;SFX.jump();}PL.jumpQ=false;
   const jetDrain=40/(1+(UPGRADES.suit.lvl-1)*0.45);
   if(spaceHeld && A.yOff>0.12 && PL.jetFuel>0){
     A.vy=Math.min(A.vy+16.5*dt,6.8);
@@ -2880,7 +2966,7 @@ function updateRover(dt){
     const gr=b.groundR(rover.dir.x,rover.dir.y,rover.dir.z);
     _c.copy(rover.dir).multiplyScalar(gr).addScaledVector(rover.face,sp*dt).normalize();
     const h=b.heightAt(_c.x,_c.y,_c.z);
-    if(!(b.liquid&&!b.liquidSolid&&h<-0.28)){
+    if(!(b.liquid&&!b.liquidSolid&&h<-0.28&&!onRoad(b,_c))){
       _q.setFromUnitVectors(rover.dir,_c);
       rover.face.applyQuaternion(_q).normalize();
       rover.dir.copy(_c);
@@ -2958,6 +3044,79 @@ function updateMarkers(ref){
   }
 }
 let hudT=0;
+/* ---- Surfaces: roads & bridges are walkable ---- */
+function onRoad(b,d){
+  if(!b.roads)return false;
+  for(const rd of b.roads){if(Math.abs(d.x*rd.n.x+d.y*rd.n.y+d.z*rd.n.z)*b.R<0.75){const a=Math.atan2(d.dot(rd.e2),d.dot(rd.e1));if(rd.height(a)>b.heightAt(d.x,d.y,d.z)-0.05)return true;}}
+  return false;
+}
+function surfR(b,d){
+  let r=b.groundR(d.x,d.y,d.z);
+  if(b.roads)for(const rd of b.roads){if(Math.abs(d.x*rd.n.x+d.y*rd.n.y+d.z*rd.n.z)*b.R<0.75){const a=Math.atan2(d.dot(rd.e2),d.dot(rd.e1)),rh=b.R+rd.height(a);if(rh>r&&rh-r<3.2)r=rh;}}
+  return r;
+}
+
+/* ---- Health, hunger, food & crash impacts ---- */
+PL.hp=100;PL.food=100;PL.crashT=-9;let camShake=0;
+const FOODS=[{k:'berry',food:15,hp:0,label:'GLOW BERRIES',ic:'🍓'},{k:'fruit',food:30,hp:15,label:'STAR FRUIT',ic:'🍐'},{k:'ration',food:50,hp:5,label:'SPACE RATION',ic:'🥫'}];
+function hurt(n,msg,quiet){
+  if(!(n>0)||PL.mode==='landing'||PL.mode==='takeoff')return;
+  PL.hp=Math.max(0,PL.hp-n);
+  if(!quiet||Math.random()<0.08){const fx=$('hurtFx');fx.classList.remove('go');void fx.offsetWidth;fx.classList.add('go');}
+  if(!quiet)SFX.hurt();
+  if(msg)toast(msg);
+  if(PL.hp<=0)knockOut();
+}
+function knockOut(){
+  if(uTime.value-(PL.koT||-99)<2)return;PL.koT=uTime.value;
+  const lost=Math.floor((INV.gold||0)*0.1);INV.gold=(INV.gold||0)-lost;
+  PL.hp=60;PL.food=Math.max(PL.food,50);
+  if(PL.mode==='rover')exitRover();
+  if(PL.mode==='walk'){astro.group.visible=false;astro.swim=false;PL.mode='landed';orbit.yaw=0;orbit.pitch=0.42;}
+  updateResHUD();SFX.alarm();comicPop('KNOCKED OUT!','#ff4d6d',50,34);
+  toast(`💫 YOU BLACKED OUT! RESCUE DRONES CARRIED YOU TO THE SHIP${lost?` (−${lost} 🪙 FEE)`:''}`);
+  saveGame(true);
+}
+function shipImpact(v,n){
+  if(v<12||uTime.value-PL.crashT<0.8)return;
+  PL.crashT=uTime.value;
+  camShake=Math.min(1.6,v/70);
+  if(v<30){SFX.land();comicPop('SCRAPE!','#ffd23f',50,40);PL.speed*=0.7;return;}
+  const resist=1-(UPGRADES.ship.lvl-1)*0.12;
+  PL.vel.addScaledVector(n,v*0.55);PL.speed*=0.25;
+  PL.shield=Math.max(0,PL.shield-v*0.25);
+  comicPop(v>90?'KA-BOOM!!':'CRASH!','#ff4d6d',50,38);
+  hurt(clamp((v-25)*0.4*resist,4,70),v>90?'💥 HULL BREACH! SLOW DOWN NEAR PLANETS!':'💥 CRASH! WATCH YOUR SPEED!');
+}
+function eatFood(){
+  const f=FOODS.find(f=>(INV[f.k]||0)>0);
+  if(!f){toast('NO FOOD! PICK 🍓 BERRIES & 🍐 STAR FRUIT ON LIVING WORLDS OR BUY RATIONS IN THE 🪙 SHOP');return;}
+  if(PL.food>=97){toast('YOU ARE FULL!');return;}
+  INV[f.k]--;PL.food=Math.min(100,PL.food+f.food);PL.hp=Math.min(100,PL.hp+f.hp);
+  SFX.eat();comicPop(`${f.ic} +${f.food} FOOD`,'#ff922b',50,40);updateResHUD();
+}
+function useMedkit(){
+  if(!(INV.medkit>0)){toast('NO MEDKITS! BUY THEM IN THE 🪙 SHOP');return;}
+  if(PL.hp>=97){toast('HEALTH ALREADY FULL!');return;}
+  INV.medkit--;PL.hp=Math.min(100,PL.hp+50);SFX.upgrade();comicPop('💊 +50 HP','#ff4d6d',50,40);updateResHUD();
+}
+function updateVitals(dt){
+  if(modalOpen)return;
+  const onFoot=PL.mode==='walk'||PL.mode==='rover';
+  PL.food=Math.max(0,PL.food-dt*(onFoot?0.3:0.12));
+  if(PL.food<=0)hurt(dt*1.5,null,true);
+  else if(PL.food>40&&PL.hp<100)PL.hp=Math.min(100,PL.hp+dt*(PL.mode==='landed'?3:0.7));
+  if(PL.food<20&&uTime.value-(PL.hungerT||-99)>25){PL.hungerT=uTime.value;toast(PL.food<=0?'🍗 STARVING! LOSING HEALTH — EAT SOMETHING [G]':'🍗 GETTING HUNGRY — EAT FOOD [G]');}
+}
+const _sk=new V3();
+function applyCamShake(dt){
+  if(camShake<=0.01){camShake=0;return;}
+  _sk.set(Math.random()-0.5,Math.random()-0.5,Math.random()-0.5).multiplyScalar(camShake);
+  camera.position.add(_sk);camShake*=Math.exp(-dt*5);
+}
+$('foodPill').addEventListener('click',e=>{e.stopPropagation();if(started)eatFood();});
+$('medPill').addEventListener('click',e=>{e.stopPropagation();if(started)useMedkit();});
+
 const key=k=>touchUI?'':`<kbd>${k}</kbd> `;
 function setPrompt(html){if(html){if(promptEl.dataset.h!==html){promptEl.innerHTML=html;promptEl.dataset.h=html;}promptEl.classList.add('on');}else promptEl.classList.remove('on');}
 function setBtn(el,label,hidden,dim,pulse){if(el.textContent!==label)el.textContent=label;el.hidden=hidden;el.classList.toggle('dim',!!dim);el.classList.toggle('pulse',!!pulse);}
@@ -2970,6 +3129,9 @@ function updateHUD(dt){
   else{locEl.textContent='DEEP SPACE';subEl.textContent='SPD '+Math.round(PL.speed)+(b?' · NEAREST '+b.name:'');}
   spdBar.style.width=(m==='fly'?clamp(Math.abs(PL.speed)/390,0,1)*100:0)+'%';
   shdBar.style.width=PL.shield+'%';
+  spdBar.parentElement.parentElement.style.display=m==='fly'?'flex':'none';
+  {const mc=$('missionCard'),tr=$('topRight').getBoundingClientRect();let pb=$('panel').getBoundingClientRect().bottom;if(mc.getBoundingClientRect().right>tr.left-4)pb=Math.max(pb,tr.bottom);if(Math.abs((mc._t||0)-pb)>1){mc._t=pb;mc.style.top=(pb+10)+'px';}}
+  $('hpBar').style.width=PL.hp+'%';$('foodBar').style.width=PL.food+'%';$('vitRow').classList.toggle('low',PL.hp<30||PL.food<15);
   $('jetRow').style.display=m==='walk'?'flex':'none';
   jetBar.style.width=PL.jetFuel+'%';
   linesEl.style.opacity=(m==='fly'&&input.boost&&PL.speed>60)?clamp((PL.speed-60)/200,0,0.8):0;
@@ -3043,6 +3205,7 @@ function frame(dt){
   PL.near=findNear(g.position);PL.alt=PL.near?altitudeOver(PL.near,g.position):1e9;
 
   if(started){
+    updateVitals(dt);
     updateCoins(dt);
     updateMining(dt);
     updateEcosystemAndHazards(dt,simT);
@@ -3050,7 +3213,7 @@ function frame(dt){
 
   ship.flameS=lerp(ship.flameS,ship.flameT||0,1-Math.exp(-dt*8));
   ship.flame.visible=ship.flameS>0.03;ship.flame.scale.set(0.8+ship.flameS*0.3,0.8+ship.flameS*0.3,ship.flameS*(0.85+Math.random()*0.3));
-  updateCamera(dt,false);
+  updateCamera(dt,false);applyCamShake(dt);
   look.x=look.y=0;
 
   let tint=0;
@@ -3076,6 +3239,16 @@ function frame(dt){
 }
 function resize(){renderer.setSize(innerWidth,innerHeight,false);camera.aspect=innerWidth/innerHeight;baseFov=camera.aspect<1?76:62;camera.updateProjectionMatrix();}
 addEventListener('resize',resize);
+addEventListener('orientationchange',()=>setTimeout(resize,300));
+if(window.visualViewport)visualViewport.addEventListener('resize',()=>setTimeout(resize,60));
+/* ---- Full screen on phones & tablets (fills the whole display, portrait or landscape) ---- */
+const isTouchDev=matchMedia('(pointer:coarse)').matches||navigator.maxTouchPoints>0;
+const fsEl=document.documentElement,canFS=!!(fsEl.requestFullscreen||fsEl.webkitRequestFullscreen);
+function goFull(){try{if(document.fullscreenElement||document.webkitFullscreenElement)return;const r=fsEl.requestFullscreen?fsEl.requestFullscreen({navigationUI:'hide'}):fsEl.webkitRequestFullscreen();if(r&&r.catch)r.catch(()=>{});}catch(_){}}
+function exitFull(){try{(document.exitFullscreen||document.webkitExitFullscreen).call(document);}catch(_){}}
+if(isTouchDev&&canFS)$('btnFull').classList.add('can');
+$('btnFull').addEventListener('click',e=>{e.stopPropagation();if(document.fullscreenElement||document.webkitFullscreenElement)exitFull();else goFull();});
+document.addEventListener('fullscreenchange',()=>setTimeout(resize,120));
 
 /* ---------- 11. REFINEMENTS: autosave, dynamic resolution, audio state, settings ---------- */
 setInterval(()=>{if(started)saveGame(true);},15000);                       // quiet autosave while playing
@@ -3121,6 +3294,7 @@ async function boot(){
   const steps=buildWorld();
   for(const [label,fn] of steps){playBtn.textContent=label+'…';await new Promise(r=>setTimeout(r,20));fn();}
   buildAsteroids();
+  for(const b of bodies)b.hot=/LAVA|CRIMSON/.test(b.blurb||'');
   ship=buildShip();scene.add(ship.group);astro=buildAstro();
   switchActiveSystem('solara');
   updateOrbits(0);
@@ -3139,11 +3313,13 @@ async function boot(){
 
   playBtn.disabled=false;playBtn.textContent='NEW EXPEDITION';playBtn.focus();
   playBtn.addEventListener('click',()=>{
+    if(isTouchDev&&canFS)goFull();
     SFX.init();SFX.discover();
     started=true;$('start').classList.add('bye');$('ui').classList.add('live');canvas.focus();PL.speed=30;
     toast('WELCOME TO GALACTIC FRONTIER!');
   });
   contBtn.addEventListener('click',()=>{
+    if(isTouchDev&&canFS)goFull();
     SFX.init();loadGame();SFX.discover();
     started=true;$('start').classList.add('bye');$('ui').classList.add('live');canvas.focus();PL.speed=30;
     toast('EXPEDITION RESUMED!');
