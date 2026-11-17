@@ -261,6 +261,89 @@ html,body{margin:0;height:100%;overflow:hidden;background:var(--space);color:var
   #start .subTitle{font-size:18px}
   #start p{font-size:13px}
 }
+/* ================= v1.1 · ELYSIAN VEIL, HAZARDS & SAVE SAFETY ================= */
+/* Gentle solar storm: slow edge waves only, low opacity so phones stay readable */
+#stormFx{position:fixed;inset:0;pointer-events:none;z-index:3;opacity:0;transition:opacity 1.4s;mix-blend-mode:screen;
+  background:radial-gradient(ellipse at 50% 50%,transparent 52%,rgba(255,120,45,.10) 78%,rgba(255,55,60,.20) 100%)}
+#stormFx.on{opacity:1;animation:none}
+#stormFx::before{content:'';position:absolute;inset:-12%;
+  background:linear-gradient(112deg,transparent 28%,rgba(255,150,70,.10) 44%,rgba(255,80,45,.05) 56%,transparent 72%);
+  animation:stormWave 9s ease-in-out infinite}
+#stormFx::after{content:'';position:absolute;inset:0;background:radial-gradient(circle at 86% 10%,rgba(255,196,110,.14),transparent 32%);animation:stormFlare 7s ease-in-out infinite alternate}
+@keyframes stormWave{0%{transform:translateX(-24%)}50%{transform:translateX(24%)}100%{transform:translateX(-24%)}}
+@keyframes stormFlare{0%{opacity:.4}100%{opacity:.9}}
+
+/* Pollen surge: emerald/pink drifting haze, still readable */
+#pollenFx{position:fixed;inset:0;pointer-events:none;z-index:3;opacity:0;transition:opacity 1.8s;mix-blend-mode:screen;
+  background:radial-gradient(ellipse at 50% 55%,rgba(150,255,220,.10) 30%,rgba(90,255,190,.20) 74%,rgba(40,180,140,.30) 100%)}
+#pollenFx.on{opacity:1}
+#pollenFx::before{content:'';position:absolute;inset:-18%;
+  background:radial-gradient(circle at 28% 38%,rgba(255,170,230,.10),transparent 42%),radial-gradient(circle at 72% 66%,rgba(140,255,220,.10),transparent 44%);
+  animation:pollenDrift 26s ease-in-out infinite alternate}
+@keyframes pollenDrift{to{transform:translate3d(2.5%,-2%,0) scale(1.07)}}
+
+/* Quiet hazard warning chip + corner toast */
+#hazChip{position:absolute;top:max(10px,env(safe-area-inset-top,0px));left:50%;transform:translateX(-50%);
+  display:none;align-items:center;gap:6px;background:rgba(23,15,36,.82);color:#ffd9b8;border:2px solid #ff9d62;
+  border-radius:999px;padding:3px 11px;font-family:var(--sans);font-weight:800;font-size:11px;z-index:9;pointer-events:none;letter-spacing:0;white-space:nowrap}
+#hazChip.on{display:flex}
+#hazChip.warn{border-color:var(--sun);color:var(--sun);animation:hazBlink 2s ease-in-out infinite}
+@keyframes hazBlink{50%{opacity:.72}}
+#hazToast{position:absolute;right:max(12px,env(safe-area-inset-right,0px));top:max(118px,calc(env(safe-area-inset-top,0px) + 112px));max-width:270px;
+  background:rgba(23,15,36,.88);border:2px solid #ffb27a;border-radius:10px;color:#ffe9c8;font-family:var(--sans);font-weight:700;font-size:12px;
+  padding:7px 10px;z-index:9;opacity:0;transform:translateY(-6px);transition:opacity .35s,transform .35s;pointer-events:none;line-height:1.35;letter-spacing:0}
+#hazToast.on{opacity:1;transform:none}
+#stormNote{font-family:var(--sans);font-size:9.5px;font-weight:800;color:#ff9a6b;margin-top:3px;line-height:1.3;display:none;letter-spacing:0}
+#stormNote.on{display:block}
+#elyStats{margin-top:5px;padding-top:4px;border-top:2px dashed rgba(23,15,36,.3);font-family:var(--sans);font-size:10px;font-weight:800;letter-spacing:0;display:none;line-height:1.55}
+#elyStats.on{display:block}
+#elyStats .big{font-size:10.5px;color:#6c3fc5;letter-spacing:.04em}
+#elyStats b{font-variant-numeric:tabular-nums}
+.resPill.x{display:none}
+.resPill.x.on{display:flex}
+
+/* Comic confirm modal */
+#confirmModal{z-index:40}
+#confirmModal .mCard{width:min(600px,96vw)}
+.cfMsg{font-family:var(--sans);font-size:14px;font-weight:700;line-height:1.5;padding:2px 2px 12px}
+.cfBtns{display:flex;gap:9px;flex-wrap:wrap;justify-content:flex-end}
+.cfBtns .uBtn{width:auto;padding:8px 14px;font-size:17px}
+
+/* Short cinematic + completion cutscene */
+#cine{position:fixed;inset:0;z-index:29;pointer-events:none;display:none}
+#cine.on{display:block}
+#cine .bar{position:absolute;left:0;right:0;height:9%;background:#080512;transform:scaleY(0);transition:transform .7s cubic-bezier(.2,.8,.2,1)}
+#cine.on .bar{transform:scaleY(1)}
+#cine .bar.t{top:0;transform-origin:top}
+#cine .bar.b{bottom:0;transform-origin:bottom}
+#cine .cap{position:absolute;left:6%;right:6%;bottom:13%;text-align:center;transform:translateY(14px);opacity:0;transition:opacity .8s .25s,transform .8s .25s}
+#cine.on .cap{opacity:1;transform:none}
+#cine .cap .k{font-family:var(--sans);font-size:11px;font-weight:800;letter-spacing:.28em;color:var(--mint)}
+#cine .cap .t{font-size:clamp(26px,5vw,54px);color:var(--sun);-webkit-text-stroke:2px var(--ink);text-shadow:4px 4px 0 var(--ink);line-height:1.02;margin-top:2px}
+#cine .cap .s{font-family:var(--sans);font-size:12px;font-weight:700;color:#fff;text-shadow:2px 2px 0 var(--ink);margin-top:6px}
+#cine .skip{position:absolute;right:16px;bottom:12px;font-family:var(--sans);font-size:10px;color:rgba(255,255,255,.55);letter-spacing:.04em}
+#cine.cut .bar{height:13%}
+#cine.cut .cap{bottom:auto;top:50%;transform:translateY(-50%);opacity:1}
+#cine.cut.on .cap{transform:translateY(-50%)}
+
+/* Research archive & achievements */
+.ach{background:#fff;border:2.5px solid var(--ink);border-radius:11px;padding:8px 11px;margin-bottom:7px;display:flex;gap:10px;align-items:center;box-shadow:2px 2px 0 var(--ink)}
+.ach.locked{opacity:.58;filter:saturate(.4)}
+.ach .ico{font-size:22px;width:30px;text-align:center}
+.ach .nm{font-family:var(--display);font-size:17px;letter-spacing:.03em}
+.ach .ds{font-family:var(--sans);font-size:11px;font-weight:600;opacity:.8;line-height:1.3}
+.ach .ok{margin-left:auto;font-family:var(--display);font-size:12px;background:var(--mint);border:2px solid var(--ink);border-radius:6px;padding:2px 7px;white-space:nowrap}
+.ach.locked .ok{background:#d8d2c5}
+.msRow{display:flex;align-items:center;gap:8px;background:#fff;border:2.5px solid var(--ink);border-radius:10px;padding:7px 10px;margin-bottom:7px;box-shadow:2px 2px 0 var(--ink);font-family:var(--sans);font-size:11.5px;font-weight:700}
+.msRow .p{flex:1}
+.msRow .uBtn{width:auto;padding:4px 10px;font-size:14px}
+.lvlBadge{font-family:var(--display);font-size:12px;background:var(--sun);border:2px solid var(--ink);border-radius:6px;padding:1px 6px}
+.exRow{background:#fff;border:2.5px solid var(--ink);border-radius:11px;padding:9px 11px;margin-bottom:8px;box-shadow:2px 2px 0 var(--ink)}
+.exRow .ttl{font-family:var(--display);font-size:18px;color:#5a2ca0;display:flex;justify-content:space-between;gap:8px}
+.exRow .need{font-family:var(--sans);font-size:11.5px;font-weight:800;margin:3px 0 6px}
+.exRow.done{background:#e9fff4;outline:2px dashed #2b7a5b;outline-offset:-6px}
+.impFile{display:none}
+
 .sRow{display:flex;align-items:center;justify-content:space-between;gap:14px;margin:10px 0;font-family:var(--display);font-size:20px;letter-spacing:.05em}
 .sRow input[type=range]{flex:1;max-width:280px;height:28px;accent-color:#ff4d6d;touch-action:none}
 .qBtns{display:flex;gap:8px}.qBtns .hudBtn.sel{background:var(--mint);transform:translate(2px,3px);box-shadow:1px 1px 0 var(--ink)}
@@ -271,6 +354,7 @@ html,body{margin:0;height:100%;overflow:hidden;background:var(--space);color:var
 <body>
 <canvas id="game" tabindex="0" aria-label="Cosmic Hop Galactic Frontier"></canvas>
 <div id="stormFx"></div>
+<div id="pollenFx"></div>
 <div id="hurtFx"></div>
 <div id="warpFx"></div>
 <div id="reticle"></div>
@@ -279,7 +363,8 @@ html,body{margin:0;height:100%;overflow:hidden;background:var(--space);color:var
 <div id="ui">
   <div id="lines"></div>
   <div id="markers"></div>
-  <div id="stormBanner">⚠️ SOLAR STORM WARNING! SEEK SHELTER OR RAISE SHIELDS!</div>
+  <div id="hazChip"><span id="hazIcon">⛈</span><span id="hazTxt">STORM</span><span id="hazTime">0:20</span></div>
+  <div id="hazToast"></div>
 
   <div id="panel" class="box">
     <div id="sysTag">SOLARA SYSTEM</div>
@@ -289,6 +374,13 @@ html,body{margin:0;height:100%;overflow:hidden;background:var(--space);color:var
     <div class="barRow"><span class="barLbl">SHD</span><div class="meter"><i id="shdBar"></i></div></div>
     <div class="barRow" id="vitRow"><span class="barLbl">HP</span><div class="meter"><i id="hpBar" style="width:100%"></i></div><span class="barLbl" style="width:auto">🍗</span><div class="meter"><i id="foodBar" style="width:100%"></i></div></div>
     <div class="barRow" id="jetRow" style="display:none"><span class="barLbl">JET</span><div class="meter"><i id="jetBar"></i></div></div>
+    <div id="stormNote"></div>
+    <div id="elyStats">
+      <div class="big">🌿 ELYSIAN RESTORATION</div>
+      <div>⚡ ENERGY NETWORK <b id="elyNodes">0/5</b></div>
+      <div>🧬 SPECIES <b id="elySpecies">0/25</b></div>
+      <div>🌸 RESTORATION <b id="elyRestore">0%</b></div>
+    </div>
   </div>
 
   <div id="missionCard" class="box" title="Click to open Exploration Journal & Missions (J)">
@@ -317,6 +409,11 @@ html,body{margin:0;height:100%;overflow:hidden;background:var(--space);color:var
       <div class="resPill" title="Aetherium (Uncommon)"><span class="resDot" style="background:#39c6ff"></span>AE: <span id="rAe">0</span></div>
       <div class="resPill" title="Solarite (Rare)"><span class="resDot" style="background:#ffd23f"></span>SO: <span id="rSo">0</span></div>
       <div class="resPill" title="Void Shard (Exotic)"><span class="resDot" style="background:#c77dff"></span>VD: <span id="rVd">0</span></div>
+      <div class="resPill x" id="pillLum" title="Lumina Crystal (Rare · Elysian energy upgrades)"><span class="resDot" style="background:#9dfcff"></span>LU: <span id="rLum">0</span></div>
+      <div class="resPill x" id="pillBp" title="Bio-Pearl (Uncommon · Elysian research)"><span class="resDot" style="background:#ffd1ec"></span>BP: <span id="rBp">0</span></div>
+      <div class="resPill x" id="pillVw" title="Voidwood (Uncommon · Elysian outposts)"><span class="resDot" style="background:#2fe08a"></span>VW: <span id="rVw">0</span></div>
+      <div class="resPill x" id="pillSeed" title="Aether Seed (Exotic · Bloom restoration)"><span class="resDot" style="background:#e6ff7a"></span>SD: <span id="rSeed">0</span></div>
+      <div class="resPill x" id="pillRp" title="Research Points"><span class="resDot" style="background:#ffffff"></span>RP: <span id="rRp">0</span></div>
     </div>
   </div>
 
@@ -376,6 +473,7 @@ html,body{margin:0;height:100%;overflow:hidden;background:var(--space);color:var
     <div class="mTabs">
       <button class="tabBtn active" id="tabMissions">🎯 MISSIONS</button>
       <button class="tabBtn" id="tabDisc">🔬 DISCOVERIES</button>
+      <button class="tabBtn" id="tabResearch">🧠 RESEARCH ARCHIVE</button>
       <button class="tabBtn" id="tabSave">💾 SAVE &amp; GRAPHICS</button>
     </div>
     <div class="mBody" id="journalBody"></div>
@@ -458,6 +556,7 @@ html,body{margin:0;height:100%;overflow:hidden;background:var(--space);color:var
       <button class="tabBtn active" id="tabShopShip">🚀 ROCKETS</button>
       <button class="tabBtn" id="tabShopAstro">🧑‍🚀 SUITS</button>
       <button class="tabBtn" id="tabShopTrade">🍎 SUPPLIES &amp; SELL ORE</button>
+      <button class="tabBtn" id="tabShopExchange">🌌 GALACTIC EXCHANGE</button>
     </div>
     <div class="mBody"><div class="uGrid" id="shopGrid"></div></div>
   </div>
@@ -480,11 +579,30 @@ html,body{margin:0;height:100%;overflow:hidden;background:var(--space);color:var
   </div>
 </div>
 
+<!-- Short cinematic / completion cutscene overlay -->
+<div id="cine">
+  <div class="bar t"></div><div class="bar b"></div>
+  <div class="cap"><div class="k" id="cineK">SYSTEM 04</div><div class="t" id="cineT">ELYSIAN VEIL</div><div class="s" id="cineS"></div></div>
+  <div class="skip">TAP / PRESS ANY KEY TO SKIP</div>
+</div>
+
+<!-- Comic confirmation modal (destructive actions) -->
+<div id="confirmModal" class="modal">
+  <div class="mCard">
+    <div class="mHead"><h2 id="cfTitle">⚠️ CONFIRM</h2></div>
+    <div class="mBody">
+      <div class="cfMsg" id="cfMsg"></div>
+      <div class="cfBtns" id="cfBtns"></div>
+    </div>
+  </div>
+</div>
+<input type="file" id="importFile" class="impFile" accept="application/json,.json">
+
 <!-- Start Screen -->
 <div id="start">
   <h1>COSMIC HOP</h1>
   <div class="subTitle">★ GALACTIC FRONTIER ★</div>
-  <p id="tag">Explore 3 Star Systems, scan alien wildlife &amp; ancient ruins, solve monolith puzzles, brave Solar Storms, build planetary outposts, and orbit the Gargantua Black Hole!</p>
+  <p id="tag">Explore 4 Star Systems, scan alien wildlife &amp; ancient ruins, solve monolith puzzles, brave gentle Solar Storms, build planetary outposts, restore the Eternal Bloom — and orbit the Gargantua Black Hole!</p>
   <div class="startBtns">
     <button id="play" type="button" disabled>BUILDING GALAXY…</button>
     <button id="contBtn" type="button" hidden>CONTINUE SAVE</button>
@@ -627,7 +745,7 @@ const SFX=(()=>{
     setSystem(i){musSys=i;padT=0.3;arpT=1.5;chordI=0;playFileMusic(i);},
     update(dt,s){
       if(!ctx)return;const t=ctx.currentTime;
-      if(stG){stG.gain.setTargetAtTime(muted?0:s.storm*0.42,t,0.3);stF.frequency.setTargetAtTime(300+s.storm*800,t,0.3);}
+      if(stG){stG.gain.setTargetAtTime(muted?0:s.storm*0.2,t,3.0);stF.frequency.setTargetAtTime(200+s.storm*540,t,0.3);}
       if(bhG)bhG.gain.setTargetAtTime(muted?0:s.hole*0.55,t,0.4);
       musicTick(dt);
     },
@@ -791,7 +909,8 @@ scene.add(new THREE.HemisphereLight(0xcfe0ff,0x4a3a78,0.95));
 const SYSTEMS=[
   {id:'solara',name:'SOLARA SYSTEM',starType:'G-Type Yellow Star',reqHyper:1,origin:new V3(0,0,0),tint:0x6fc3ff,desc:'Starter planetary system with 8 diverse worlds, moons & orbital cities.'},
   {id:'nyx',name:'NYX BINARY RIFT',starType:'Blue-Violet Giant',reqHyper:2,origin:new V3(6800,340,-4400),tint:0xb5179e,desc:'Mysterious violet rift containing bioluminescent Vespera, spore-world Xylos & shattered Chronos.'},
-  {id:'gargantua',name:'GARGANTUA ABYSS',starType:'Supermassive Black Hole',reqHyper:3,origin:new V3(-6200,-420,-9800),tint:0xff922b,desc:'Endgame deep-space abyss dominated by the Gargantua Black Hole & dark-matter worlds.'}
+  {id:'gargantua',name:'GARGANTUA ABYSS',starType:'Supermassive Black Hole',reqHyper:3,origin:new V3(-6200,-420,-9800),tint:0xff922b,desc:'Endgame deep-space abyss dominated by the Gargantua Black Hole & dark-matter worlds.'},
+  {id:'elysian',name:'ELYSIAN VEIL',starType:'Living Bloom Nebula',reqHyper:4,origin:new V3(6400,2200,6600),tint:0x7dffc4,desc:'System 04 — a living crystal organism, floating islands, glowing oceans and the five-node Energy Network. Restore the Eternal Bloom.'}
 ];
 
 const skyGroup=new THREE.Group();scene.add(skyGroup);
@@ -865,41 +984,59 @@ function updateOrbits(t){
 }
 
 /* ---- Player Inventory, Consumables & Upgrades (Levels 1-5) ---- */
-const INV={fe:30,ae:12,so:5,vd:0,shieldCell:1,jetCell:1,scanMod:0,outpostKit:1,gold:0,berry:0,fruit:0,ration:2,medkit:1};
-const GOLD_RATE={fe:1,ae:2,so:4,vd:6};
+const INV={fe:30,ae:12,so:5,vd:0,lum:0,bp:0,vw:0,seed:0,rp:0,shieldCell:1,jetCell:1,scanMod:0,outpostKit:1,gold:0,berry:0,fruit:0,ration:2,medkit:1};
+const GOLD_RATE={fe:1,ae:2,so:4,vd:6,lum:9,bp:7,vw:6,seed:12};
 function earnGold(n,pop){
   if(!(n>0))return;INV.gold=(INV.gold||0)+n;updateResHUD();SFX.coin();
   const p=$('goldPill');p.classList.remove('bump');void p.offsetWidth;p.classList.add('bump');
   if(pop)comicPop(`+${n} 🪙`,'#ffd23f',50,30);
 }
 const RES_META={
-  fe:{key:'fe',label:'FERRITE',color:0xff922b,hex:'#ff922b'},
-  ae:{key:'ae',label:'AETHERIUM',color:0x39c6ff,hex:'#39c6ff'},
-  so:{key:'so',label:'SOLARITE',color:0xffd23f,hex:'#ffd23f'},
-  vd:{key:'vd',label:'VOID SHARD',color:0xc77dff,hex:'#c77dff'}
+  fe:{key:'fe',label:'FERRITE',color:0xff922b,hex:'#ff922b',rarity:'COMMON'},
+  ae:{key:'ae',label:'AETHERIUM',color:0x39c6ff,hex:'#39c6ff',rarity:'UNCOMMON'},
+  so:{key:'so',label:'SOLARITE',color:0xffd23f,hex:'#ffd23f',rarity:'RARE'},
+  vd:{key:'vd',label:'VOID SHARD',color:0xc77dff,hex:'#c77dff',rarity:'EXOTIC'},
+  lum:{key:'lum',label:'LUMINA CRYSTAL',color:0x9dfcff,hex:'#9dfcff',rarity:'RARE',elysian:true,use:'Energy upgrades'},
+  bp:{key:'bp',label:'BIO-PEARL',color:0xffd1ec,hex:'#ffd1ec',rarity:'UNCOMMON',elysian:true,use:'Research'},
+  vw:{key:'vw',label:'VOIDWOOD',color:0x2fe08a,hex:'#2fe08a',rarity:'UNCOMMON',elysian:true,use:'Outposts'},
+  seed:{key:'seed',label:'AETHER SEED',color:0xe6ff7a,hex:'#e6ff7a',rarity:'EXOTIC',elysian:true,use:'Bloom restoration'}
 };
 const UPGRADES={
   tool:{name:'MULTI-TOOL & SCANNER',lvl:1,max:5,desc:'Boosts Mining Laser extraction yield & speed, expands Terrain Scanner pulse radius, and unlocks advanced mineral analysis.',
     costs:[null,{fe:25,ae:10,so:0,vd:0},{fe:45,ae:25,so:10,vd:0},{fe:75,ae:45,so:25,vd:5},{fe:120,ae:80,so:50,vd:20}]},
   suit:{name:'EXOSUIT & JETPACK',lvl:1,max:5,desc:'Upgrades Jetpack thruster burn time & recharge, and reinforces Hazard/Thermal Shielding against Solar Storms.',
     costs:[null,{fe:20,ae:12,so:0,vd:0},{fe:40,ae:28,so:12,vd:0},{fe:70,ae:50,so:28,vd:5},{fe:110,ae:85,so:55,vd:20}]},
-  ship:{name:'STARSHIP & HYPERDRIVE',lvl:1,max:5,desc:'Hyperdrive Class (Lv.2: Nyx Rift, Lv.3: Gargantua Abyss), increases boost speed & Black Hole gravity escape thrust.',
+  ship:{name:'STARSHIP & HYPERDRIVE',lvl:1,max:5,desc:'Hyperdrive Class (Lv.2: Nyx Rift, Lv.3: Gargantua Abyss, Lv.4: Elysian Veil), increases boost speed & Black Hole gravity escape thrust.',
     costs:[null,{fe:30,ae:15,so:5,vd:0},{fe:55,ae:35,so:20,vd:5},{fe:90,ae:60,so:40,vd:15},{fe:140,ae:95,so:70,vd:35}]}
 };
 function updateResHUD(){
   $('rFe').textContent=INV.fe;$('rAe').textContent=INV.ae;$('rSo').textContent=INV.so;$('rVd').textContent=INV.vd;
+  $('rLum').textContent=INV.lum||0;$('rBp').textContent=INV.bp||0;$('rVw').textContent=INV.vw||0;$('rSeed').textContent=INV.seed||0;$('rRp').textContent=INV.rp||0;
+  const showX=activeSystemId==='elysian'||INV.lum||INV.bp||INV.vw||INV.seed||INV.rp;
+  for(const id of ['pillLum','pillBp','pillVw','pillSeed','pillRp'])$(id).classList.toggle('on',!!showX);
   $('rGold').textContent=INV.gold||0;$('rFood').textContent=(INV.berry||0)+(INV.fruit||0)+(INV.ration||0);$('rMed').textContent=INV.medkit||0;$('shopGold').textContent=INV.gold||0;
 }
 
 /* ---- Exploration Missions & Discovery Journal ---- */
 const DISCOVERIES=[];
 const MISSIONS=[
-  {id:'m1',title:'FIRST CONTACT',desc:'Scan 3 unknown alien species, flora, or minerals using Pulse Scanner [C].',type:'scan',goal:3,prog:0,done:false,reward:{fe:25,ae:15,so:5,vd:0}},
-  {id:'m2',title:'ANCIENT FOOTPRINTS',desc:'Discover and activate an Ancient Alien Monolith Puzzle on a planetary surface.',type:'ruin',goal:1,prog:0,done:false,reward:{fe:20,ae:25,so:15,vd:0}},
-  {id:'m3',title:'FRONTIER ARCHITECT',desc:'Construct a Planetary Outpost Shelter or Beacon on any world [B].',type:'outpost',goal:1,prog:0,done:false,reward:{fe:30,ae:20,so:15,vd:5}},
-  {id:'m4',title:'STORM HARVEST',desc:'Gather 3 Solarite crystals (including Storm Crystals during Solar Storms).',type:'solarite',goal:3,prog:0,done:false,reward:{fe:30,ae:30,so:20,vd:10}},
-  {id:'m5',title:'THE DEEP FRONTIER',desc:'Upgrade Hyperdrive to Lv.3 and enter the Gargantua Abyss system.',type:'gargantua',goal:1,prog:0,done:false,reward:{fe:50,ae:50,so:40,vd:25}}
+  {id:'m1',title:'FIRST CONTACT',desc:'Scan 3 unknown alien species, flora, or minerals using Pulse Scanner [C].',type:'scan',goal:3,prog:0,done:false,gold:100,reward:{fe:25,ae:15,so:5,vd:0,lum:0}},
+  {id:'m2',title:'ANCIENT FOOTPRINTS',desc:'Discover and activate an Ancient Alien Monolith Puzzle on a planetary surface.',type:'ruin',goal:1,prog:0,done:false,gold:100,reward:{fe:20,ae:25,so:15,vd:0,lum:0}},
+  {id:'m3',title:'FRONTIER ARCHITECT',desc:'Construct a Planetary Outpost Shelter or Beacon on any world [B].',type:'outpost',goal:1,prog:0,done:false,gold:100,reward:{fe:30,ae:20,so:15,vd:5,lum:0}},
+  {id:'m4',title:'STORM HARVEST',desc:'Gather 3 Solarite crystals (including Storm Crystals during Solar Storms).',type:'solarite',goal:3,prog:0,done:false,gold:100,reward:{fe:30,ae:30,so:20,vd:10,lum:0}},
+  {id:'m5',title:'THE DEEP FRONTIER',desc:'Upgrade Hyperdrive to Lv.3 and enter the Gargantua Abyss system.',type:'gargantua',goal:1,prog:0,done:false,gold:100,reward:{fe:50,ae:50,so:40,vd:25,lum:0}},
+  {id:'m6',title:'BEYOND THE VOID',desc:'Upgrade the Hyperdrive to Lv.4 and discover System 04 — the Elysian Veil.',type:'elysianSystem',goal:1,prog:0,done:false,gold:100,reward:{fe:20,ae:20,so:10,vd:5,lum:4}},
+  {id:'m7',title:'LIVING DISCOVERIES',desc:'Scan 5 living organisms in the Elysian Veil with the Pulse Scanner [C].',type:'elysianScan',goal:5,prog:0,done:false,gold:100,reward:{fe:10,ae:15,lum:6,bp:2,so:0,vd:0}},
+  {id:'m8',title:'THE LOST NETWORK',desc:'Find and reactivate 3 of the 5 lost Energy Network nodes.',type:'elysianNode',goal:3,prog:0,done:false,gold:100,reward:{fe:20,ae:20,lum:8,bp:2,so:0,vd:0}},
+  {id:'m9',title:'CRYSTAL HARVEST',desc:'Mine 10 rare Lumina Crystals from the floating islands, oceans and crystal peaks.',type:'lumCrystal',goal:10,prog:0,done:false,gold:100,reward:{fe:0,ae:20,lum:10,bp:3,so:0,vd:0}},
+  {id:'m10',title:'ETERNAL BLOOM',desc:'Restore THE ETERNAL BLOOM: activate all 5 Energy Network nodes and scan 10 Elysian species, then stabilize the Bloom.',type:'bloom',goal:1,prog:0,done:false,gold:500,reward:{fe:50,ae:50,lum:20,bp:10,vw:10,seed:2,so:20,vd:10}}
 ];
+function addMissReward(m){
+  for(const k of ['fe','ae','so','vd','lum','bp','vw','seed']){
+    const v=(m.reward&&m.reward[k])||0;if(v)INV[k]=(INV[k]||0)+v;
+  }
+  updateResHUD();
+}
 function advanceMission(type,amt=1){
   let changed=false;
   for(const m of MISSIONS){
@@ -908,29 +1045,184 @@ function advanceMission(type,amt=1){
     changed=true;
     if(m.prog>=m.goal){
       m.done=true;
-      INV.fe+=m.reward.fe;INV.ae+=m.reward.ae;INV.so+=m.reward.so;INV.vd+=m.reward.vd;
-      updateResHUD();
-      SFX.discover();earnGold(100,true);
-      toast(`MISSION COMPLETE: ${m.title}! +100 🪙`);
+      addMissReward(m);
+      SFX.discover();
+      const g=m.gold||100;earnGold(g,true);
+      toast(`MISSION COMPLETE: ${m.title}! +${g} 🪙`);
+      if(m.id==='m10')grantEternalExplorer();
     }
   }
-  if(changed)updateMissionHUD();
+  if(changed){updateMissionHUD();updateElyHUD();checkAchievements();checkMilestones();saveGame(true);}
 }
 function updateMissionHUD(){
   if(typeof tutStep!=='undefined'&&tutActive()&&started)return;
-  const cur=MISSIONS.find(m=>!m.done)||MISSIONS[MISSIONS.length-1];
-  $('mTitle').textContent=cur.done?`★ ALL MISSIONS COMPLETE!`:`★ MISSION: ${cur.title}`;
+  const cur=MISSIONS.find(m=>!m.done);
+  if(!cur){
+    $('mTitle').textContent='★ ALL MISSIONS COMPLETE!';
+    $('mDesc').textContent=GAME.title?'TITLE EARNED: '+GAME.title:'THE GALAXY REMEMBERS YOUR NAME.';
+    $('mProg').textContent='GALACTIC EXPLORER RANK ACHIEVED';
+    return;
+  }
+  $('mTitle').textContent=`★ MISSION: ${cur.title}`;
   $('mDesc').textContent=cur.desc;
-  $('mProg').textContent=cur.done?'GALACTIC EXPLORER RANK ACHIEVED':`PROGRESS: ${cur.prog} / ${cur.goal}`;
+  $('mProg').textContent=`PROGRESS: ${cur.prog} / ${cur.goal}`;
 }
 function recordDiscovery(cat,name,planet,detail){
   if(DISCOVERIES.some(d=>d.name===name&&d.planet===planet))return false;
-  DISCOVERIES.unshift({cat,name,planet,detail,time:new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})});
+  const b=bodies.find(x=>x.name===planet);
+  DISCOVERIES.unshift({cat,name,planet,sys:b?b.sys:'',detail,time:new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})});
   SFX.discover();
   comicPop(`${cat.toUpperCase()} DISCOVERED!`,'#ffd23f',50,34);
-  earnGold(15,true);tutFlags.scan=1;
+  earnGold(15,true);
+  INV.rp=(INV.rp||0)+2;updateResHUD();updateElyHUD();
+  tutFlags.scan=1;
   advanceMission('scan',1);
+  if(cat==='Species'&&b&&b.sys==='elysian')advanceMission('elysianScan',1);
+  checkAchievements();checkMilestones();
   return true;
+}
+
+/* ---- ELYSIAN VEIL: living-system state, HUD, titles & restoration ---- */
+const GAME={title:'',achievements:[],milestones:[],contracts:[],contractSeed:0,outposts:[],sysVisited:['solara'],seenElysian:false};
+const ELYS={nodes:[],beams:[],bloom:null,core:null,petals:[],plantMats:[],restored:false,beamGroup:null};
+const CINE={open:false,t:0};
+const ELYS_NODE_COST={fe:15,ae:5,lum:3};
+const ACH_LIST=[
+  {id:'contact',name:'FIRST CONTACT',desc:'Log your first field discovery.'},
+  {id:'builder',name:'FRONTIER BUILDER',desc:'Construct a permanent frontier outpost.'},
+  {id:'hopper',name:'SYSTEM HOPPER',desc:'Visit all four star systems.'},
+  {id:'grid',name:'POWER GRID',desc:'Bring all 5 Energy Network nodes online.'},
+  {id:'biologist',name:'VEIL BIOLOGIST',desc:'Catalogue all 25 Elysian species.'},
+  {id:'explorer',name:'GALACTIC EXPLORER',desc:'Complete every expedition mission.'},
+  {id:'eternal',name:'ETERNAL EXPLORER',desc:'Restore the Eternal Bloom.'}
+];
+const MILESTONES=[
+  {id:'ms_d10',name:'FIELD NOTES',desc:'Log 10 discoveries.',req:()=>DISCOVERIES.length>=10,reward:{gold:80,rp:2}},
+  {id:'ms_d25',name:'XENO-ARCHIVIST',desc:'Log 25 discoveries across the galaxy.',req:()=>DISCOVERIES.length>=25,reward:{gold:160,rp:4,ae:10}},
+  {id:'ms_n3',name:'NETWORK PIONEER',desc:'Reactivate 3 Energy Network nodes.',req:()=>ELYS.nodes.filter(n=>n.activated).length>=3,reward:{gold:100,rp:3,lum:5}},
+  {id:'ms_n5',name:'GRID MASTER',desc:'Reactivate all 5 Energy Network nodes.',req:()=>ELYS.nodes.length>=5&&ELYS.nodes.every(n=>n.activated),reward:{gold:250,rp:6,seed:1}},
+  {id:'ms_sp10',name:'LIVING CATALOGUE',desc:'Scan 10 Elysian species.',req:()=>elysSpeciesCount()>=10,reward:{gold:120,rp:3,bp:2}},
+  {id:'ms_restore',name:'BLOOMKEEPER',desc:'Restore the Eternal Bloom.',req:()=>ELYS.restored,reward:{gold:500,rp:10,lum:10,bp:5}}
+];
+function grantAch(id){
+  if(GAME.achievements.some(a=>a.id===id))return false;
+  const a=ACH_LIST.find(x=>x.id===id);if(!a)return false;
+  GAME.achievements.push({id:a.id,name:a.name,desc:a.desc,time:Date.now()});
+  toast('🏆 ACHIEVEMENT: '+a.name);SFX.discover();
+  return true;
+}
+function checkAchievements(){
+  if(DISCOVERIES.length>=1)grantAch('contact');
+  if(GAME.outposts.length>=1)grantAch('builder');
+  if(GAME.sysVisited.length>=4)grantAch('hopper');
+  if(ELYS.nodes.length>=5&&ELYS.nodes.every(n=>n.activated))grantAch('grid');
+  if(elysSpeciesCount()>=25)grantAch('biologist');
+  if(MISSIONS.every(m=>m.done))grantAch('explorer');
+  if(ELYS.restored)grantAch('eternal');
+}
+function checkMilestones(){
+  let changed=false;
+  for(const ms of MILESTONES){
+    if(GAME.milestones.includes(ms.id)||!ms.req())continue;
+    GAME.milestones.push(ms.id);changed=true;
+    const r=ms.reward||{};
+    if(r.gold)INV.gold=(INV.gold||0)+r.gold;
+    if(r.rp)INV.rp=(INV.rp||0)+r.rp;
+    for(const k of ['fe','ae','so','vd','lum','bp','vw','seed'])if(r[k])INV[k]=(INV[k]||0)+r[k];
+    toast(`🧠 ARCHIVE MILESTONE: ${ms.name}!${r.gold?` +${r.gold} 🪙`:''}${r.rp?` +${r.rp} RP`:''}`);
+    SFX.upgrade();
+  }
+  if(changed){updateResHUD();updateElyHUD();}
+}
+function elysSpeciesCount(){return DISCOVERIES.filter(d=>d.cat==='Species'&&d.sys==='elysian').length;}
+function elysNodesActive(){return ELYS.nodes.filter(n=>n.activated).length;}
+function elysPylonsLit(){let c=0;for(const n of ELYS.nodes)for(const p of n.pylons)if(p.lit)c++;return c;}
+function elysRestorePct(){
+  if(ELYS.restored)return 100;
+  return Math.min(99,Math.round(elysNodesActive()*8+elysPylonsLit()*2+Math.min(25,elysSpeciesCount())));
+}
+function updateElyHUD(){
+  const on=activeSystemId==='elysian'||elysNodesActive()>0||elysSpeciesCount()>0;
+  const panel=$('elyStats');if(!panel)return;
+  panel.classList.toggle('on',on);
+  const a=$('elyNodes'),b=$('elySpecies'),c=$('elyRestore');
+  if(a)a.textContent=elysNodesActive()+'/5';
+  if(b)b.textContent=elysSpeciesCount()+'/25';
+  if(c)c.textContent=elysRestorePct()+'%';
+}
+function playCinematic(k,t,s,cut){
+  const el=$('cine');if(!el)return;
+  $('cineK').textContent=k;$('cineT').textContent=t;$('cineS').textContent=s||'';
+  el.classList.toggle('cut',!!cut);el.classList.add('on');CINE.open=true;
+  clearTimeout(CINE.t);
+  CINE.t=setTimeout(()=>{el.classList.remove('on','cut');CINE.open=false;},cut?5200:4300);
+}
+function applyBloomState(){
+  if(!ELYS.core)return;
+  const n=elysNodesActive(),k=n/5;
+  ELYS.core.material.emissiveIntensity=0.55+n*0.18+(ELYS.restored?0.8:0);
+  ELYS.core.material.color.setHex(ELYS.restored?0xe6ff7a:0x9dfcff);
+  for(let i=0;i<ELYS.petals.length;i++){
+    const m=ELYS.petals[i];
+    m.material.emissiveIntensity=0.35+k*0.35+(ELYS.restored?0.55:0);
+    if(ELYS.restored)m.material.emissive.setHex(i%2?0xe6ff7a:0xffd1ec);
+  }
+  for(const m of ELYS.plantMats)m.emissiveIntensity=Math.min(1.1,m.userData.baseGlow+k*0.25+(ELYS.restored?0.25:0));
+  if(ELYS.bloom)ELYS.bloom.restored=ELYS.restored;
+}
+function setNetNodeActive(n,on){
+  n.activated=!!on;
+  if(n.mesh&&n.mesh.material){n.mesh.material.emissive.setHex(on?0xe6ff7a:0x9dfcff);n.mesh.material.emissiveIntensity=on?1.3:0.5;}
+  for(const p of n.pylons){
+    p.lit=!!on||p.lit;
+    if(p.lit&&p.mesh)p.mesh.material=toon(0x5df2c0,{emissive:0x5df2c0,emissiveIntensity:0.9});
+  }
+  const beam=ELYS.beams.find(b=>b.node===n);if(beam)beam.mesh.visible=!!on;
+  applyBloomState();
+}
+function canRestoreBloom(){
+  return !ELYS.restored&&ELYS.nodes.length>=5&&ELYS.nodes.every(n=>n.activated)&&elysSpeciesCount()>=10;
+}
+function stabilizeBloom(){
+  if(ELYS.restored){toast('THE ETERNAL BLOOM IS ALREADY BLOOMING!');return true;}
+  const n=elysNodesActive(),sp=elysSpeciesCount();
+  if(n<5){toast(`THE ENERGY NETWORK IS INCOMPLETE — ${n}/5 NODES ONLINE`);return true;}
+  if(sp<10){toast(`THE BLOOM NEEDS MORE LIFE — SCAN ${10-sp} MORE ELYSIAN SPECIES`);return true;}
+  ELYS.restored=true;
+  updateResHUD();updateElyHUD();applyBloomState();
+  SFX.discover();comicPop('THE BLOOM AWAKENS!','#e6ff7a',50,42);
+  playCinematic('ETERNAL BLOOM','RESTORED','The living heart of the Elysian Veil beats again.',true);
+  advanceMission('bloom',1);checkAchievements();checkMilestones();
+  saveGame(true);
+  return true;
+}
+function grantEternalExplorer(){
+  if(GAME.title==='ETERNAL EXPLORER')return;
+  GAME.title='ETERNAL EXPLORER';
+  if(!SKIN.ownedShip.includes('goldenbloom'))SKIN.ownedShip.push('goldenbloom');
+  SKIN.ship='goldenbloom';dressShip(ship.model,ship.flame,'goldenbloom');
+  grantAch('eternal');updateMissionHUD();updateElyHUD();saveGame(true);
+  setTimeout(()=>playCinematic('TITLE UNLOCKED','ETERNAL EXPLORER','Golden Bloom ship skin equipped. The Veil is whole.',true),5600);
+}
+const _eb=new V3(),_ed=new V3();
+function updateElysFx(dt,t){
+  if(!ELYS.bloom)return;
+  const bc=ELYS.bloom.center;
+  for(const beam of ELYS.beams){
+    if(!beam.node.activated){beam.mesh.visible=false;continue;}
+    _eb.copy(beam.node.body.center).add(beam.node.localPos);
+    _ed.subVectors(bc,_eb);const len=_ed.length();
+    beam.mesh.position.copy(_eb);
+    beam.mesh.quaternion.setFromUnitVectors(AY,_ed.multiplyScalar(1/len));
+    beam.mesh.scale.set(1,len,1);
+    beam.mesh.visible=true;
+    beam.mesh.material.opacity=0.22+0.08*Math.sin(t*2.2+beam.node.id);
+  }
+  if(ELYS.core){
+    const pulse=1+Math.sin(t*1.4)*0.035+(ELYS.restored?0.04*Math.sin(t*4):0);
+    ELYS.core.scale.setScalar(pulse);
+    if(ELYS.restored)ELYS.bloom.rotation.y+=dt*0.06;
+  }
 }
 
 /* ---- Harvestable Resource Nodes & Storm Crystals ---- */
@@ -938,13 +1230,97 @@ const nodeGeos={};
 function getNodeGeo(type){
   if(nodeGeos[type])return nodeGeos[type];
   const col=RES_META[type].color;
-  const g=merge([
-    [new THREE.OctahedronGeometry(0.58,0),col,Mx(0,0.68,0,0,0,0,0.88,1.5,0.88)],
-    [new THREE.OctahedronGeometry(0.36,0),col,Mx(0.36,0.44,0.18,0.2,0.4,-0.35,0.75,1.15,0.75)],
-    [new THREE.OctahedronGeometry(0.33,0),col,Mx(-0.33,0.4,-0.15,-0.2,0.1,0.4,0.75,1.05,0.75)],
-    [new THREE.DodecahedronGeometry(0.48,0),0x2d243b,Mx(0,0.18,0,0,0,0,1.25,0.45,1.25)]
-  ]);
+  let g;
+  if(type==='lum'){
+    g=merge([
+      [new THREE.OctahedronGeometry(0.5,0),col,Mx(0,1.05,0,0,0,0,0.55,1.9,0.55)],
+      [new THREE.OctahedronGeometry(0.3,0),col,Mx(0.38,0.5,0.1,0.25,0,0.4,0.45,1.3,0.45)],
+      [new THREE.OctahedronGeometry(0.28,0),col,Mx(-0.36,0.46,-0.12,-0.2,0,0.45,0.45,1.15,0.45)],
+      [new THREE.CylinderGeometry(0.42,0.55,0.35,7),0x2d243b,Mx(0,0.16,0)]
+    ]);
+  }else if(type==='bp'){
+    g=merge([
+      [new THREE.SphereGeometry(0.5,12,9),col,Mx(0,0.55,0)],
+      [new THREE.SphereGeometry(0.34,10,8),0xffe6f6,Mx(0.42,0.35,0.12)],
+      [new THREE.SphereGeometry(0.27,9,7),col,Mx(-0.4,0.3,-0.15)],
+      [new THREE.TorusGeometry(0.52,0.05,5,16),0xffffff,Mx(0,0.55,0,Math.PI/2,0,0)],
+      [new THREE.CylinderGeometry(0.5,0.62,0.2,8),0x2d243b,Mx(0,0.1,0)]
+    ]);
+  }else if(type==='vw'){
+    g=merge([
+      [new THREE.CylinderGeometry(0.13,0.28,1.5,6),col,Mx(0,0.75,0,0,0,0.15)],
+      [new THREE.CylinderGeometry(0.1,0.17,0.9,6),0x1b9e5e,Mx(0.35,1.0,0.05,0,0,-0.55)],
+      [new THREE.ConeGeometry(0.28,0.5,6),0x9dffcc,Mx(0,1.55,0)],
+      [new THREE.SphereGeometry(0.12,6,5),0xe6ff7a,Mx(0.55,1.35,0.05)],
+      [new THREE.CylinderGeometry(0.5,0.7,0.3,7),0x2d243b,Mx(0,0.12,0)]
+    ]);
+  }else if(type==='seed'){
+    g=merge([
+      [new THREE.DodecahedronGeometry(0.58,0),col,Mx(0,0.7,0,0,0,0,0.8,1.35,0.8)],
+      [new THREE.TorusGeometry(0.5,0.06,5,16),0xffffff,Mx(0,0.7,0,Math.PI/2,0,0)],
+      [new THREE.TorusGeometry(0.38,0.05,5,14),0xb4ff7a,Mx(0,0.7,0,0,0,Math.PI/2)],
+      [new THREE.ConeGeometry(0.3,0.5,6),0x6dff9a,Mx(0,1.42,0)],
+      [new THREE.CylinderGeometry(0.46,0.6,0.2,8),0x2d243b,Mx(0,0.1,0)]
+    ]);
+  }else{
+    g=merge([
+      [new THREE.OctahedronGeometry(0.58,0),col,Mx(0,0.68,0,0,0,0,0.88,1.5,0.88)],
+      [new THREE.OctahedronGeometry(0.36,0),col,Mx(0.36,0.44,0.18,0.2,0.4,-0.35,0.75,1.15,0.75)],
+      [new THREE.OctahedronGeometry(0.33,0),col,Mx(-0.33,0.4,-0.15,-0.2,0.1,0.4,0.75,1.05,0.75)],
+      [new THREE.DodecahedronGeometry(0.48,0),0x2d243b,Mx(0,0.18,0,0,0,0,1.25,0.45,1.25)]
+    ]);
+  }
   return nodeGeos[type]=g;
+}
+/* Energy Network node + pylons placed on an Elysian world */
+const netNodeGeo=merge([
+  [new THREE.OctahedronGeometry(1.0,0),0x9dfcff,Mx(0,2.6,0,0,0,0,0.75,2.7,0.75)],
+  [new THREE.OctahedronGeometry(0.55,0),0xe6ff7a,Mx(0,2.6,0,0,0,0,0.7,1.5,0.7)],
+  [new THREE.TorusGeometry(1.55,0.13,6,22),0x7dffc4,Mx(0,1.2,0,Math.PI/2,0,0)],
+  [new THREE.CylinderGeometry(1.55,1.95,0.5,10),0x2a1f4a,Mx(0,0.22,0)],
+  [new THREE.OctahedronGeometry(0.4,0),0x9dfcff,Mx(1.25,1.5,1.25)],
+  [new THREE.OctahedronGeometry(0.4,0),0x9dfcff,Mx(-1.25,1.5,-1.25)]
+]);
+const netPylonGeo=merge([
+  [new THREE.CylinderGeometry(0.16,0.28,1.5,6),0x4a4266,Mx(0,0.75,0)],
+  [new THREE.OctahedronGeometry(0.24,0),0x9dfcff,Mx(0,1.65,0)],
+  [new THREE.TorusGeometry(0.34,0.05,4,12),0xe6ff7a,Mx(0,1.65,0,Math.PI/2,0,0)]
+]);
+function addEnergyNode(b,idx){
+  if(!b.netNodes)b.netNodes=[];
+  const rnd=mulberry32(730+idx*17);let dir=null,gr=0;
+  for(let t=0;t<500;t++){
+    const d=randUnit(rnd),h=b.heightAt(d.x,d.y,d.z);
+    if(b.liquid&&!b.liquidSolid&&h<0.35)continue;
+    gr=b.groundR(d.x,d.y,d.z);
+    const lp=d.clone().multiplyScalar(gr);
+    if(b.colliders.some(c=>c.p.distanceToSquared(lp)<64))continue;
+    if(b.nodes.some(nd=>nd.localPos.distanceToSquared(lp)<90))continue;
+    dir=d;break;
+  }
+  if(!dir){dir=randUnit(rnd);gr=b.groundR(dir.x,dir.y,dir.z);}
+  const node=new THREE.Mesh(netNodeGeo,new THREE.MeshToonMaterial({vertexColors:true,gradientMap:gradTex,emissive:0x9dfcff,emissiveIntensity:0.5}));
+  node.matrixAutoUpdate=false;node.matrix.copy(placeM(dir,gr-0.05,0,1.2));addOutline(node,OL_BIG);(b.detail||b.group).add(node);
+  const lp=dir.clone().multiplyScalar(gr);b.colliders.push({p:lp,r:1.7});
+  const [e1,e2]=tangentBasis(dir),pylons=[];
+  for(let p=0;p<3;p++){
+    const ang=(p/3)*TAU;let pd=null;
+    for(let k=0;k<14;k++){
+      const aa=ang+k*0.4;
+      const q=dir.clone().addScaledVector(e1,Math.cos(aa)*5.6/b.R).addScaledVector(e2,Math.sin(aa)*5.6/b.R).normalize();
+      const hh=b.heightAt(q.x,q.y,q.z);
+      if(!(b.liquid&&!b.liquidSolid&&hh<0.25)){pd=q;break;}
+    }
+    if(!pd)pd=dir.clone().addScaledVector(e1,Math.cos(ang)*5.6/b.R).addScaledVector(e2,Math.sin(ang)*5.6/b.R).normalize();
+    const pgr=b.groundR(pd.x,pd.y,pd.z);
+    const pm=new THREE.Mesh(netPylonGeo,toon(0x4a4266));pm.matrixAutoUpdate=false;pm.matrix.copy(placeM(pd,pgr-0.04,0,1));addOutline(pm,OL_PROP);
+    (b.detail||b.group).add(pm);
+    const plp=pd.clone().multiplyScalar(pgr);b.colliders.push({p:plp,r:0.55});
+    pylons.push({mesh:pm,localPos:plp,dir:pd.clone(),lit:false});
+  }
+  const obj={id:idx,body:b,mesh:node,dir:dir.clone(),localPos:lp,pylons,activated:false,scanned:false,name:`${b.name} Energy Node ${idx+1}`};
+  b.netNodes.push(obj);ELYS.nodes.push(obj);
+  return obj;
 }
 function spawnResourceNodes(b,rnd,types,count){
   const parent=b.detail||b.group;
@@ -1067,7 +1443,8 @@ function buildAsteroids(){
   const belts=[
     {sys:'solara',origin:SYSTEMS[0].origin,rMin:920,rMax:1240,count:36,types:['fe','ae','so']},
     {sys:'nyx',origin:SYSTEMS[1].origin,rMin:620,rMax:980,count:34,types:['ae','so','vd']},
-    {sys:'gargantua',origin:SYSTEMS[2].origin,rMin:680,rMax:1050,count:32,types:['so','vd']}
+    {sys:'gargantua',origin:SYSTEMS[2].origin,rMin:680,rMax:1050,count:32,types:['so','vd']},
+    {sys:'elysian',origin:SYSTEMS[3].origin,rMin:1250,rMax:1750,count:34,types:['lum','bp','vw','seed']}
   ];
   for(const belt of belts){
     for(let i=0;i<belt.count;i++){
@@ -1179,10 +1556,22 @@ function terrainMaterial(liq,cloudU){
   m.customProgramCacheKey=()=>'terrain_'+(liq?1:0)+'_'+NC;
   return m;
 }
-function buildRocky(b,{N,colFn,liq,clouds}){
+function buildRocky(b,def){
+  b.terrainDef=def;
+  const {N,colFn,liq,clouds}=def;
   const geo=buildTerrainGeo(b.R,N,b.heightAt,colFn,b.liquid);
   const mesh=new THREE.Mesh(geo,terrainMaterial(liq,clouds));b.group.add(mesh);b.terrain=mesh;
   mesh.add(new THREE.Mesh(geo,OL_PLANET));
+}
+/* Active system only: release the dominant terrain buffers, rebuild on re-entry */
+function disposeBodyTerrain(b){
+  if(!b.terrain)return;
+  const geo=b.terrain.geometry;
+  b.group.remove(b.terrain);
+  b.terrain.material.dispose();b.terrain=null;geo.dispose();
+}
+function ensureBodyTerrain(b){
+  if(!b.terrain&&b.terrainDef)buildRocky(b,b.terrainDef);
 }
 const _sd=new V3();
 function scatter(b,rnd,count,tries,accept,geo,mat,colorFn,olMat=OL_PROP,parent=b.detail,sink=0.05){
@@ -1624,9 +2013,85 @@ function makeBlackHole(sysId,origin){
   return bh;
 }
 
+/* ---- System 04: the Eternal Bloom organism (living crystal core) ---- */
+function buildBloom(origin){
+  const R=180;
+  const b=makeBody({name:'THE ETERNAL BLOOM',sys:'elysian',kind:'bloom',R,anchor:origin,landable:false,color:'#7dffc4',blurb:'LIVING CRYSTAL ORGANISM · ENERGY NETWORK CORE',resList:['LUMINA','AETHER']});
+  const rnd=mulberry32(4040),grp=new THREE.Group();b.group.add(grp);
+  const roots=[];
+  for(let i=0;i<16;i++){
+    const a=i/16*TAU,len=70+((i*37)%4)*24,lean=0.3+(i%3)*0.12;
+    roots.push([new THREE.CylinderGeometry(0.9,5.4,len,5),i%2?0x2f8f6a:0x1f6d52,Mx(Math.cos(a)*R*0.34,-R*0.95,Math.sin(a)*R*0.34,Math.cos(a)*lean,0,Math.sin(a)*lean)]);
+  }
+  const rootMesh=new THREE.Mesh(merge(roots),new THREE.MeshToonMaterial({vertexColors:true,gradientMap:gradTex,emissive:0x0f5a3a,emissiveIntensity:0.55}));
+  addOutline(rootMesh,OL_BIG);grp.add(rootMesh);
+
+  const coreMat=new THREE.MeshToonMaterial({color:0x9dfcff,gradientMap:gradTex,emissive:0x9dfcff,emissiveIntensity:0.8});
+  const core=new THREE.Mesh(new THREE.IcosahedronGeometry(R*0.2,1),coreMat);
+  core.position.y=R*0.06;addOutline(core,OL_BIG);grp.add(core);ELYS.core=core;
+
+  const petalGeo=new THREE.ConeGeometry(R*0.16,R*0.55,5);
+  for(let i=0;i<8;i++){
+    const a=i/8*TAU,tilt=0.55+(i%2?0.18:0);
+    const dir=new V3(Math.cos(a)*Math.sin(tilt),Math.cos(tilt),Math.sin(a)*Math.sin(tilt)).normalize();
+    const mat=new THREE.MeshToonMaterial({color:i%2?0xffd1ec:0x7dffc4,gradientMap:gradTex,emissive:i%2?0xff8fce:0x2fe08a,emissiveIntensity:0.5});
+    const p=new THREE.Mesh(petalGeo,mat);
+    p.position.copy(dir).multiplyScalar(R*0.36);
+    p.quaternion.setFromUnitVectors(AY,dir);
+    p.scale.set(1,1,0.55);
+    addOutline(p,OL_BIG);grp.add(p);ELYS.petals.push(p);
+  }
+
+  const ringGroup=new THREE.Group();grp.add(ringGroup);ELYS.orbitGroup=ringGroup;
+  for(let i=0;i<3;i++){
+    const ring=new THREE.Mesh(new THREE.TorusGeometry(R*(0.55+i*0.15),2.4,6,64),
+      new THREE.MeshBasicMaterial({color:i%2?0x7dffc4:0x9dfcff,transparent:true,opacity:0.16,blending:THREE.AdditiveBlending,depthWrite:false,side:THREE.DoubleSide}));
+    ring.rotation.x=Math.PI/2+0.28*i;ring.rotation.y=i*0.55;ringGroup.add(ring);
+  }
+
+  const islandGeo=merge([
+    [new THREE.DodecahedronGeometry(12,0),0x5a4a7a,Mx(0,-2,0,0.2,0.4,0.1,1.5,0.7,1.2)],
+    [new THREE.DodecahedronGeometry(8,0),0x3b3352,Mx(2,-8,0,0.5,0,0.2,1,1.3,1)],
+    [new THREE.SphereGeometry(10,8,5,0,TAU,0,Math.PI/2),0x5ccf8a,Mx(0,4,0,0,0,0,1.4,0.35,1.1)],
+    [new THREE.OctahedronGeometry(2.2,0),0x9dfcff,Mx(5,6,2,0,0,0,0.7,2.4,0.7)],
+    [new THREE.OctahedronGeometry(1.6,0),0xffd1ec,Mx(-4,5,-3,0,0,0,0.7,1.8,0.7)]
+  ]);
+  for(let i=0;i<10;i++){
+    const [e1,e2]=tangentBasis(randUnit(rnd));
+    const a=rnd()*TAU,dir=new V3().addScaledVector(e1,Math.cos(a)).addScaledVector(e2,Math.sin(a)).normalize();
+    dir.y=0.18+((i*7)%5)*0.14;dir.normalize();
+    const m=new THREE.Mesh(islandGeo,vcToon);m.scale.setScalar(1.6+rnd()*1.8);
+    m.position.copy(dir).multiplyScalar(R*(1.05+rnd()*0.35));
+    m.userData.by=m.position.y;m.userData.bph=rnd()*TAU;m.userData.bsp=0.25+rnd()*0.5;
+    addOutline(m,OL_BIG);ringGroup.add(m);
+  }
+
+  const gc=cv(256,256),g=gc.getContext('2d'),rg=g.createRadialGradient(128,128,10,128,128,128);
+  rg.addColorStop(0,'rgba(210,255,232,1)');rg.addColorStop(0.28,'rgba(125,255,196,.45)');rg.addColorStop(0.62,'rgba(157,252,255,.14)');rg.addColorStop(1,'rgba(125,255,196,0)');
+  g.fillStyle=rg;g.fillRect(0,0,256,256);
+  const halo=new THREE.Sprite(new THREE.SpriteMaterial({map:tex(gc),blending:THREE.AdditiveBlending,depthWrite:false,transparent:true}));
+  halo.scale.setScalar(R*5.6);grp.add(halo);
+
+  addAtmosphere(b,0x7dffc4,R*1.32,1.15,4);
+  b.alwaysUpdate=true;
+  b.updaters.push((dt,t)=>{
+    core.rotation.y+=dt*0.16;core.rotation.x+=dt*0.05;
+    ringGroup.rotation.y+=dt*0.035;
+    halo.scale.setScalar(R*5.6+Math.sin(t*0.8)*R*0.08);
+    if(ELYS.restored)for(const p of ELYS.petals)p.rotation.y+=dt*0.05;
+    ringGroup.children.forEach(ch=>{if(ch.userData.by!==undefined)ch.position.y=ch.userData.by+Math.sin(t*ch.userData.bsp+ch.userData.bph)*6;});
+  });
+  ELYS.bloom=b;
+  return b;
+}
+function elyGlowMat(hex,glow){
+  const m=new THREE.MeshToonMaterial({vertexColors:true,gradientMap:gradTex,emissive:hex,emissiveIntensity:glow});
+  m.userData.baseGlow=glow;ELYS.plantMats.push(m);return m;
+}
+
 function buildWorld(){
   const steps=[];
-  const S0=SYSTEMS[0].origin, S1=SYSTEMS[1].origin, S2=SYSTEMS[2].origin;
+  const S0=SYSTEMS[0].origin, S1=SYSTEMS[1].origin, S2=SYSTEMS[2].origin, S3=SYSTEMS[3].origin;
 
   // ================= SYSTEM 1: SOLARA =================
   steps.push(['IGNITING SOL',()=>{
@@ -1858,6 +2323,197 @@ function buildWorld(){
     spawnPlanetaryEcosystem(ta,trnd,{wildlife:7,wildlifeColor:0xff4d6d});
   }]);
 
+  // ================= SYSTEM 4: ELYSIAN VEIL =================
+  steps.push(['AWAKENING THE ETERNAL BLOOM',()=>{
+    buildBloom(S3);
+  }]);
+
+  steps.push(['RAISING AURELIA',()=>{
+    const b=makeBody({name:'AURELIA',sys:'elysian',R:60,anchor:S3,orbitR:560,orbitSpeed:0.0048,phase:0.55,sky:0.8,skyColor:0x9d7cff,color:'#c9a7ff',blurb:'FLOATING ISLANDS · LOW GRAVITY',resList:['FE','AE','LUMINA'],grav:0.55});
+    const n1=makeNoise(1201),n2=makeNoise(1202),rnd=mulberry32(1203);
+    b.heightAt=(x,y,z)=>{
+      const c=fbm(n1,x*1.35+4,y*1.35,z*1.35-2,4)*2.1;
+      const ridge=Math.pow(Math.max(0,fbm(n2,x*3.8,y*3.8+3,z*3.8,3)),1.6)*7.5;
+      return 0.45+c*1.5+ridge*sstep(-0.05,0.18,c)+0.45*Math.abs(n2(x*6,y*6,z*6));
+    };
+    const cA=new C3(0x6b4fa8),cB=new C3(0x9d7cff),cC=new C3(0x5fe0a0),cD=new C3(0xffd1ec),cE=new C3(0xe9e3ff);
+    buildRocky(b,{N:56,colFn:(x,y,z,h,s,c)=>{
+      const col=s<0.7?cA:s<0.84?cB:h>5.2?cE:(n2(x*4.2,y*4.2,z*4.2)>0.12?cC:cD);
+      c[0]=col.r;c[1]=col.g;c[2]=col.b;
+    }});
+    addAtmosphere(b,0x9d7cff,b.R*1.38,0.95,5);
+    b.detail=new THREE.Group();b.group.add(b.detail);
+    const crystal=merge([
+      [new THREE.OctahedronGeometry(0.55,0),0x9dfcff,Mx(0,1.0,0,0,0,0,0.55,2.3,0.55)],
+      [new THREE.OctahedronGeometry(0.32,0),0xffd1ec,Mx(0.5,0.55,0.1,0.15,0,0.5,0.5,1.5,0.5)],
+      [new THREE.OctahedronGeometry(0.3,0),0x7dffc4,Mx(-0.45,0.5,-0.15,-0.1,0,0.5,0.5,1.2,0.5)]
+    ]);
+    scatter(b,rnd,240,6000,(d,h,r)=>h>0.3?0.6+r()*1.3:0,crystal,elyGlowMat(0x9dfcff,0.55),null);
+    const bloomTree=merge([
+      [new THREE.CylinderGeometry(0.12,0.22,1.3,6),0xd8cff0,Mx(0,0.65,0)],
+      [new THREE.SphereGeometry(0.55,10,6),0xffd1ec,Mx(0,1.55,0,0,0,0,1.5,0.4,1.5)],
+      [new THREE.SphereGeometry(0.3,8,5),0xfff0f7,Mx(0,1.7,0,0,0,0,1.2,0.5,1.2)],
+      [new THREE.OctahedronGeometry(0.2,0),0xe6ff7a,Mx(0,1.9,0,0,0,0,0.7,1.5,0.7)]
+    ]);
+    scatter(b,rnd,130,4000,(d,h,r)=>h>0.5?0.7+r()*0.7:0,bloomTree,elyGlowMat(0xff8fce,0.4),null);
+    const isle=merge([
+      [new THREE.DodecahedronGeometry(2.6,0),0x5a4a7a,Mx(0,0,0,0.2,0.4,0.1,1.6,0.75,1.3)],
+      [new THREE.DodecahedronGeometry(1.8,0),0x3b3352,Mx(0.4,-1.7,0,0.4,0,0.2,1,1.4,1)],
+      [new THREE.SphereGeometry(2.2,8,5,0,TAU,0,Math.PI/2),0x5fe0a0,Mx(0,0.7,0,0,0,0,1.5,0.4,1.2)],
+      [new THREE.OctahedronGeometry(0.6,0),0x9dfcff,Mx(1.1,1.5,0.4,0,0,0,0.7,2.2,0.7)],
+      [new THREE.OctahedronGeometry(0.45,0),0xffd1ec,Mx(-0.9,1.3,-0.5,0,0,0,0.7,1.8,0.7)]
+    ]);
+    for(let i=0;i<7;i++){
+      const d=randUnit(rnd);d.y=d.y*0.5+0.25;d.normalize();
+      const m=new THREE.Mesh(isle,vcToon);m.scale.setScalar(1.1+rnd()*1.4);
+      m.position.copy(d).multiplyScalar(b.R+14+rnd()*20);
+      m.rotation.set(rnd(),rnd()*TAU,rnd()*0.3);
+      addOutline(m,OL_BIG);b.detail.add(m);
+    }
+    spawnResourceNodes(b,rnd,['lum','fe','ae'],20);
+    spawnPlanetaryEcosystem(b,rnd,{wildlife:6,wildlifeColor:0x9dfcff});
+    addEnergyNode(b,0);
+  }]);
+
+  steps.push(['FLOODING PELAGIA',()=>{
+    const b=makeBody({name:'PELAGIA',sys:'elysian',R:54,anchor:S3,orbitR:880,orbitSpeed:0.0036,phase:2.2,liquid:true,sky:0.9,skyColor:0x4ff0d0,color:'#6ffbe4',blurb:'GLOWING OCEAN WORLD · SWIMMING',resList:['FE','AE','BIO-PEARL']});
+    const n1=makeNoise(1301),n2=makeNoise(1302),rnd=mulberry32(1303);
+    b.heightAt=(x,y,z)=>{
+      const c=fbm(n1,x*1.5,y*1.5,z*1.5,4)*2.2+0.03;
+      if(c<0)return Math.max(-5,c*8);
+      const ridge=Math.pow(Math.max(0,fbm(n2,x*4.6,y*4.6,z*4.6,3)),1.7)*5.2;
+      return 0.35+c*2.4+ridge*sstep(0.05,0.25,c);
+    };
+    const cS=new C3(0xffd1ec),cM=new C3(0x3fd9b0),cD=new C3(0x1a6fd6),cL=new C3(0x9dfcff);
+    buildRocky(b,{N:54,colFn:(x,y,z,h,s,c)=>{
+      const col=h<0.4?cS:s<0.78?cD:(n2(x*4,y*4,z*4)>0?cL:cM);
+      c[0]=col.r;c[1]=col.g;c[2]=col.b;
+    },liq:{shallow:0xffd1ec,mid:0x4ff0d0,deep:0x1a6fd6,foam:0xeafff8,glow:0.75,glowAll:0.35,rings:1}});
+    addAtmosphere(b,0x6ffbe4,b.R*1.4,1.05,5);
+    b.detail=new THREE.Group();b.group.add(b.detail);
+    const coral=merge([
+      [new THREE.ConeGeometry(0.42,2.8,5),0xff8fce,Mx(0,1.4,0)],
+      [new THREE.ConeGeometry(0.28,1.8,5),0x6ffbe4,Mx(0.5,0.9,0.2,0,0,-0.35)],
+      [new THREE.ConeGeometry(0.24,1.4,5),0x9dfcff,Mx(-0.45,0.7,-0.15,0,0,0.3)],
+      [new THREE.SphereGeometry(0.2,7,5),0xe6ff7a,Mx(0,2.9,0)]
+    ]);
+    scatter(b,rnd,220,5000,(d,h,r)=>h>0.2?0.7+r()*1.2:0,coral,elyGlowMat(0xff8fce,0.55),null);
+    const jelly=merge([[new THREE.SphereGeometry(0.5,10,7),0xffd1ec,Mx(0,0.4,0,0,0,0,1,0.7,1)],[new THREE.CylinderGeometry(0.04,0.14,0.9,5),0x9dfcff,Mx(0,-0.2,0,0,0,0.1)]]);
+    scatter(b,rnd,60,3000,(d,h,r)=>h<0.1?0.8+r()*0.8:0,jelly,elyGlowMat(0xffb3e6,0.6),null);
+    spawnResourceNodes(b,rnd,['bp','ae','fe'],20);
+    spawnPlanetaryEcosystem(b,rnd,{wildlife:6,wildlifeColor:0xffd1ec});
+    addEnergyNode(b,2);
+  }]);
+
+  steps.push(['SHATTERING PRISMARA',()=>{
+    const b=makeBody({name:'PRISMARA',sys:'elysian',R:56,anchor:S3,orbitR:1240,orbitSpeed:0.0029,phase:4.1,sky:0.75,skyColor:0x7d9dff,color:'#9dfcff',blurb:'CRYSTAL MOUNTAINS · MAGNETIC ZONES',resList:['FE','SO','VD','LUMINA']});
+    const n1=makeNoise(1401),n2=makeNoise(1402),rnd=mulberry32(1403);
+    b.heightAt=(x,y,z)=>{
+      const c=fbm(n1,x*1.6,y*1.6,z*1.6,4)*1.9+0.1;
+      const rid=1-Math.abs(fbm(n2,x*3.2,y*3.2,z*3.2,3))*2.2;
+      const peak=Math.pow(Math.max(0,rid),1.8)*12;
+      return 0.3+c*1.5+peak*sstep(-0.08,0.2,c);
+    };
+    const cK=new C3(0x2a2350),cP=new C3(0x5a3fa8),cC=new C3(0x9dfcff),cW=new C3(0xe9f6ff),cM=new C3(0xc77dff);
+    buildRocky(b,{N:56,colFn:(x,y,z,h,s,c)=>{
+      const col=s<0.68?cK:s<0.8?cP:h>7?cW:(n2(x*5,y*5,z*5)>0.05?cC:cM);
+      c[0]=col.r;c[1]=col.g;c[2]=col.b;
+    }});
+    addAtmosphere(b,0x9dfcff,b.R*1.4,1.05,5);
+    b.detail=new THREE.Group();b.group.add(b.detail);
+    const spire=merge([
+      [new THREE.OctahedronGeometry(0.6,0),0x9dfcff,Mx(0,1.3,0,0,0,0,0.6,3.2,0.6)],
+      [new THREE.OctahedronGeometry(0.38,0),0xc77dff,Mx(0.55,0.6,0.15,0.3,0,0.55,0.45,1.9,0.45)],
+      [new THREE.OctahedronGeometry(0.3,0),0xe9f6ff,Mx(-0.5,0.5,-0.2,-0.25,0,0.55,0.45,1.5,0.45)]
+    ]);
+    scatter(b,rnd,240,6000,(d,h,r)=>h>0.4?0.6+r()*1.7:0,spire,elyGlowMat(0x9dfcff,0.7),null);
+    b.magZones=[];
+    for(let z=0;z<3;z++){
+      const zd=randUnit(rnd);const [e1,e2]=tangentBasis(zd);
+      const zg=new THREE.Group();zg.position.copy(zd).multiplyScalar(b.R+9);
+      const zmat=new THREE.MeshBasicMaterial({color:0x9dfcff,transparent:true,opacity:0.22,blending:THREE.AdditiveBlending,depthWrite:false,side:THREE.DoubleSide});
+      const ring=new THREE.Mesh(new THREE.TorusGeometry(7,0.16,5,36),zmat);ring.rotation.x=Math.PI/2;zg.add(ring);
+      for(let s=0;s<7;s++){
+        const a=s/7*TAU,sh=new THREE.Mesh(new THREE.OctahedronGeometry(0.5+s%3*0.2,0),toon(0x9dfcff,{emissive:0x39c6ff,emissiveIntensity:0.9}));
+        sh.position.set(Math.cos(a)*6.5,Math.sin(a*2)*2.2,Math.sin(a)*6.5);sh.rotation.set(a,a*1.3,a*0.7);zg.add(sh);
+      }
+      b.detail.add(zg);
+      b.magZones.push({dir:zd.clone(),cos:Math.cos(0.22),group:zg});
+    }
+    spawnResourceNodes(b,rnd,['lum','fe','so','vd'],22);
+    spawnPlanetaryEcosystem(b,rnd,{wildlife:6,wildlifeColor:0x9dfcff});
+    addEnergyNode(b,3);
+  }]);
+
+  steps.push(['ROOTING MYCELORA',()=>{
+    const b=makeBody({name:'MYCELORA',sys:'elysian',R:52,anchor:S3,orbitR:1600,orbitSpeed:0.0024,phase:5.6,liquid:true,sky:0.85,skyColor:0x2fe08a,color:'#2fe08a',blurb:'GIANT MUSHROOMS · UNDERGROUND ROOTS',resList:['FE','AE','VOIDWOOD','AETHER SEED']});
+    const n1=makeNoise(1501),n2=makeNoise(1502),rnd=mulberry32(1503);
+    b.heightAt=(x,y,z)=>{
+      const c=fbm(n1,x*1.55,y*1.55,z*1.55,4)*2.3+0.04;
+      if(c<0)return Math.max(-4.5,c*7);
+      const lump=Math.pow(Math.max(0,1-Math.abs(fbm(n2,x*5.2,y*5.2,z*5.2,3))*2.2),2)*3.2;
+      return 0.3+c*2.7+lump*sstep(0.05,0.3,c);
+    };
+    const cD=new C3(0x2b2338),cR=new C3(0x4a3550),cG=new C3(0x2fe08a),cT=new C3(0x9dffcc),cP=new C3(0xff8fce);
+    buildRocky(b,{N:54,colFn:(x,y,z,h,s,c)=>{
+      const col=h<0.35?cT:s<0.76?cD:(n2(x*4.4,y*4.4,z*4.4)>0.1?cG:(h>3.2?cR:cP));
+      c[0]=col.r;c[1]=col.g;c[2]=col.b;
+    },liq:{shallow:0x9dffcc,mid:0x2fe08a,deep:0x0f6a52,foam:0xeafff6,glow:0.8,glowAll:0.25,rings:1}});
+    addAtmosphere(b,0x2fe08a,b.R*1.4,1.0,5);
+    b.detail=new THREE.Group();b.group.add(b.detail);
+    const cap=new THREE.SphereGeometry(1.5,12,6,0,TAU,0,Math.PI/2);
+    const spots=[];
+    for(let k=0;k<6;k++){const a=k*TAU/6+0.4,r=0.9;spots.push([new THREE.SphereGeometry(0.18,6,4),0xfff0f7,Mx(Math.cos(a)*r,2.05,Math.sin(a)*r)]);}
+    const shroom=merge([[new THREE.CylinderGeometry(0.26,0.42,2.1,7),0xe8e0d0,Mx(0,1.05,0)],[cap,0xffffff,Mx(0,2.0,0,0,0,0,1,0.8,1)],[new THREE.CylinderGeometry(1.45,1.25,0.12,12),0xffd9ec,Mx(0,1.98,0)],...spots]);
+    const caps=[0x2fe08a,0x7dffc4,0xff8fce,0x9dfcff,0xe6ff7a];
+    scatter(b,rnd,300,8000,(d,h,r)=>h>0.3?(r()<0.18?2.0+r()*2.6:0.7+r()*1.2):0,shroom,elyGlowMat(0x2fe08a,0.5),r=>new C3(caps[(r()*5)|0]));
+    // colossal roots arching out of the soil
+    const archGeo=merge([
+      [new THREE.TorusGeometry(4.4,0.55,6,18,Math.PI),0x6b3f2a,Mx(0,0.1,0,0,0,0)],
+      [new THREE.TorusGeometry(3.2,0.38,6,16,Math.PI),0x2f8f6a,Mx(0.4,1.1,0,0,0.4,0)]
+    ]);
+    for(let i=0;i<10;i++){
+      const d=randUnit(rnd),h=b.heightAt(d.x,d.y,d.z);
+      if(b.liquid&&!b.liquidSolid&&h<0.4)continue;
+      const m=new THREE.Mesh(archGeo,vcToon);m.matrixAutoUpdate=false;m.matrix.copy(placeM(d,b.groundR(d.x,d.y,d.z)-0.4,rnd()*TAU,2.1+rnd()*1.1));
+      addOutline(m,OL_BIG);b.detail.add(m);b.colliders.push({p:d.clone().multiplyScalar(b.groundR(d.x,d.y,d.z)),r:1.2});
+    }
+    spawnResourceNodes(b,rnd,['vw','seed','ae','fe'],24);
+    spawnPlanetaryEcosystem(b,rnd,{wildlife:6,wildlifeColor:0x2fe08a});
+    addEnergyNode(b,4);
+  }]);
+
+  steps.push(['ORBITING PETAL & ECHO',()=>{
+    const au=bodies.find(x=>x.name==='AURELIA'),my=bodies.find(x=>x.name==='MYCELORA');
+    const petal=makeMoon({name:'PETAL',sys:'elysian',R:15,parent:au,orbitR:128,orbitSpeed:0.05,phase:1.2,tilt:0.2,color:'#ffd1ec',blurb:"AURELIA'S PETAL MOON · LUMINA BLOOMS"},[0xd98ab8,0xffd1ec,0xfff0f7],4101,['lum']);
+    addAtmosphere(petal,0xffd1ec,petal.R*1.5,0.85,5);
+    const prnd=mulberry32(4111);
+    const pCry=merge([[new THREE.OctahedronGeometry(0.5,0),0xffd1ec,Mx(0,0.9,0,0,0,0,0.5,2.1,0.5)],[new THREE.OctahedronGeometry(0.3,0),0x9dfcff,Mx(0.5,0.4,0.1,0.2,0,0.4,0.5,1.2,0.5)]]);
+    scatter(petal,prnd,80,3200,(d,h,r)=>h>-0.4?0.7+r()*1.2:0,pCry,elyGlowMat(0xffd1ec,0.6),null);
+    addEnergyNode(petal,1);
+
+    const echo=makeMoon({name:'ECHO',sys:'elysian',R:14,parent:my,orbitR:136,orbitSpeed:0.042,phase:3.4,tilt:-0.25,color:'#7dffc4',blurb:"MYCELORA'S RUIN MOON · ECHOES OF THE NETWORK"},[0x3b3352,0x5a7a6a,0x2fe08a],4102,['vd','lum']);
+    addAtmosphere(echo,0x2fe08a,echo.R*1.5,0.9,5);
+    const ernd=mulberry32(4112);
+    const ruins=merge([
+      [new THREE.CylinderGeometry(0.4,0.9,4.2,6),0x4f466e,Mx(0,2.1,0)],
+      [new THREE.TorusGeometry(1.6,0.14,6,20),0x2fe08a,Mx(0,4.4,0,Math.PI/2,0,0)],
+      [new THREE.OctahedronGeometry(0.45,0),0x9dfcff,Mx(0,4.4,0)]
+    ]);
+    scatter(echo,ernd,16,2600,(d,h,r)=>h>0.2?1.0+r()*1.4:0,ruins,elyGlowMat(0x2fe08a,0.5),null);
+  }]);
+
+  steps.push(['LINKING THE ENERGY NETWORK',()=>{
+    const bg=new THREE.Group();scene.add(bg);ELYS.beamGroup=bg;bg.visible=(activeSystemId==='elysian');
+    for(const n of ELYS.nodes){
+      const geo=new THREE.CylinderGeometry(0.45,1.1,1,8,1,true);geo.translate(0,0.5,0);
+      const mesh=new THREE.Mesh(geo,new THREE.MeshBasicMaterial({color:0x9dfcff,transparent:true,opacity:0.26,blending:THREE.AdditiveBlending,depthWrite:false,side:THREE.DoubleSide}));
+      mesh.frustumCulled=false;mesh.visible=false;bg.add(mesh);
+      ELYS.beams.push({node:n,mesh});
+    }
+    applyBloomState();
+  }]);
+
   return steps;
 }
 const _sd2=new V3();
@@ -1870,7 +2526,8 @@ const SHIP_SKINS=[
   {id:'inferno',name:'INFERNO BLAZE',price:400,body:0xffb703,acc:0xd62828,str:0x2b2d42,glass:0xff9f1c,gEm:0x7a2a00,f1:0xff3d00,f2:0xffe066,fin2:true,desc:'Hot-rod flames plus twin racing tail fins.'},
   {id:'arctic',name:'ARCTIC FOX',price:700,body:0xffffff,acc:0x39c6ff,str:0x1d3557,glass:0xbde0fe,gEm:0x1d3557,f1:0x4cc9f0,f2:0xe0fbff,pods:true,desc:'Snow-white hull with extra booster pods.'},
   {id:'midnight',name:'MIDNIGHT RAVEN',price:1000,body:0x2b2d42,acc:0x7b2cbf,str:0x5df2c0,glass:0xff4dd8,gEm:0x7a1060,f1:0xc77dff,f2:0xffffff,fin2:true,pods:true,desc:'Stealth-dark hull, neon trim, purple plasma.'},
-  {id:'golden',name:'GOLDEN FALCON',price:2000,body:0xffd23f,acc:0xe09f1f,str:0xffffff,glass:0x5df2c0,gEm:0x0a6a50,f1:0xffffff,f2:0xffe066,fin2:true,pods:true,desc:'Solid-gold legend. Every pilot will know you made it.'}
+  {id:'golden',name:'GOLDEN FALCON',price:2000,body:0xffd23f,acc:0xe09f1f,str:0xffffff,glass:0x5df2c0,gEm:0x0a6a50,f1:0xffffff,f2:0xffe066,fin2:true,pods:true,desc:'Solid-gold legend. Every pilot will know you made it.'},
+  {id:'goldenbloom',name:'GOLDEN BLOOM',price:0,locked:true,body:0xffe08a,acc:0xff8fce,str:0x7dffc4,glass:0xe6ff7a,gEm:0x2a6a1a,f1:0xe6ff7a,f2:0xffd1ec,fin2:true,pods:true,desc:'Eternal Explorer reward — living gold petals with bloom-green plasma.'}
 ];
 const ASTRO_SKINS=[
   {id:'classic',name:'CLASSIC SUIT',price:0,suit:0xffffff,legs:0xe8ecff,chest:0x7a86b8,belt:0xff4d6d,visor:0xffb23f,vEm:0x7a3a00,desc:'Standard-issue white explorer suit.'},
@@ -2054,18 +2711,53 @@ const outpostGeo=merge([
   [new THREE.CylinderGeometry(0.06,0.06,2.2,6),0xff4d6d,Mx(1.1,2.2,0)],
   [new THREE.SphereGeometry(0.18,8,6),0xffd23f,Mx(1.1,3.35,0)]
 ]);
-function placeOutpostOnPlanet(b,dir,typeLabel='SHELTER'){
+function spawnOutpostMesh(b,dir,lvl=1){
   const gr=b.groundR(dir.x,dir.y,dir.z);
   const m=new THREE.Mesh(outpostGeo,vcToon);
   m.matrixAutoUpdate=false;
-  m.matrix.copy(placeM(dir,gr-0.05,0,1.0));
+  m.matrix.copy(placeM(dir,gr-0.05,0,1+0.13*(lvl-1)));
   addOutline(m,OL_BIG);
   (b.detail||b.group).add(m);
   const lp=dir.clone().multiplyScalar(gr);
-  b.outposts.push({mesh:m,localPos:lp,dir:dir.clone(),type:typeLabel});
-  b.colliders.push({p:lp,r:1.5});
-  advanceMission('outpost',1);
+  return {mesh:m,localPos:lp,dir:dir.clone(),gr,lvl,type:'OUTPOST'};
+}
+function placeOutpostOnPlanet(b,dir,typeLabel='SHELTER'){
+  const gr=b.groundR(dir.x,dir.y,dir.z);
+  const lp=dir.clone().multiplyScalar(gr);
+  if(b.outposts.some(o=>o.localPos.distanceTo(lp)<11)){toast('TOO CLOSE TO ANOTHER OUTPOST — PICK OPEN GROUND');return null;}
+  const entry={id:'op'+Date.now().toString(36)+Math.floor(Math.random()*999),body:b.name,dir:[dir.x,dir.y,dir.z],lvl:1};
+  const op=spawnOutpostMesh(b,dir,1);op.id=entry.id;
+  b.outposts.push(op);b.colliders.push({p:lp,r:1.5});
+  GAME.outposts.push(entry);
+  advanceMission('outpost',1);checkAchievements();checkMilestones();
   return lp;
+}
+function upgradeOutpost(entry){
+  if(!entry||entry.lvl>=5)return false;
+  const cost={fe:20*entry.lvl,ae:12*entry.lvl,so:6*entry.lvl,vw:2*entry.lvl};
+  if((INV.fe||0)<cost.fe||(INV.ae||0)<cost.ae||(INV.so||0)<cost.so||(INV.vw||0)<cost.vw){
+    toast(`UPGRADE NEEDS ${cost.fe} FE · ${cost.ae} AE · ${cost.so} SO · ${cost.vw} VOIDWOOD`);return false;
+  }
+  INV.fe-=cost.fe;INV.ae-=cost.ae;INV.so-=cost.so;INV.vw-=cost.vw;
+  entry.lvl++;
+  for(const b of bodies)for(const op of b.outposts)if(op.id===entry.id){
+    op.lvl=entry.lvl;
+    op.mesh.matrix.copy(placeM(op.dir,op.gr-0.05,0,1+0.13*(entry.lvl-1)));
+  }
+  updateResHUD();SFX.upgrade();checkMilestones();
+  toast(`OUTPOST UPGRADED TO LV.${entry.lvl}!`);
+  return true;
+}
+function rebuildSavedOutposts(){
+  for(const entry of GAME.outposts){
+    const b=bodies.find(x=>x.name===entry.body);
+    if(!b||!Array.isArray(entry.dir)||b.outposts.some(o=>o.id===entry.id))continue;
+    const dir=new THREE.Vector3().fromArray(entry.dir);
+    if(dir.lengthSq()<1e-6)continue;
+    dir.normalize();
+    const op=spawnOutpostMesh(b,dir,clamp(entry.lvl||1,1,5));op.id=entry.id;
+    b.outposts.push(op);b.colliders.push({p:op.localPos,r:1.5});
+  }
 }
 
 const rover={active:false,deployed:false,body:null,mesh:null,dir:new V3(0,1,0),face:new V3(0,0,-1),localPos:new V3()};
@@ -2152,6 +2844,18 @@ function triggerScan(){
       recordDiscovery('Mineral',`${RES_META[nd.type].label} Deposit`,b.name,`High-purity ${RES_META[nd.type].label} crystal cluster.`);
     }
   }
+  if(b.netNodes)for(const nn of b.netNodes){
+    _a.copy(b.center).add(nn.localPos);
+    if(ref.distanceTo(_a)<scanWave.maxR&&!nn.scanned){
+      nn.scanned=true;found++;
+      recordDiscovery('Energy Network',nn.name,b.name,'Dormant Elysian conduit node. Energize it, then light its 3 pylons.');
+      toast('ENERGY NODE FOUND — LAND AND PRESS [E] TO ENERGIZE');
+    }
+    for(const pl of nn.pylons){
+      _a.copy(b.center).add(pl.localPos);
+      if(ref.distanceTo(_a)<scanWave.maxR)pl.scanned=true;
+    }
+  }
   if(found>0)toast(`SCAN IDENTIFIED ${found} NEW DISCOVER${found>1?'IES':'Y'}!`);
 }
 
@@ -2169,7 +2873,17 @@ function openModal(id){
 }
 function closeModals(){
   modalOpen=false;
-  ['upgradeModal','craftModal','journalModal','mapModal','settingsModal','shopModal','helpModal'].forEach(id=>$(id).classList.remove('open'));
+  ['upgradeModal','craftModal','journalModal','mapModal','settingsModal','shopModal','helpModal','confirmModal'].forEach(id=>$(id).classList.remove('open'));
+}
+function askConfirm(title,msg,btns){
+  $('cfTitle').textContent=title;$('cfMsg').textContent=msg;
+  const wrap=$('cfBtns');wrap.innerHTML='';
+  for(const b of btns){
+    const el=document.createElement('button');el.type='button';el.className='uBtn '+(b.cls||'');el.textContent=b.label;
+    el.addEventListener('click',e=>{e.stopPropagation();closeModals();b.fn&&b.fn();});
+    wrap.appendChild(el);
+  }
+  openModal('confirmModal');
 }
 
 $('btnUpgrade').addEventListener('click',e=>{e.stopPropagation();SFX.init();renderUpgrades();openModal('upgradeModal');});
@@ -2184,6 +2898,7 @@ $('btnShop').addEventListener('click',e=>{e.stopPropagation();SFX.init();renderS
 $('tabShopShip').addEventListener('click',()=>{shopTab='ship';renderShop();});
 $('tabShopAstro').addEventListener('click',()=>{shopTab='astro';renderShop();});
 $('tabShopTrade').addEventListener('click',()=>{shopTab='trade';renderShop();});
+$('tabShopExchange').addEventListener('click',()=>{shopTab='exchange';renderShop();});
 $('upgradeModal').addEventListener('click',e=>{if(e.target===$('upgradeModal'))closeModals();});
 
 let craftTab='craft';
@@ -2200,6 +2915,7 @@ $('closeJournal').addEventListener('click',e=>{e.stopPropagation();closeModals()
 $('journalModal').addEventListener('click',e=>{if(e.target===$('journalModal'))closeModals();});
 $('tabMissions').addEventListener('click',()=>{journalTab='missions';renderJournalModal();});
 $('tabDisc').addEventListener('click',()=>{journalTab='disc';renderJournalModal();});
+$('tabResearch').addEventListener('click',()=>{journalTab='research';renderJournalModal();});
 $('tabSave').addEventListener('click',()=>{journalTab='save';renderJournalModal();});
 
 let mapTab='radar';
@@ -2287,13 +3003,16 @@ function readInput(){
 /* ---------- 10. GAME STATES, CRAFTING, OUTPOSTS, WARP & SAVE SYSTEM ---------- */
 let ship,astro;
 const PL={mode:'fly',vel:new V3(),speed:0,near:null,alt:1e9,body:null,local:new V3(),L:null,T:null,lookIdle:9,jumpQ:false,hotT:0,
-  shield:100,jetFuel:100,stormActive:false,stormTimer:75,currentSys:SYSTEMS[0],mineTimer:0,targetNode:null,nearInteract:null,sheltered:false};
+  shield:100,jetFuel:100,stormActive:false,stormTimer:240,stormDur:0,stormWarned:false,pollenActive:false,pollenTimer:300,pollenDur:0,pollenWarned:false,
+  hazardExposed:false,hazUiT:0,rebootGrace:0,currentSys:SYSTEMS[0],mineTimer:0,targetNode:null,nearInteract:null,sheltered:false};
 const orbit={yaw:0,pitch:0.4};
 const camUp=new V3(0,1,0),carry=new V3();
 const _f=new V3(),_u=new V3(),_r=new V3(),_a=new V3(),_b=new V3(),_c=new V3(),_e=new V3(),_g=new V3(),_q=new Q(),_m=new M4();
 const AX=new V3(1,0,0),AY=new V3(0,1,0);
 const toastEl=$('toast');
 function toast(t){toastEl.textContent=t;toastEl.classList.remove('go');void toastEl.offsetWidth;toastEl.classList.add('go');}
+let hazToastT=0;
+function hazToast(msg){const el=$('hazToast');if(!el)return;el.textContent=msg;el.classList.add('on');clearTimeout(hazToastT);hazToastT=setTimeout(()=>el.classList.remove('on'),6000);}
 const landRange=b=>Math.max(42,b.R*1.05);
 
 function findNear(pos){let best=null,bd=1e12;for(const b of bodies){if(b.sys!==activeSystemId)continue;const d=pos.distanceTo(b.center)-b.R;if(d<bd){bd=d;best=b;}}return best;}
@@ -2326,18 +3045,68 @@ function astroSvg(k){const c=hexCss;return `<svg viewBox="0 0 60 100">
 <circle cx="30" cy="26" r="16" fill="${c(k.suit)}" stroke="#170f24" stroke-width="3"/>
 <ellipse cx="30" cy="27" rx="11" ry="8" fill="${c(k.visor)}" stroke="#170f24" stroke-width="2.5"/>
 ${k.crown?`<path d="M18 12 L20 2 L25 9 L30 0 L35 9 L40 2 L42 12Z" fill="#ffe066" stroke="#170f24" stroke-width="2"/>`:''}</svg>`;}
+const CONTRACT_POOL=[
+  {k:'fe',n:30,gold:34,rp:2,l:'FERRITE HAUL'},
+  {k:'ae',n:15,gold:44,rp:3,l:'AETHERIUM RUN'},
+  {k:'so',n:8,gold:56,rp:4,l:'SOLARITE ORDER'},
+  {k:'vd',n:4,gold:64,rp:4,l:'VOID SHARD LOT'},
+  {k:'lum',n:5,gold:82,rp:5,l:'LUMINA CRYSTAL LOT'},
+  {k:'bp',n:4,gold:66,rp:4,l:'BIO-PEARL LOT'},
+  {k:'vw',n:3,gold:48,rp:3,l:'VOIDWOOD STOCK'},
+  {k:'seed',n:1,gold:38,rp:2,l:'AETHER SEED SAMPLE'}
+];
+function ensureContracts(){
+  const day=Math.floor(Date.now()/86400000);
+  if(GAME.contractSeed!==day){GAME.contractSeed=day;GAME.contracts=[];}
+  if(GAME.contracts.length)return;
+  const rnd=mulberry32(day*7919+41),pool=CONTRACT_POOL.slice(),out=[];
+  for(let i=0;i<4;i++){
+    const p=pool.splice(Math.floor(rnd()*pool.length),1)[0];
+    out.push({id:'ct'+day+'_'+i,k:p.k,n:p.n,l:p.l,gold:Math.round(p.gold*(0.9+rnd()*0.3)),rp:p.rp,item:i===3?'outpostKit':(i===2?'medkit':null),claimed:false});
+  }
+  GAME.contracts=out;
+}
 function renderShop(){
   tutFlags.shop=1;
-  for(const [id,t] of [['tabShopShip','ship'],['tabShopAstro','astro'],['tabShopTrade','trade']])$(id).classList.toggle('active',shopTab===t);
+  for(const [id,t] of [['tabShopShip','ship'],['tabShopAstro','astro'],['tabShopTrade','trade'],['tabShopExchange','exchange']])$(id).classList.toggle('active',shopTab===t);
   updateResHUD();
   const grid=$('shopGrid');grid.innerHTML='';const gold=INV.gold||0;
+  if(shopTab==='exchange'){
+    ensureContracts();
+    const head=document.createElement('div');head.className='uCard';
+    head.innerHTML=`<div><div class="uTitle"><span>🌌 GALACTIC EXCHANGE</span><span class="uLvl">4 CONTRACTS</span></div>
+      <div class="uDesc" style="margin-top:6px">Frontier brokers post fresh supply contracts every day. Deliver the cargo for gold, Research Points and rare frontier items.</div></div>
+      <div class="uCost">RESEARCH POINTS: ${INV.rp||0} RP</div>`;
+    grid.appendChild(head);
+    for(const c of GAME.contracts){
+      const ok=!c.claimed&&(INV[c.k]||0)>=c.n;
+      const itemName=c.item==='outpostKit'?'OUTPOST KIT':c.item==='medkit'?'MEDKIT':'';
+      const card=document.createElement('div');card.className='uCard'+(c.claimed?' equipped':'');
+      card.innerHTML=`<div><div class="uTitle"><span>${c.l}</span><span class="uLvl">${c.claimed?'✓ DELIVERED':`HAVE ${INV[c.k]||0}/${c.n}`}</span></div>
+        <div class="uDesc" style="margin-top:5px">Deliver ${c.n} ${c.k.toUpperCase()} → +${c.gold} 🪙, +${c.rp} RP${itemName?', +1 '+itemName:''}.</div></div>
+        <button class="uBtn buy" data-ct="${c.id}" ${ok?'':'disabled'}>${c.claimed?'CONTRACT COMPLETE':ok?'DELIVER CARGO':'NOT ENOUGH CARGO'}</button>`;
+      grid.appendChild(card);
+    }
+    grid.querySelectorAll('[data-ct]').forEach(b=>b.addEventListener('click',()=>{
+      const c=GAME.contracts.find(x=>x.id===b.dataset.ct);
+      if(!c||c.claimed||(INV[c.k]||0)<c.n)return;
+      INV[c.k]-=c.n;
+      earnGold(c.gold,false);
+      INV.rp=(INV.rp||0)+c.rp;
+      if(c.item)INV[c.item]=(INV[c.item]||0)+1;
+      c.claimed=true;
+      SFX.coin();updateResHUD();saveGame(true);renderShop();
+      toast(`CONTRACT COMPLETE — +${c.gold} 🪙 +${c.rp} RP${c.item?' +1 '+c.item.toUpperCase():''}`);
+    }));
+    return;
+  }
   if(shopTab==='trade'){
     const SUP=[{k:'ration',p:20,l:'🥫 SPACE RATION',d:'+50 FOOD. Essential on barren worlds with no fruit.'},{k:'medkit',p:40,l:'💊 MEDKIT',d:'+50 HEALTH instantly. Use with [H] or tap 💊.'}];
     SUP.forEach((d,i)=>{const ok=gold>=d.p;const card=document.createElement('div');card.className='uCard';
       card.innerHTML=`<div><div class="uTitle"><span>${d.l}</span><span class="uLvl">HAVE ${INV[d.k]||0}</span></div><div class="uDesc" style="margin-top:6px">${d.d}</div></div>
       <div><button class="uBtn buy" data-sup="${i}" ${ok?'':'disabled'}>${ok?'BUY · '+d.p+' 🪙':'NEED '+(d.p-gold)+' MORE 🪙'}</button></div>`;grid.appendChild(card);});
     grid.querySelectorAll('[data-sup]').forEach(b=>b.addEventListener('click',()=>{const d=SUP[+b.dataset.sup];if((INV.gold||0)<d.p)return;INV.gold-=d.p;INV[d.k]=(INV[d.k]||0)+1;SFX.coin();updateResHUD();saveGame(true);renderShop();}));
-    const DEALS=[{k:'fe',n:10,g:10,l:'FERRITE'},{k:'ae',n:10,g:25,l:'AETHERIUM'},{k:'so',n:5,g:30,l:'SOLARITE'},{k:'vd',n:2,g:30,l:'VOID SHARD'}];
+    const DEALS=[{k:'fe',n:10,g:10,l:'FERRITE'},{k:'ae',n:10,g:25,l:'AETHERIUM'},{k:'so',n:5,g:30,l:'SOLARITE'},{k:'vd',n:2,g:30,l:'VOID SHARD'},{k:'lum',n:3,g:36,l:'LUMINA CRYSTAL'},{k:'bp',n:3,g:27,l:'BIO-PEARL'},{k:'vw',n:2,g:20,l:'VOIDWOOD'},{k:'seed',n:1,g:18,l:'AETHER SEED'}];
     DEALS.forEach((d,i)=>{const ok=INV[d.k]>=d.n;const card=document.createElement('div');card.className='uCard';
       card.innerHTML=`<div><div class="uTitle"><span>${d.l}</span><span class="uLvl">HAVE ${INV[d.k]}</span></div><div class="uDesc" style="margin-top:6px">Sell spare ore to the bazaar traders for gold coins.</div></div>
       <div><div class="uCost">${d.n} ${d.k.toUpperCase()} → ${d.g} 🪙</div><button class="uBtn buy" style="margin-top:8px" data-sell="${i}" ${ok?'':'disabled'}>${ok?'SELL':'NOT ENOUGH ORE'}</button></div>`;grid.appendChild(card);});
@@ -2346,16 +3115,17 @@ function renderShop(){
   }
   const isShip=shopTab==='ship',list=isShip?SHIP_SKINS:ASTRO_SKINS,owned=isShip?SKIN.ownedShip:SKIN.ownedAstro,cur=isShip?SKIN.ship:SKIN.astro;
   for(const k of list){
-    const has=owned.includes(k.id),eq=cur===k.id,afford=gold>=k.price;
+    const has=owned.includes(k.id),eq=cur===k.id,afford=gold>=k.price,locked=!!k.locked&&!has;
     const card=document.createElement('div');card.className='uCard'+(eq?' equipped':'');
     card.innerHTML=`<div><div class="shopPrev">${isShip?shipSvg(k):astroSvg(k)}</div>
-      <div class="uTitle" style="margin-top:8px"><span>${k.name}</span><span class="uLvl">${k.price?k.price+' 🪙':'FREE'}</span></div>
+      <div class="uTitle" style="margin-top:8px"><span>${k.name}</span><span class="uLvl">${locked?'REWARD':k.price?k.price+' 🪙':'FREE'}</span></div>
       <div class="uDesc" style="margin-top:4px">${k.desc}</div></div>
-      <button class="uBtn${has?'':' buy'}" data-skin="${k.id}" ${eq||(!has&&!afford)?'disabled':''}>${eq?'★ EQUIPPED':has?'EQUIP':afford?'BUY · '+k.price+' 🪙':'NEED '+(k.price-gold)+' MORE 🪙'}</button>`;
+      <button class="uBtn${has?'':' buy'}" data-skin="${k.id}" ${eq||(!has&&(!afford||locked))?'disabled':''}>${eq?'★ EQUIPPED':locked?'ETERNAL BLOOM REWARD':has?'EQUIP':afford?'BUY · '+k.price+' 🪙':'NEED '+(k.price-gold)+' MORE 🪙'}</button>`;
     grid.appendChild(card);
   }
   grid.querySelectorAll('[data-skin]').forEach(b=>b.addEventListener('click',()=>{
     const id=b.dataset.skin,k=list.find(s=>s.id===id);
+    if(k.locked&&!owned.includes(id)){toast('RESTORE THE ETERNAL BLOOM TO EARN THE GOLDEN BLOOM SKIN');return;}
     if(!owned.includes(id)){if((INV.gold||0)<k.price)return;INV.gold-=k.price;owned.push(id);toast(`PURCHASED ${k.name}!`);SFX.coin();}
     if(isShip){SKIN.ship=id;dressShip(ship.model,ship.flame,id);}else{SKIN.astro=id;dressAstro(astro,id);}
     SFX.upgrade();updateResHUD();saveGame(true);renderShop();
@@ -2405,22 +3175,30 @@ function renderCraftModal(){
       {id:'scn',name:'ADVANCED SCANNER MODULE',desc:`Permanently expands Pulse Scanner range (+35m per module). Installed: ${INV.scanMod}`,cost:{fe:15,ae:15,so:5,vd:0},
         run:()=>{INV.scanMod++;toast('SCANNER MODULE INSTALLED!');}},
       {id:'kit',name:'OUTPOST CONSTRUCTION KIT',desc:`Modular prefab shelter & beacon kit. In stock: ${INV.outpostKit}`,cost:{fe:25,ae:10,so:5,vd:0},
-        run:()=>{INV.outpostKit++;toast('OUTPOST KIT CRAFTED!');}}
+        run:()=>{INV.outpostKit++;toast('OUTPOST KIT CRAFTED!');}},
+      {id:'lumfocus',name:'LUMINA FOCUS CRYSTAL',desc:`Elysian crystal optics. Permanently expands Pulse Scanner range (+35m). Installed: ${INV.scanMod}`,cost:{lum:2,bp:1},
+        run:()=>{INV.scanMod++;toast('LUMINA FOCUS INSTALLED — SCANNER RANGE UP!');}},
+      {id:'medgel',name:'BIO-PEARL MED-GEL',desc:`Pelagian pearl gel restores tissue fast. Crafts 1 Medkit. In stock: ${INV.medkit}`,cost:{bp:2,lum:1},
+        run:()=>{INV.medkit++;toast('BIO-PEARL MEDKIT CRAFTED!');}},
+      {id:'vwframe',name:'VOIDWOOD OUTPOST FRAME',desc:`Resin-hardened Myceloran frame. Crafts 1 Outpost Construction Kit. In stock: ${INV.outpostKit}`,cost:{vw:3,seed:1},
+        run:()=>{INV.outpostKit++;toast('VOIDWOOD OUTPOST KIT CRAFTED!');}}
     ];
+    const matKeys=['fe','ae','so','vd','lum','bp','vw','seed'];
     const grid=document.createElement('div');grid.className='uGrid';
     for(const r of recipes){
-      const ok=INV.fe>=r.cost.fe && INV.ae>=r.cost.ae && INV.so>=r.cost.so && INV.vd>=r.cost.vd;
+      const ok=matKeys.every(k=>!r.cost[k]||(INV[k]||0)>=r.cost[k]);
+      const costLine=matKeys.filter(k=>r.cost[k]).map(k=>`${k.toUpperCase()} ${r.cost[k]}`).join(' · ');
       const c=document.createElement('div');c.className='uCard';
       c.innerHTML=`<div><div class="uTitle"><span>${r.name}</span></div><div class="uDesc" style="margin-top:5px">${r.desc}</div></div>
-        <div><div class="uCost">COST: FE ${r.cost.fe} · AE ${r.cost.ae} · SO ${r.cost.so}</div>
+        <div><div class="uCost">COST: ${costLine||'FREE'}</div>
         <button class="uBtn" style="margin-top:8px" data-rcp="${r.id}" ${ok?'':'disabled'}>CRAFT ITEM</button></div>`;
       grid.appendChild(c);
     }
     body.appendChild(grid);
     grid.querySelectorAll('[data-rcp]').forEach(btn=>btn.addEventListener('click',()=>{
       const r=recipes.find(x=>x.id===btn.dataset.rcp);
-      if(!r||INV.fe<r.cost.fe||INV.ae<r.cost.ae||INV.so<r.cost.so)return;
-      INV.fe-=r.cost.fe;INV.ae-=r.cost.ae;INV.so-=r.cost.so;
+      if(!r||!matKeys.every(k=>!r.cost[k]||(INV[k]||0)>=r.cost[k]))return;
+      for(const k of matKeys)if(r.cost[k])INV[k]-=r.cost[k];
       r.run();SFX.craft();updateResHUD();renderCraftModal();saveGame(true);
     }));
   }else{
@@ -2439,14 +3217,37 @@ function renderCraftModal(){
       <div><div class="uCost">COST: FE 20 · AE 10</div>
       <button class="uBtn sky" id="btnDeployRover" style="margin-top:8px" ${(onSurface&&INV.fe>=20&&INV.ae>=10)?'':'disabled'}>DEPLOY PLANETARY ROVER</button></div>`;
     grid.appendChild(c2);
+    if(GAME.outposts.length){
+      const c3=document.createElement('div');c3.className='uCard';
+      c3.innerHTML=`<div><div class="uTitle"><span>FRONTIER OUTPOST NETWORK</span><span class="uLvl">${GAME.outposts.length} BUILT</span></div>
+        <div class="uDesc" style="margin-top:6px">Permanent outposts persist across sessions and survive system jumps. Upgrade to Lv.5 for stronger shelter beacons.</div>
+        <div id="outpostList" style="display:flex;flex-direction:column;gap:6px;margin-top:8px"></div></div>`;
+      grid.appendChild(c3);
+    }
     body.appendChild(grid);
+    if(GAME.outposts.length){
+      const list=$('outpostList');
+      for(const e of GAME.outposts){
+        const cost={fe:20*e.lvl,ae:12*e.lvl,so:6*e.lvl,vw:2*e.lvl};
+        const max=e.lvl>=5,canUp=!max&&(INV.fe||0)>=cost.fe&&(INV.ae||0)>=cost.ae&&(INV.so||0)>=cost.so&&(INV.vw||0)>=cost.vw;
+        const row=document.createElement('div');row.style.cssText='display:flex;align-items:center;gap:8px;justify-content:space-between;background:rgba(23,15,36,.08);border-radius:8px;padding:5px 7px';
+        row.innerHTML=`<div style="font-family:var(--sans);font-size:11px;font-weight:800">${e.body}<br><span style="color:#6c3fc5">LV.${e.lvl} ${max?'· MAX':''}</span></div>
+          <button class="uBtn" style="width:auto;padding:4px 9px;font-size:14px" data-op="${e.id}" ${max||!canUp?'disabled':''}>${max?'MAX':`UPGRADE · ${cost.fe} FE / ${cost.ae} AE / ${cost.vw} VW`}</button>`;
+        list.appendChild(row);
+      }
+      list.querySelectorAll('[data-op]').forEach(b=>b.addEventListener('click',()=>{
+        const e=GAME.outposts.find(x=>x.id===b.dataset.op);
+        if(upgradeOutpost(e)){saveGame(true);renderCraftModal();}
+      }));
+    }
 
     const bOut=$('btnDeployOutpost');
     if(bOut)bOut.addEventListener('click',()=>{
       if(!onSurface||INV.outpostKit<=0)return;
-      INV.outpostKit--;
       const dir=PL.mode==='walk'?astro.dir.clone():PL.local.clone().normalize();
-      placeOutpostOnPlanet(PL.body,dir,'OUTPOST SHELTER');
+      const placed=placeOutpostOnPlanet(PL.body,dir,'OUTPOST SHELTER');
+      if(!placed)return;
+      INV.outpostKit--;
       recordDiscovery('Outpost',`${PL.body.name} Frontier Base`,PL.body.name,'Player-constructed shielded habitat & beacon.');
       SFX.craft();updateResHUD();saveGame(true);closeModals();
       toast(`OUTPOST CONSTRUCTED ON ${PL.body.name}!`);
@@ -2468,6 +3269,7 @@ function renderCraftModal(){
 function renderJournalModal(){
   $('tabMissions').classList.toggle('active',journalTab==='missions');
   $('tabDisc').classList.toggle('active',journalTab==='disc');
+  $('tabResearch').classList.toggle('active',journalTab==='research');
   $('tabSave').classList.toggle('active',journalTab==='save');
   const body=$('journalBody');body.innerHTML='';
 
@@ -2476,7 +3278,7 @@ function renderJournalModal(){
       const el=document.createElement('div');el.className='jItem';
       el.innerHTML=`<div><div style="font-family:var(--display);font-size:20px;color:${m.done?'#2b7a5b':'#ff4d6d'}">${m.done?'✓':'★'} ${m.title}</div>
         <div style="font-size:12px;font-weight:600;margin-top:2px">${m.desc}</div>
-        <div style="font-size:11px;font-weight:800;opacity:.75;margin-top:3px">REWARD: FE +${m.reward.fe} · AE +${m.reward.ae} · SO +${m.reward.so} · VD +${m.reward.vd}</div></div>
+        <div style="font-size:11px;font-weight:800;opacity:.75;margin-top:3px">REWARD: ${['fe','ae','so','vd','lum','bp','vw','seed'].filter(k=>m.reward[k]).map(k=>`${k.toUpperCase()} +${m.reward[k]}`).join(' · ')}</div></div>
         <span class="jBadge" style="background:${m.done?'var(--mint)':'var(--sun)'}">${m.done?'COMPLETE':`${m.prog}/${m.goal}`}</span>`;
       body.appendChild(el);
     }
@@ -2492,6 +3294,33 @@ function renderJournalModal(){
         body.appendChild(el);
       }
     }
+  }else if(journalTab==='research'){
+    const rw=r=>[r.gold?`${r.gold}🪙`:null,r.rp?`${r.rp} RP`:null,['fe','ae','so','vd','lum','bp','vw','seed'].filter(k=>r[k]).map(k=>`+${r[k]} ${k.toUpperCase()}`)].flat().filter(Boolean).join(' · ');
+    body.innerHTML=`
+      <div class="uCard" style="margin-bottom:8px">
+        <div><div class="uTitle"><span>🧠 RESEARCH ARCHIVE</span><span class="uLvl">${INV.rp||0} RP</span></div>
+        <div class="uDesc" style="margin-top:6px">Expedition title: <b>${GAME.title||'NONE YET'}</b> · Achievements ${GAME.achievements.length}/${ACH_LIST.length} · Milestones ${GAME.milestones.length}/${MILESTONES.length}</div></div>
+      </div>
+      <div class="uGrid" id="achGrid"></div>
+      <div class="jList" id="msList" style="margin-top:10px"></div>`;
+    const ag=$('achGrid');
+    for(const a of ACH_LIST){
+      const got=GAME.achievements.some(x=>(x.id||x)===a.id);
+      const card=document.createElement('div');card.className='uCard';
+      card.innerHTML=`<div><div class="uTitle"><span>${got?'🏆':'🔒'} ${a.name}</span><span class="uLvl">${got?'EARNED':'LOCKED'}</span></div>
+        <div class="uDesc" style="margin-top:5px">${a.desc}</div></div>`;
+      ag.appendChild(card);
+    }
+    const ml=$('msList');
+    for(const ms of MILESTONES){
+      const got=GAME.milestones.includes(ms.id);
+      const el=document.createElement('div');el.className='jItem';
+      el.innerHTML=`<div><div style="font-family:var(--display);font-size:19px;color:${got?'#2b7a5b':'#5a2ca0'}">${got?'✓':'○'} ${ms.name}</div>
+        <div style="font-size:12px;font-weight:600;margin-top:2px">${ms.desc}</div>
+        <div style="font-size:11px;font-weight:800;opacity:.75;margin-top:3px">REWARD: ${rw(ms.reward)}</div></div>
+        <span class="jBadge" style="background:${got?'var(--mint)':'#ddd'}">${got?'ARCHIVED':'IN PROGRESS'}</span>`;
+      ml.appendChild(el);
+    }
   }else{
     body.innerHTML=`
       <div class="uGrid">
@@ -2506,9 +3335,11 @@ function renderJournalModal(){
         </div>
         <div class="uCard">
           <div><div class="uTitle"><span>EXPEDITION SAVE DATA</span></div>
-          <div class="uDesc" style="margin-top:6px">Save your resources, upgrades, discoveries, missions, and visited worlds to local browser storage.</div></div>
-          <div style="display:flex;gap:6px">
+          <div class="uDesc" style="margin-top:6px">Save your resources, upgrades, discoveries, missions, and visited worlds to local browser storage. Export a JSON backup or import one on another device.</div></div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap">
             <button class="uBtn" id="btnManualSave">💾 SAVE NOW</button>
+            <button class="uBtn sky" id="btnExportSave">📤 EXPORT SAVE</button>
+            <button class="uBtn void" id="btnImportSave">📥 IMPORT SAVE</button>
             <button class="uBtn" id="btnResetSave" style="background:var(--pop);color:#fff">🗑️ RESET</button>
           </div>
         </div>
@@ -2517,9 +3348,28 @@ function renderJournalModal(){
       applyGraphicsQuality(btn.dataset.gfx);renderJournalModal();toast(`GRAPHICS: ${btn.dataset.gfx.toUpperCase()}`);
     }));
     $('btnManualSave').addEventListener('click',()=>{saveGame(false);});
+    $('btnExportSave').addEventListener('click',()=>{
+      saveGame(true);
+      let raw=null;try{raw=localStorage.getItem('cosmic_hop_gf_save');}catch(_){}
+      if(!raw){toast('NO SAVE DATA TO EXPORT YET');return;}
+      try{
+        const blob=new Blob([raw],{type:'application/json'});
+        const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+        a.download='cosmic_hop_galactic_frontier_save.json';document.body.appendChild(a);a.click();a.remove();
+        setTimeout(()=>URL.revokeObjectURL(a.href),2000);
+        toast('SAVE EXPORTED AS JSON!');
+      }catch(_){toast('EXPORT FAILED — TRY SAVE NOW FIRST');}
+    });
+    $('btnImportSave').addEventListener('click',()=>$('importFile').click());
     $('btnResetSave').addEventListener('click',()=>{
-      localStorage.removeItem('cosmic_hop_gf_save');
-      toast('SAVE DATA CLEARED! RELOAD FOR NEW GAME.');
+      askConfirm('⚠️ RESET EXPEDITION','Erase your saved expedition? This cannot be undone.',[
+        {label:'CANCEL'},
+        {label:'ERASE SAVE',cls:'void',fn:()=>{
+          try{localStorage.removeItem('cosmic_hop_gf_save');}catch(_){}
+          toast('SAVE DATA CLEARED — RESTARTING…');
+          setTimeout(()=>location.reload(),700);
+        }}
+      ]);
     });
   }
 }
@@ -2601,14 +3451,28 @@ function switchActiveSystem(sysId){
   $('sysTag').textContent=sys.name;
   skyMat.uniforms.uSysTint.value.copy(srgb(sys.tint));
   for(const b of bodies){
-    b.group.visible=(b.sys===sysId);
+    const on=b.sys===sysId;
+    b.group.visible=on;
+    if(on)ensureBodyTerrain(b);else disposeBodyTerrain(b);
   }
   for(const ast of asteroids){
     ast.mesh.visible=(ast.sys===sysId&&!ast.depleted);
   }
+  if(ELYS.beamGroup)ELYS.beamGroup.visible=sysId==='elysian';
   localStarLight.position.copy(sys.origin);
   localStarLight.color.setHex(sys.tint);
+  if(!GAME.sysVisited.includes(sysId))GAME.sysVisited.push(sysId);
   if(sysId==='gargantua')advanceMission('gargantua',1);
+  if(sysId==='elysian'){
+    updateElyHUD();
+    if(!GAME.seenElysian){
+      GAME.seenElysian=true;
+      advanceMission('elysianSystem',1);
+      playCinematic('SYSTEM 04','ELYSIAN VEIL','A living crystal organism — restore the Eternal Bloom.',false);
+      setTimeout(()=>toast('🌿 SCAN ENERGY NODES [C] · LIGHT 3 PYLONS · RESTORE THE BLOOM'),4200);
+    }
+  }
+  checkAchievements();checkMilestones();updateResHUD();
   SFX.setSystem(Math.max(0,SYSTEMS.indexOf(sys)));
 }
 
@@ -2649,7 +3513,10 @@ function saveGame(silent=false){
       missions:MISSIONS.map(m=>({id:m.id,prog:m.prog,done:m.done})),
       sys:activeSystemId,
       skins:SKIN,
-      vitals:{hp:Math.round(PL.hp),food:Math.round(PL.food)}
+      vitals:{hp:Math.round(PL.hp),food:Math.round(PL.food)},
+      elys:{nodes:ELYS.nodes.map(n=>({id:n.id,activated:n.activated,pylons:n.pylons.map(p=>p.lit)})),restored:ELYS.restored},
+      game:{title:GAME.title,achievements:GAME.achievements,milestones:GAME.milestones,contracts:GAME.contracts,contractSeed:GAME.contractSeed,outposts:GAME.outposts,sysVisited:GAME.sysVisited,seenElysian:GAME.seenElysian},
+      hazard:{stormActive:PL.stormActive,stormTimer:PL.stormTimer,stormWarned:PL.stormWarned,pollenActive:PL.pollenActive,pollenTimer:PL.pollenTimer,pollenWarned:PL.pollenWarned}
     };
     localStorage.setItem('cosmic_hop_gf_save',JSON.stringify(data));
     if(!silent)toast('EXPEDITION PROGRESS SAVED!');
@@ -2688,6 +3555,39 @@ function loadGame(){
         if(m){m.prog=sm.prog||0;m.done=!!sm.done;}
       }
     }
+    if(data.game){
+      GAME.title=typeof data.game.title==='string'?data.game.title:'';
+      if(Array.isArray(data.game.achievements))GAME.achievements=data.game.achievements.map(x=>typeof x==='string'?(ACH_LIST.find(a=>a.id===x)||{id:x,name:x,desc:''}):x).filter(x=>x&&x.id);
+      if(Array.isArray(data.game.milestones))GAME.milestones=data.game.milestones.filter(x=>typeof x==='string');
+      GAME.contractSeed=+data.game.contractSeed||0;
+      GAME.contracts=Array.isArray(data.game.contracts)?data.game.contracts:[];
+      GAME.outposts=Array.isArray(data.game.outposts)?data.game.outposts:[];
+      GAME.sysVisited=Array.isArray(data.game.sysVisited)&&data.game.sysVisited.length?data.game.sysVisited:['solara'];
+      GAME.seenElysian=!!data.game.seenElysian;
+    }
+    if(data.hazard){
+      PL.stormActive=!!data.hazard.stormActive;
+      PL.stormTimer=+data.hazard.stormTimer||240;
+      PL.stormWarned=!!data.hazard.stormWarned;
+      PL.pollenActive=!!data.hazard.pollenActive;
+      PL.pollenTimer=+data.hazard.pollenTimer||300;
+      PL.pollenWarned=!!data.hazard.pollenWarned;
+      if(PL.stormTimer<=0)PL.stormTimer=5;
+      if(PL.pollenTimer<=0)PL.pollenTimer=300;
+    }
+    if(data.elys&&Array.isArray(data.elys.nodes)){
+      for(const sn of data.elys.nodes){
+        const n=ELYS.nodes.find(x=>x.id===sn.id);
+        if(!n)continue;
+        if(Array.isArray(sn.pylons))for(let i=0;i<n.pylons.length;i++){
+          if(sn.pylons[i]){n.pylons[i].lit=true;if(n.pylons[i].mesh)n.pylons[i].mesh.material=toon(0x5df2c0,{emissive:0x5df2c0,emissiveIntensity:0.9});}
+        }
+        if(sn.activated)setNetNodeActive(n,true);
+      }
+      if(data.elys.restored){ELYS.restored=true;applyBloomState();}
+    }
+    rebuildSavedOutposts();
+    updateElyHUD();
     if(data.sys&&SYSTEMS.some(s=>s.id===data.sys)){
       switchActiveSystem(data.sys);
       const startB=bodies.find(b=>b.sys===data.sys&&!b.moon&&b.kind!=='sun');
@@ -2748,6 +3648,7 @@ function updateMining(dt){
       const meta=RES_META[bestTarget.type];
       INV[bestTarget.type]+=yieldAmt;
       if(bestTarget.type==='so')advanceMission('solarite',yieldAmt);
+      if(bestTarget.type==='lum')advanceMission('lumCrystal',yieldAmt);
       const gEarn=yieldAmt*(GOLD_RATE[bestTarget.type]||1);tutFlags.mine=1;
       INV.gold=(INV.gold||0)+gEarn;
       updateResHUD();
@@ -2802,6 +3703,17 @@ function updateEcosystemAndHazards(dt,t){
     if(rover.deployed && rover.body===b && PL.mode==='walk' && localPos.distanceTo(rover.localPos)<3.5){
       PL.nearInteract={kind:'rover',label:'DRIVE NOMAD ROVER'};
     }
+    if(b.netNodes)for(const nn of b.netNodes){
+      if(!nn.activated&&localPos.distanceTo(nn.localPos)<4.6){
+        const lit=nn.pylons.filter(p=>p.lit).length;
+        PL.nearInteract={kind:'netnode',node:nn,label:lit>=3?`ENERGIZE ENERGY NODE — ${ELYS_NODE_COST.fe} FE · ${ELYS_NODE_COST.ae} AE · ${ELYS_NODE_COST.lum} LUMINA`:`ENERGY NODE LOCKED — LIGHT ${3-lit} MORE PYLON${3-lit>1?'S':''}`};
+      }
+      for(const py of nn.pylons){
+        if(!py.lit&&localPos.distanceTo(py.localPos)<2.8){
+          PL.nearInteract={kind:'netpylon',node:nn,pylon:py,idx:nn.pylons.indexOf(py),label:`CHARGE NETWORK PYLON (${nn.pylons.filter(x=>x.lit).length+1}/3)`};
+        }
+      }
+    }
     for(const ru of b.ruins){
       if(ru.solved)continue;
       for(let pi=0;pi<ru.pylons.length;pi++){
@@ -2812,31 +3724,83 @@ function updateEcosystemAndHazards(dt,t){
       }
     }
   }
-
-  // Solar Storm Cycle (Generous interval + Clear Shelter Indicator)
-  PL.stormTimer-=dt;
-  if(PL.stormTimer<=0){
-    PL.stormActive=!PL.stormActive;
-    PL.stormTimer=PL.stormActive?18:85;
-    if(PL.stormActive){SFX.alarm();comicPop('SOLAR STORM!','#ff4d6d',50,30);}
+  if(activeSystemId==='elysian'&&PL.mode==='fly'&&ELYS.bloom){
+    const bd=ship.group.position.distanceTo(ELYS.bloom.center);
+    if(bd<ELYS.bloom.R*2.6)PL.nearInteract={kind:'bloom',label:ELYS.restored?'THE ETERNAL BLOOM IS RESTORED':'STABILIZE THE ETERNAL BLOOM'};
   }
-  const starDist=ref.distanceTo(PL.currentSys.origin);
-  const exposedToStorm=PL.stormActive && starDist<2600 && !PL.sheltered;
-  $('stormFx').classList.toggle('on',exposedToStorm);
-  $('stormBanner').classList.toggle('on',exposedToStorm);
 
-  const shieldResist=1-(UPGRADES.suit.lvl-1)*0.2;
-  if(exposedToStorm){
-    SFX.stormCrackle();
-    PL.shield=Math.max(0,PL.shield-4.5*shieldResist*dt);
+  // Hazards: gentle Solar Storms + Elysian Pollen Surges. One at a time, never in menus/tutorial/cutscenes.
+  const blockedForHazard=modalOpen||CINE.open||tutActive();
+  PL.rebootGrace=Math.max(0,PL.rebootGrace-dt);
+  const elysian=activeSystemId==='elysian';
+
+  if(!PL.stormActive){
+    if(!blockedForHazard)PL.stormTimer-=dt;
+    if(PL.stormTimer<=20&&PL.stormTimer>0&&!PL.stormWarned&&!blockedForHazard&&!PL.pollenActive){
+      PL.stormWarned=true;
+      hazToast('☀️ Solar storm approaching in 20s. Find shelter.');
+    }
+    if(PL.stormTimer<=0&&!blockedForHazard&&!PL.pollenActive){
+      PL.stormActive=true;PL.stormDur=35+Math.random()*10;PL.stormTimer=PL.stormDur;PL.stormWarned=false;
+      toast('☀️ SOLAR STORM — FIND SHELTER (caves, outposts or your ship)');
+      comicPop('SOLAR STORM','#ffb27a',50,32);
+    }
+  }else{
+    if(!blockedForHazard)PL.stormTimer-=dt;
+    if(PL.stormTimer<=0){PL.stormActive=false;PL.stormTimer=360+Math.random()*120;PL.stormWarned=false;toast('☀️ The solar storm has passed.');}
+  }
+
+  if(elysian&&!PL.pollenActive){
+    if(!blockedForHazard)PL.pollenTimer-=dt;
+    if(PL.pollenTimer<=20&&PL.pollenTimer>0&&!PL.pollenWarned&&!blockedForHazard&&!PL.stormActive){
+      PL.pollenWarned=true;
+      hazToast('🌿 Pollen surge approaching in 20s. Find shelter.');
+    }
+    if(PL.pollenTimer<=0&&!blockedForHazard&&!PL.stormActive){
+      PL.pollenActive=true;PL.pollenDur=30;PL.pollenTimer=PL.pollenDur;PL.pollenWarned=false;
+      toast('🌿 POLLEN SURGE — VISIBILITY FALLING · FIND SHELTER');
+      comicPop('POLLEN SURGE','#7dffc4',50,32);
+    }
+  }else if(elysian){
+    if(!blockedForHazard)PL.pollenTimer-=dt;
+    if(PL.pollenTimer<=0){PL.pollenActive=false;PL.pollenTimer=300+Math.random()*120;PL.pollenWarned=false;toast('🌿 The pollen surge has settled.');}
+  }
+
+  const starDist=ref.distanceTo(PL.currentSys.origin);
+  const exposedToStorm=PL.stormActive&&!blockedForHazard&&starDist<2600&&!PL.sheltered;
+  const exposedToPollen=PL.pollenActive&&!blockedForHazard&&elysian&&!PL.sheltered;
+  PL.hazardExposed=exposedToStorm||exposedToPollen;
+  $('stormFx').classList.toggle('on',exposedToStorm);
+  $('pollenFx').classList.toggle('on',exposedToPollen);
+
+  const hazardKind=PL.stormActive?'storm':(PL.pollenActive?'pollen':null);
+  const suitResist=1-(UPGRADES.suit.lvl-1)*0.2;
+  if(PL.rebootGrace<=0&&(exposedToStorm||exposedToPollen)){
+    if(Math.random()<dt*0.22)SFX.stormCrackle();
+    PL.shield=Math.max(0,PL.shield-(exposedToStorm?2.2:1.7)*suitResist*dt);
     if(PL.shield<=0){
-      PL.shield=55;
-      toast('⚠️ SHIELD OVERLOAD! EMERGENCY REBOOT!');hurt(20,null);
-      if(PL.mode==='walk'||PL.mode==='rover')enterShip();
+      PL.shield=55;PL.rebootGrace=2.5;
+      toast('⚠️ SHIELD EMPTY — EMERGENCY REBOOT. SUIT RECOVERING…');
+      hurt(10,null,true);
     }
   }else{
     PL.shield=Math.min(100,PL.shield+(PL.sheltered?18:9)*dt);
   }
+
+  // Quiet hazard HUD: chip with countdown + small note beside the HP bar
+  const chip=$('hazChip');
+  if(hazardKind||(!blockedForHazard&&(PL.stormWarned||PL.pollenWarned)&&((PL.stormTimer>0&&PL.stormTimer<=20)||(PL.pollenTimer>0&&PL.pollenTimer<=20)))){
+    const warning=!hazardKind;
+    const kind=hazardKind||(PL.stormWarned&&PL.stormTimer<=20?'storm':'pollen');
+    const left=hazardKind?(hazardKind==='storm'?PL.stormTimer:PL.pollenTimer):(kind==='storm'?PL.stormTimer:PL.pollenTimer);
+    chip.classList.add('on');chip.classList.toggle('warn',warning);
+    $('hazIcon').textContent=kind==='storm'?'⛈':'🌿';
+    $('hazTxt').textContent=warning?'SOON':(kind==='storm'?'STORM':'POLLEN');
+    $('hazTime').textContent=Math.max(0,Math.ceil(left))+'s';
+  }else chip.classList.remove('on','warn');
+  const note=$('stormNote');
+  note.classList.toggle('on',!!PL.hazardExposed);
+  if(PL.hazardExposed)note.textContent=exposedToPollen?'Pollen: shield draining · visibility low':'Storm: shield draining · HP regen reduced';
 
   // Gargantua Black Hole Relativistic Gravity Pull
   const bh=bodies.find(b=>b.kind==='blackhole'&&b.sys===activeSystemId);
@@ -2887,6 +3851,39 @@ function handleInteract(){
       toast('MONOLITH UNLOCKED! +25 AE, +15 SO, +5 VD!');
     }
     return true;
+  }
+  if(PL.nearInteract.kind==='netpylon'){
+    const {node,pylon,idx}=PL.nearInteract;
+    if(pylon.lit)return true;
+    pylon.lit=true;
+    pylon.mesh.material=toon(0x5df2c0,{emissive:0x5df2c0,emissiveIntensity:0.9});
+    SFX.puzzleNode(idx);updateElyHUD();
+    const litCount=node.pylons.filter(p=>p.lit).length;
+    comicPop(`PYLON ${litCount}/3 CHARGED!`,'#7dffc4',50,40);
+    if(litCount>=3)toast('NODE PYLONS CHARGED — RETURN TO THE NODE AND PRESS [E] TO ENERGIZE');
+    saveGame(true);
+    return true;
+  }
+  if(PL.nearInteract.kind==='netnode'){
+    const n=PL.nearInteract.node;
+    if(n.activated)return true;
+    const lit=n.pylons.filter(p=>p.lit).length;
+    if(lit<3){toast(`NODE OFFLINE — CHARGE ITS ${3-lit} REMAINING PYLON${3-lit>1?'S':''} FIRST`);return true;}
+    const cost=ELYS_NODE_COST;
+    if((INV.fe||0)<cost.fe||(INV.ae||0)<cost.ae||(INV.lum||0)<cost.lum){
+      toast(`NEED ${cost.fe} FE · ${cost.ae} AE · ${cost.lum} LUMINA TO ENERGIZE THIS NODE`);return true;
+    }
+    INV.fe-=cost.fe;INV.ae-=cost.ae;INV.lum-=cost.lum;
+    setNetNodeActive(n,true);
+    updateResHUD();updateElyHUD();advanceMission('elysianNode',1);
+    checkAchievements();checkMilestones();
+    SFX.discover();comicPop(`ENERGY NODE ${elysNodesActive()}/5 ONLINE!`,'#e6ff7a',50,38);
+    toast(`⚡ ${n.name.split(' Energy')[0]} NODE LINKED TO THE BLOOM`);
+    saveGame(true);
+    return true;
+  }
+  if(PL.nearInteract.kind==='bloom'){
+    return stabilizeBloom();
   }
   return false;
 }
@@ -3193,9 +4190,10 @@ function useMedkit(){
 function updateVitals(dt){
   if(modalOpen)return;
   const onFoot=PL.mode==='walk'||PL.mode==='rover';
-  PL.food=Math.max(0,PL.food-dt*(onFoot?0.3:0.12));
+  const hazResist=1-(UPGRADES.suit.lvl-1)*0.2;
+  PL.food=Math.max(0,PL.food-dt*(onFoot?0.3:0.12)*(PL.hazardExposed?1+0.35*hazResist:1));
   if(PL.food<=0)hurt(dt*1.5,null,true);
-  else if(PL.food>40&&PL.hp<100)PL.hp=Math.min(100,PL.hp+dt*(PL.mode==='landed'?3:0.7));
+  else if(PL.food>40&&PL.hp<100)PL.hp=Math.min(100,PL.hp+dt*(PL.mode==='landed'?3:0.7)*(1-(PL.hazardExposed?0.7*hazResist:0)));
   if(PL.food<20&&uTime.value-(PL.hungerT||-99)>25){PL.hungerT=uTime.value;toast(PL.food<=0?'🍗 STARVING! LOSING HEALTH — EAT SOMETHING [G]':'🍗 GETTING HUNGRY — EAT FOOD [G]');}
 }
 const _sk=new V3();
@@ -3336,6 +4334,7 @@ function frame(dt){
     updateMining(dt);
     updateEcosystemAndHazards(dt,simT);
   }
+  if(activeSystemId==='elysian')updateElysFx(dt,simT);
 
   ship.flameS=lerp(ship.flameS,ship.flameT||0,1-Math.exp(-dt*8));
   ship.flame.visible=ship.flameS>0.03;ship.flame.scale.set(0.8+ship.flameS*0.3,0.8+ship.flameS*0.3,ship.flameS*(0.85+Math.random()*0.3));
@@ -3377,7 +4376,7 @@ $('btnFull').addEventListener('click',e=>{e.stopPropagation();if(document.fullsc
 document.addEventListener('fullscreenchange',()=>setTimeout(resize,120));
 
 /* ---------- 11. REFINEMENTS: autosave, dynamic resolution, audio state, settings ---------- */
-setInterval(()=>{if(started)saveGame(true);},15000);                       // quiet autosave while playing
+setInterval(()=>{if(started&&!window.__saveImporting)saveGame(true);},15000);                       // quiet autosave while playing
 document.addEventListener('visibilitychange',()=>{if(document.hidden&&started)saveGame(true);});
 addEventListener('pagehide',()=>{if(started)saveGame(true);});
 
@@ -3396,7 +4395,8 @@ function audioState(){
   if(!started||modalOpen)return{storm:0,hole:0};
   let hole=0;
   if(PL.currentSys&&PL.currentSys.id==='gargantua'){const bh=bodies.find(b=>b.kind==='blackhole');if(bh)hole=clamp(1-ship.group.position.distanceTo(bh.center)/1800,0,1);}
-  return{storm:(PL.stormActive&&!PL.sheltered&&PL.mode!=='landed')?1:0,hole};
+  const exposed=(PL.stormActive||PL.pollenActive)&&!PL.sheltered;
+  return{storm:exposed?1:0,hole};
 }
 
 /* settings panel (sound + dynamic resolution) */
@@ -3438,21 +4438,53 @@ async function boot(){
   if(hasSave)contBtn.hidden=false;
 
   playBtn.disabled=false;playBtn.textContent='NEW EXPEDITION';playBtn.focus();
-  playBtn.addEventListener('click',()=>{
+  const startPlaying=(resume)=>{
     if(isTouchDev&&canFS)goFull();
     SFX.init();SFX.discover();
+    if(resume)loadGame();
     started=true;$('start').classList.add('bye');$('ui').classList.add('live');canvas.focus();PL.speed=30;
-    toast('WELCOME TO GALACTIC FRONTIER!');
+    toast(resume?'EXPEDITION RESUMED!':'WELCOME TO GALACTIC FRONTIER!');
+  };
+  window.__startPlaying=startPlaying;
+  playBtn.addEventListener('click',()=>{
+    let hasSave=false;try{hasSave=!!localStorage.getItem('cosmic_hop_gf_save');}catch(_){}
+    if(!hasSave){startPlaying(false);return;}
+    SFX.init();
+    askConfirm('⚠️ START NEW EXPEDITION','Starting a new expedition will ERASE your saved progress.',[
+      {label:'CANCEL',cls:''},
+      {label:'CONTINUE SAVE',cls:'sky',fn:()=>startPlaying(true)},
+      {label:'ERASE & START NEW',cls:'void',fn:()=>{try{localStorage.removeItem('cosmic_hop_gf_save');}catch(_){}startPlaying(false);}}
+    ]);
   });
-  contBtn.addEventListener('click',()=>{
-    if(isTouchDev&&canFS)goFull();
-    SFX.init();loadGame();SFX.discover();
-    started=true;$('start').classList.add('bye');$('ui').classList.add('live');canvas.focus();PL.speed=30;
-    toast('EXPEDITION RESUMED!');
-  });
+  contBtn.addEventListener('click',()=>startPlaying(true));
 }
 boot().catch(err=>{console.error(err);const e=$('err');e.hidden=false;e.textContent='Could not start: '+(err&&err.message||err);playBtn.textContent='OOPS';});
-window.__game={COINS,SKIN,earnGold,PL,bodies,INV,UPGRADES,MISSIONS,DISCOVERIES,get ship(){return ship;},get astro(){return astro;},actLand,actExit,warpToBody,keys,look,camera,frame};
+
+/* ---- Save import + offline service worker ---- */
+$('importFile').addEventListener('change',e=>{
+  const f=e.target.files&&e.target.files[0];if(!f)return;
+  const rd=new FileReader();
+  rd.onload=()=>{
+    let data=null;
+    try{data=JSON.parse(String(rd.result));}catch(_){}
+    e.target.value='';
+    if(!data||typeof data!=='object'||!data.inv){toast('INVALID SAVE FILE — EXPECTED COSMIC HOP JSON');return;}
+    askConfirm('⚠️ IMPORT SAVE','Import this save? Your current expedition progress will be replaced.',[
+      {label:'CANCEL'},
+      {label:'IMPORT SAVE',cls:'sky',fn:()=>{
+        window.__saveImporting=true;
+        try{localStorage.setItem('cosmic_hop_gf_save',JSON.stringify(data));}catch(_){window.__saveImporting=false;toast('IMPORT FAILED — STORAGE BLOCKED');return;}
+        toast('SAVE IMPORTED — RESTARTING…');
+        setTimeout(()=>location.reload(),700);
+      }}
+    ]);
+  };
+  rd.readAsText(f);
+});
+if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)){
+  addEventListener('load',()=>{navigator.serviceWorker.register('./sw.js',{updateViaCache:'none'}).then(r=>r.update()).catch(()=>{});});
+}
+window.__game={COINS,SKIN,earnGold,PL,bodies,INV,UPGRADES,MISSIONS,DISCOVERIES,ELYS,GAME,get ship(){return ship;},get astro(){return astro;},actLand,actExit,warpToBody,switchActiveSystem,triggerScan,handleInteract,keys,look,camera,frame};
 </script>
 </body>
 </html>
