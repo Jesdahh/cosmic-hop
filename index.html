@@ -349,6 +349,43 @@ html,body{margin:0;height:100%;overflow:hidden;background:var(--space);color:var
 .qBtns{display:flex;gap:8px}.qBtns .hudBtn.sel{background:var(--mint);transform:translate(2px,3px);box-shadow:1px 1px 0 var(--ink)}
 .sNote{margin:2px 0 8px;font-size:14px;opacity:.75}
 .modal .mBody{touch-action:pan-y}
+
+/* Expansion pack UI: surface sectors, pets, photo mode, vaults & base control */
+#entryFx{position:fixed;inset:0;pointer-events:none;z-index:3;opacity:0;transition:opacity .5s;
+  background:radial-gradient(ellipse at 50% 120%,rgba(255,170,60,0) 35%,rgba(255,130,40,.32) 72%,rgba(255,80,20,.62) 100%)}
+#entryFx.on{opacity:1}
+#photoHint{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);z-index:31;display:none;pointer-events:none;
+  background:rgba(23,15,36,.86);border:2px solid var(--sun);border-radius:999px;color:var(--sun);padding:7px 16px;
+  font-family:var(--sans);font-size:12px;font-weight:800;letter-spacing:.04em;white-space:nowrap}
+body.photoMode #photoHint{display:block}
+#photoSnap,#photoExit{position:fixed;bottom:max(18px,env(safe-area-inset-bottom,0px));z-index:31;display:none;
+  font-family:var(--display);font-size:19px;letter-spacing:.04em;border:3px solid var(--ink);border-radius:999px;padding:9px 20px;
+  box-shadow:3px 3px 0 var(--ink);cursor:pointer}
+#photoSnap{right:max(16px,env(safe-area-inset-right,0px));background:var(--sun);color:var(--ink)}
+#photoExit{left:max(16px,env(safe-area-inset-left,0px));background:var(--pop);color:#fff}
+body.photoMode #photoSnap,body.photoMode #photoExit{display:block}
+body.photoMode #ui{opacity:0!important}
+#photoFlash{position:fixed;inset:0;background:#fff;z-index:60;opacity:0;pointer-events:none}
+#photoFlash.snap{animation:snap .45s ease-out}
+@keyframes snap{0%{opacity:.95}100%{opacity:0}}
+#petChip,#sectorChip{position:absolute;left:max(12px,env(safe-area-inset-left,0px));font-family:var(--sans);font-size:11px;font-weight:800;
+  background:rgba(23,15,36,.82);border:2px solid var(--mint);border-radius:999px;color:#d9fff1;padding:3px 10px;z-index:6;display:none;pointer-events:none;max-width:260px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#petChip{top:max(244px,calc(env(safe-area-inset-top,0px) + 238px));border-color:var(--sun);color:var(--sun)}
+#petChip.on,#sectorChip.on{display:block}
+#sectorChip{top:max(274px,calc(env(safe-area-inset-top,0px) + 268px));border-color:var(--sky);color:#cdefff}
+.codeGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;max-width:320px;margin:12px auto}
+.codeGrid .uBtn{font-size:24px;padding:10px 0}
+.codeReadout{font-family:var(--display);font-size:44px;letter-spacing:.35em;text-align:center;background:#170f24;color:var(--mint);border:3px solid var(--ink);border-radius:12px;padding:6px 10px 6px 18px;margin:6px auto;max-width:320px}
+.baseGrid{display:flex;flex-direction:column;gap:9px}
+.baseRow{background:#fff;border:2.5px solid var(--ink);border-radius:11px;padding:8px 10px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;box-shadow:2px 2px 0 var(--ink)}
+.baseRow .nm{font-family:var(--display);font-size:17px;min-width:92px}
+.baseRow .st{font-family:var(--sans);font-size:11px;font-weight:800;opacity:.75;flex:1;min-width:100px}
+.baseRow .uBtn{width:auto;padding:4px 9px;font-size:14px}
+.fRow{background:#fff;border:2.5px solid var(--ink);border-radius:11px;padding:9px 11px;margin-bottom:8px;box-shadow:2px 2px 0 var(--ink)}
+.fRow .ft{font-family:var(--display);font-size:19px;display:flex;justify-content:space-between;gap:6px}
+.fRep{height:9px;border:2px solid var(--ink);border-radius:99px;background:#e5dcc8;overflow:hidden;margin:5px 0}
+.fRep i{display:block;height:100%;background:linear-gradient(90deg,var(--mint),var(--sun))}
+@media (max-width:640px){#petChip,#sectorChip{display:none!important}}
 </style>
 </head>
 <body>
@@ -357,6 +394,11 @@ html,body{margin:0;height:100%;overflow:hidden;background:var(--space);color:var
 <div id="pollenFx"></div>
 <div id="hurtFx"></div>
 <div id="warpFx"></div>
+<div id="entryFx"></div>
+<div id="photoFlash"></div>
+<div id="photoHint">📷 PHOTO MODE — ENTER CAPTURE · P / ESC EXIT</div>
+<button id="photoSnap" type="button">📸 CAPTURE</button>
+<button id="photoExit" type="button">✕ EXIT</button>
 <div id="reticle"></div>
 <div id="popLayer"></div>
 
@@ -388,6 +430,8 @@ html,body{margin:0;height:100%;overflow:hidden;background:var(--space);color:var
     <div id="mDesc">Scan 3 alien species or plants using Pulse Scanner [C]</div>
     <div id="mProg">PROGRESS: 0 / 3</div>
   </div>
+  <div id="petChip"></div>
+  <div id="sectorChip"></div>
 
   <div id="topRight">
     <div id="btnRow">
@@ -395,6 +439,7 @@ html,body{margin:0;height:100%;overflow:hidden;background:var(--space);color:var
       <button class="hudBtn paper" id="btnHelp" title="How to play (I)">❓</button>
       <button class="hudBtn paper" id="btnFull" title="Full screen">⛶</button>
       <button class="hudBtn paper" id="btnSettings" title="Sound &amp; performance (O)">⚙️</button>
+      <button class="hudBtn sky" id="btnPhoto" title="Photo Mode (P)">📷</button>
       <button class="hudBtn gold" id="btnShop" title="Coin Shop (K)">🪙<span class="lbl"> SHOP</span></button>
       <button class="hudBtn void" id="btnCraft" title="Craft & Outposts (B)">🔨<span class="lbl"> BUILD</span></button>
       <button class="hudBtn mint" id="btnUpgrade" title="Upgrade Tech Bay (U)">🛠️<span class="lbl"> TECH</span></button>
@@ -414,6 +459,8 @@ html,body{margin:0;height:100%;overflow:hidden;background:var(--space);color:var
       <div class="resPill x" id="pillVw" title="Voidwood (Uncommon · Elysian outposts)"><span class="resDot" style="background:#2fe08a"></span>VW: <span id="rVw">0</span></div>
       <div class="resPill x" id="pillSeed" title="Aether Seed (Exotic · Bloom restoration)"><span class="resDot" style="background:#e6ff7a"></span>SD: <span id="rSeed">0</span></div>
       <div class="resPill x" id="pillRp" title="Research Points"><span class="resDot" style="background:#ffffff"></span>RP: <span id="rRp">0</span></div>
+      <div class="resPill x" id="pillStorm" title="Storm Crystal (event resource · sell at the Exchange)"><span class="resDot" style="background:#a0f0ff"></span>ST: <span id="rStorm">0</span></div>
+      <div class="resPill x" id="pillMap" title="Treasure Map (read with T on a surface)">🗺 <span id="rMaps">0</span></div>
     </div>
   </div>
 
@@ -422,7 +469,7 @@ html,body{margin:0;height:100%;overflow:hidden;background:var(--space);color:var
   <div id="help" class="box">
     <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> fly/walk/rover · <kbd>MOUSE</kbd> steer · <kbd>SHIFT</kbd> boost<br>
     <kbd>L</kbd> land/launch · <kbd>E</kbd> exit/board/interact · <kbd>SPACE</kbd> jump/jetpack<br>
-    <kbd>F</kbd>/<kbd>CLICK</kbd> mine · <kbd>C</kbd> scan · <kbd>U</kbd> tech · <kbd>B</kbd> craft/build · <kbd>M</kbd> map · <kbd>J</kbd> log · <kbd>K</kbd> 🪙 shop · <kbd>G</kbd> eat · <kbd>H</kbd> medkit
+    <kbd>F</kbd>/<kbd>CLICK</kbd> mine · <kbd>C</kbd> scan · <kbd>P</kbd> photo · <kbd>T</kbd> treasure map · <kbd>U</kbd> tech · <kbd>B</kbd> craft/build · <kbd>M</kbd> map · <kbd>J</kbd> log · <kbd>K</kbd> 🪙 shop · <kbd>G</kbd> eat · <kbd>H</kbd> medkit
   </div>
 
   <div id="stick"><div id="knob"></div></div>
@@ -473,6 +520,8 @@ html,body{margin:0;height:100%;overflow:hidden;background:var(--space);color:var
     <div class="mTabs">
       <button class="tabBtn active" id="tabMissions">🎯 MISSIONS</button>
       <button class="tabBtn" id="tabDisc">🔬 DISCOVERIES</button>
+      <button class="tabBtn" id="tabFactions">🤝 FACTIONS</button>
+      <button class="tabBtn" id="tabFauna">🐾 FAUNA</button>
       <button class="tabBtn" id="tabResearch">🧠 RESEARCH ARCHIVE</button>
       <button class="tabBtn" id="tabSave">💾 SAVE &amp; GRAPHICS</button>
     </div>
@@ -512,9 +561,17 @@ html,body{margin:0;height:100%;overflow:hidden;background:var(--space);color:var
           <li><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> fly / walk · <kbd>MOUSE</kbd> steer · <kbd>SHIFT</kbd> boost / run</li>
           <li><kbd>L</kbd> land / take off · <kbd>E</kbd> exit ship, board, use</li>
           <li><kbd>SPACE</kbd> jump (hold in air = jetpack)</li>
-          <li><kbd>F</kbd> or click: mine · <kbd>C</kbd> scan</li>
+          <li><kbd>F</kbd> or click: mine · <kbd>C</kbd> scan · <kbd>P</kbd> photo mode · <kbd>T</kbd> read treasure map</li>
           <li><kbd>G</kbd> eat · <kbd>H</kbd> medkit · <kbd>K</kbd> shop</li>
           <li><kbd>U</kbd> tech · <kbd>B</kbd> build · <kbd>M</kbd> map · <kbd>J</kbd> log · <kbd>I</kbd> this help</li></ul></section>
+        <section><h3>🧭 FRONTIER LIFE</h3><ul>
+          <li><b>POINTS OF INTEREST</b>: crashed ships, derelict probes, sealed vaults (find 3 glyph stones, then enter the code), and stranded survivors. Press <kbd>E</kbd> near them.</li>
+          <li><b>TREASURE MAPS</b> drop from probes &amp; vaults. Press <kbd>T</kbd> on a planet to reveal a buried cache waypoint.</li>
+          <li><b>WILDLIFE</b>: walk up to a creature and press <kbd>E</kbd> with fruit to tame it. Tamed creatures follow you. Scan every species on a world for a catalogue reward.</li>
+          <li><b>PHOTO MODE</b>: <kbd>P</kbd> hides the HUD, <kbd>ENTER</kbd> captures. Photograph creatures for Star Cartographer contracts.</li>
+          <li><b>FACTIONS</b>: rescues, salvage, photos and discoveries earn reputation and daily / weekly contracts. Claim them in <b>LOG → FACTIONS</b>.</li>
+          <li><b>BASES</b>: press <kbd>E</kbd> at an outpost for storage, farms and teleporters. Visit your bases from the <b>MAP</b>.</li>
+          <li><b>STORM RUSH</b>: when a solar storm hits, glowing storm crystals erupt nearby. Mine them before the storm passes!</li></ul></section>
         <section><h3>📱 PHONE &amp; TABLET</h3><ul>
           <li>Left side: drag the <b>joystick</b> to fly or walk.</li>
           <li>Right side: <b>swipe</b> to look and steer.</li>
@@ -596,6 +653,38 @@ html,body{margin:0;height:100%;overflow:hidden;background:var(--space);color:var
     </div>
   </div>
 </div>
+<!-- Vault code puzzle -->
+<div id="codeModal" class="modal">
+  <div class="mCard" style="width:min(520px,96vw)">
+    <div class="mHead"><h2>🔐 SEALED VAULT</h2><button class="hudBtn" id="closeCode" style="background:var(--pop);color:#fff">✕</button></div>
+    <div class="mBody">
+      <div id="codeMsg" class="uDesc" style="text-align:center">Enter the three-glyph sequence.</div>
+      <div class="codeReadout" id="codeReadout">___</div>
+      <div class="codeGrid" id="codeGrid"></div>
+      <div style="display:flex;gap:8px;justify-content:center;margin-top:4px">
+        <button class="uBtn" id="codeClear" style="width:auto">CLEAR</button>
+        <button class="uBtn buy" id="codeEnter" style="width:auto">UNSEAL</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Outpost base control -->
+<div id="baseModal" class="modal">
+  <div class="mCard" style="width:min(760px,96vw)">
+    <div class="mHead"><h2 id="baseTitle">🏠 BASE CONTROL</h2><button class="hudBtn" id="closeBase" style="background:var(--pop);color:#fff">✕</button></div>
+    <div class="mBody" id="baseBody"></div>
+  </div>
+</div>
+
+<!-- Photo gallery -->
+<div id="photoModal" class="modal">
+  <div class="mCard" style="width:min(760px,96vw)">
+    <div class="mHead"><h2>📷 PHOTO ARCHIVE</h2><button class="hudBtn" id="closePhoto" style="background:var(--pop);color:#fff">✕</button></div>
+    <div class="mBody" id="photoBody"></div>
+  </div>
+</div>
+
 <input type="file" id="importFile" class="impFile" accept="application/json,.json">
 
 <!-- Start Screen -->
@@ -962,7 +1051,7 @@ const bodies=[];
 let activeSystemId='solara';
 function makeBody(o){
   const b=Object.assign({name:'?',sys:'solara',kind:'rocky',R:10,parent:null,anchor:null,orbitR:0,orbitSpeed:0,phase:0,tilt:0,landable:true,liquid:false,liquidSolid:false,
-    sky:0,skyColor:0x88ccff,color:'#fff',colliders:[],obst:[],nodes:[],discoverables:[],creatures:[],caves:[],ruins:[],outposts:[],updaters:[],detail:null,visited:false,moon:false,heightAt:()=>0,resList:['FE']},o);
+    sky:0,skyColor:0x88ccff,color:'#fff',colliders:[],obst:[],nodes:[],discoverables:[],creatures:[],caves:[],ruins:[],outposts:[],pois:[],stormNodes:[],updaters:[],detail:null,visited:false,moon:false,heightAt:()=>0,resList:['FE']},o);
   b.group=new THREE.Group();b.center=b.group.position;b.delta=new V3();
   if(b.anchor)b.center.copy(b.anchor);
   b.group.visible=(b.sys===activeSystemId);
@@ -984,8 +1073,8 @@ function updateOrbits(t){
 }
 
 /* ---- Player Inventory, Consumables & Upgrades (Levels 1-5) ---- */
-const INV={fe:30,ae:12,so:5,vd:0,lum:0,bp:0,vw:0,seed:0,rp:0,shieldCell:1,jetCell:1,scanMod:0,outpostKit:1,gold:0,berry:0,fruit:0,ration:2,medkit:1};
-const GOLD_RATE={fe:1,ae:2,so:4,vd:6,lum:9,bp:7,vw:6,seed:12};
+const INV={fe:30,ae:12,so:5,vd:0,lum:0,bp:0,vw:0,seed:0,rp:0,shieldCell:1,jetCell:1,scanMod:0,outpostKit:1,gold:0,berry:0,fruit:0,ration:2,medkit:1,maps:1,storm:0};
+const GOLD_RATE={fe:1,ae:2,so:4,vd:6,lum:9,bp:7,vw:6,seed:12,storm:14};
 function earnGold(n,pop){
   if(!(n>0))return;INV.gold=(INV.gold||0)+n;updateResHUD();SFX.coin();
   const p=$('goldPill');p.classList.remove('bump');void p.offsetWidth;p.classList.add('bump');
@@ -999,7 +1088,8 @@ const RES_META={
   lum:{key:'lum',label:'LUMINA CRYSTAL',color:0x9dfcff,hex:'#9dfcff',rarity:'RARE',elysian:true,use:'Energy upgrades'},
   bp:{key:'bp',label:'BIO-PEARL',color:0xffd1ec,hex:'#ffd1ec',rarity:'UNCOMMON',elysian:true,use:'Research'},
   vw:{key:'vw',label:'VOIDWOOD',color:0x2fe08a,hex:'#2fe08a',rarity:'UNCOMMON',elysian:true,use:'Outposts'},
-  seed:{key:'seed',label:'AETHER SEED',color:0xe6ff7a,hex:'#e6ff7a',rarity:'EXOTIC',elysian:true,use:'Bloom restoration'}
+  seed:{key:'seed',label:'AETHER SEED',color:0xe6ff7a,hex:'#e6ff7a',rarity:'EXOTIC',elysian:true,use:'Bloom restoration'},
+  storm:{key:'storm',label:'STORM CRYSTAL',color:0xa0f0ff,hex:'#a0f0ff',rarity:'EVENT'}
 };
 const UPGRADES={
   tool:{name:'MULTI-TOOL & SCANNER',lvl:1,max:5,desc:'Boosts Mining Laser extraction yield & speed, expands Terrain Scanner pulse radius, and unlocks advanced mineral analysis.',
@@ -1012,6 +1102,8 @@ const UPGRADES={
 function updateResHUD(){
   $('rFe').textContent=INV.fe;$('rAe').textContent=INV.ae;$('rSo').textContent=INV.so;$('rVd').textContent=INV.vd;
   $('rLum').textContent=INV.lum||0;$('rBp').textContent=INV.bp||0;$('rVw').textContent=INV.vw||0;$('rSeed').textContent=INV.seed||0;$('rRp').textContent=INV.rp||0;
+  $('rStorm').textContent=INV.storm||0;$('rMaps').textContent=INV.maps||0;
+  $('pillStorm').classList.toggle('on',!!INV.storm);$('pillMap').classList.toggle('on',!!INV.maps);
   const showX=activeSystemId==='elysian'||INV.lum||INV.bp||INV.vw||INV.seed||INV.rp;
   for(const id of ['pillLum','pillBp','pillVw','pillSeed','pillRp'])$(id).classList.toggle('on',!!showX);
   $('rGold').textContent=INV.gold||0;$('rFood').textContent=(INV.berry||0)+(INV.fruit||0)+(INV.ration||0);$('rMed').textContent=INV.medkit||0;$('shopGold').textContent=INV.gold||0;
@@ -1077,13 +1169,16 @@ function recordDiscovery(cat,name,planet,detail){
   INV.rp=(INV.rp||0)+2;updateResHUD();updateElyHUD();
   tutFlags.scan=1;
   advanceMission('scan',1);
+  factionProgress('scan',1);
+  if(cat==='Species'&&b)checkFaunaCatalog(b);
   if(cat==='Species'&&b&&b.sys==='elysian')advanceMission('elysianScan',1);
   checkAchievements();checkMilestones();
   return true;
 }
 
 /* ---- ELYSIAN VEIL: living-system state, HUD, titles & restoration ---- */
-const GAME={title:'',achievements:[],milestones:[],contracts:[],contractSeed:0,outposts:[],sysVisited:['solara'],seenElysian:false};
+const GAME={title:'',achievements:[],milestones:[],contracts:[],contractSeed:0,outposts:[],sysVisited:['solara'],seenElysian:false,
+  rep:{guild:0,veilkeepers:0,cartographers:0},factionContracts:[],factionSeed:{day:0,week:0},tamed:[],photoLog:[],catReward:{},poiState:{},treasure:[],crew:0};
 const ELYS={nodes:[],beams:[],bloom:null,core:null,petals:[],plantMats:[],restored:false,beamGroup:null};
 const CINE={open:false,t:0};
 const ELYS_NODE_COST={fe:15,ae:5,lum:3};
@@ -1135,6 +1230,355 @@ function checkMilestones(){
   if(changed){updateResHUD();updateElyHUD();}
 }
 function elysSpeciesCount(){return DISCOVERIES.filter(d=>d.cat==='Species'&&d.sys==='elysian').length;}
+
+/* ---- FRONTIER FACTIONS, REPUTATION & ROTATING DAILY / WEEKLY CONTRACTS ---- */
+const FACTIONS=[
+  {id:'guild',name:'FRONTIER GUILD',icon:'🔧',color:'#ff922b',desc:'Salvage, rescue and construction work across the frontier.'},
+  {id:'veilkeepers',name:'VEILKEEPERS',icon:'🌿',color:'#2fe08a',desc:'Xenology, taming and storm-crystal research.'},
+  {id:'cartographers',name:'STAR CARTOGRAPHERS',icon:'🛰️',color:'#39c6ff',desc:'Survey, photography and treasure-mapping contracts.'}
+];
+const REP_RANKS=['UNKNOWN','ASSOCIATE','FIELD AGENT','TRUSTED','LEGEND'];
+function repLevel(v){const th=[0,20,50,100,180];let l=0;for(let i=0;i<th.length;i++)if(v>=th[i])l=i;return l;}
+function repNext(v){const th=[0,20,50,100,180];for(const t of th)if(v<t)return t;return null;}
+function factionById(id){return FACTIONS.find(f=>f.id===id);}
+function grantRep(id,n){
+  if(!id||!n)return;
+  const before=GAME.rep[id]||0,after=before+n;
+  GAME.rep[id]=after;
+  factionProgress('rep',0);
+  const lb=repLevel(before),la=repLevel(after);
+  if(la>lb){
+    const gold=50+la*40,rp=la*2;
+    earnGold(gold,true);INV.rp=(INV.rp||0)+rp;updateResHUD();
+    const f=factionById(id);
+    toast(`${f.icon} ${f.name}: ${REP_RANKS[la]}! +${gold} 🪙 +${rp} RP`);
+    SFX.upgrade();
+  }
+}
+const FACTION_POOL={
+  guild:[
+    {type:'salvage',goal:3,label:'SALVAGE 3 WRECKS OR PROBES',desc:'Recover frontier technology from crash sites and derelicts.'},
+    {type:'rescue',goal:1,label:'RESCUE 1 STRANDED SURVIVOR',desc:'Bring a lost colonist back to the Guild relay.'},
+    {type:'build',goal:1,label:'CONSTRUCT 1 OUTPOST',desc:'Establish a permanent Guild foothold on any world.'},
+    {type:'deliver',k:'fe',goal:25,label:'DELIVER 25 FERRITE',desc:'Stockpile structural ferrite for Guild repair yards.'}
+  ],
+  veilkeepers:[
+    {type:'storm',goal:6,label:'HARVEST 6 STORM CRYSTALS',desc:'Mine the rare crystals that erupt during solar storms.'},
+    {type:'tame',goal:1,label:'TAME 1 CREATURE',desc:'Form a bond with alien wildlife using fruit.'},
+    {type:'scan',goal:4,label:'LOG 4 NEW DISCOVERIES',desc:'Expand the living catalogue with fresh field scans.'},
+    {type:'deliver',k:'bp',goal:3,label:'DELIVER 3 BIO-PEARLS',desc:'Supply the Veilkeepers with living-crystal samples.'}
+  ],
+  cartographers:[
+    {type:'photo',goal:2,label:'PHOTOGRAPH 2 CREATURES',desc:'Capture wildlife portraits in Photo Mode.'},
+    {type:'treasure',goal:1,label:'DIG 1 BURIED CACHE',desc:'Follow a treasure map to a hidden frontier cache.'},
+    {type:'scan',goal:5,label:'SURVEY 5 DISCOVERIES',desc:'Chart new species, ruins and mineral formations.'},
+    {type:'deliver',k:'ae',goal:15,label:'DELIVER 15 AETHERIUM',desc:'Fuel the Cartographer survey relays.'}
+  ]
+};
+const WEEKLY_POOL=[
+  {type:'salvage',goal:8,label:'WEEKLY: SALVAGE 8 SITES'},
+  {type:'scan',goal:15,label:'WEEKLY: SURVEY 15 DISCOVERIES'},
+  {type:'storm',goal:20,label:'WEEKLY: HARVEST 20 STORM CRYSTALS'},
+  {type:'photo',goal:6,label:'WEEKLY: PHOTOGRAPH 6 CREATURES'}
+];
+function ensureFactionContracts(){
+  const day=Math.floor(Date.now()/86400000),week=Math.floor(day/7);
+  if(GAME.factionSeed&&GAME.factionSeed.day===day&&GAME.factionSeed.week===week&&GAME.factionContracts.length)return;
+  GAME.factionSeed={day,week};
+  const rnd=mulberry32(day*104729+week*37+13);
+  const out=[];
+  for(const f of FACTIONS){
+    const pool=FACTION_POOL[f.id],p=pool[(rnd()*pool.length)|0],wc=!(p.k);
+    out.push({id:'fc'+day+'_'+f.id,faction:f.id,type:p.type,k:p.k||null,goal:p.goal,prog:0,label:p.label,desc:p.desc,weekly:false,claimed:false,
+      reward:{gold:90+Math.round(rnd()*50),rp:3+((rnd()*2)|0),rep:8+((rnd()*5)|0)}});
+  }
+  const wf=FACTIONS[(rnd()*FACTIONS.length)|0],wp=WEEKLY_POOL[(rnd()*WEEKLY_POOL.length)|0];
+  out.push({id:'fw'+week+'_'+wf.id,faction:wf.id,type:wp.type,k:null,goal:wp.goal,prog:0,label:wp.label,desc:'A major contract spanning the week. Bigger effort, bigger reward.',weekly:true,claimed:false,
+    reward:{gold:320,rp:10,rep:30}});
+  GAME.factionContracts=out;
+  saveGame(true);
+}
+function factionProgress(type,amt=1){
+  ensureFactionContracts();
+  let changed=false;
+  for(const ct of GAME.factionContracts){
+    if(ct.claimed||ct.type!==type||ct.type==='deliver')continue;
+    if(ct.prog>=ct.goal)continue;
+    ct.prog=Math.min(ct.goal,ct.prog+amt);changed=true;
+    if(ct.prog>=ct.goal)toast(`📜 CONTRACT READY: ${ct.label} — CLAIM IN LOG → FACTIONS`);
+  }
+  if(changed)saveGame(true);
+}
+function claimFactionContract(ct){
+  if(!ct||ct.claimed)return false;
+  if(ct.type==='deliver'){
+    if((INV[ct.k]||0)<ct.goal){toast(`NEED ${ct.goal} ${ct.k.toUpperCase()} TO DELIVER`);return false;}
+    INV[ct.k]-=ct.goal;
+  }else if(ct.prog<ct.goal){toast('CONTRACT NOT COMPLETE YET');return false;}
+  ct.claimed=true;
+  earnGold(ct.reward.gold,true);INV.rp=(INV.rp||0)+ct.reward.rp;
+  grantRep(ct.faction,ct.reward.rep);
+  updateResHUD();saveGame(true);renderJournalModal();
+  const f=factionById(ct.faction);
+  toast(`${f.icon} CONTRACT CLAIMED — +${ct.reward.gold} 🪙 +${ct.reward.rp} RP +${ct.reward.rep} REP`);
+  return true;
+}
+
+/* ---- ECOLOGY: COMPANIONS, PLANET CATALOGUES & PHOTO MODE ---- */
+function bodySpeciesNames(b){return [...new Set((b.creatures||[]).map(c=>c.name))];}
+function bodySpeciesScanned(b){
+  const names=new Set(DISCOVERIES.filter(d=>d.cat==='Species'&&d.planet===b.name).map(d=>d.name));
+  return bodySpeciesNames(b).filter(n=>names.has(n));
+}
+function checkFaunaCatalog(b){
+  if(!b||GAME.catReward[b.name])return;
+  const names=bodySpeciesNames(b);if(!names.length)return;
+  if(bodySpeciesScanned(b).length>=names.length){
+    GAME.catReward[b.name]=true;
+    earnGold(120,true);INV.rp=(INV.rp||0)+5;INV.bp=(INV.bp||0)+1;
+    grantRep('veilkeepers',12);
+    recordDiscovery('Fauna Catalogue',`${b.name} Complete`,b.name,'Every native species on this world has been documented.');
+    toast(`🐾 ${b.name} FAUNA CATALOGUE COMPLETE! +120 🪙 +5 RP`);
+    saveGame(true);
+  }
+}
+function applyTamedState(){
+  for(const t of GAME.tamed){
+    const b=bodies.find(x=>x.name===t.body);if(!b)continue;
+    for(const c of b.creatures)if(c.name===t.name)c.tamed=true;
+  }
+}
+function tameCreature(b,cr){
+  if(!cr||cr.tamed)return false;
+  if((INV.fruit||0)+(INV.berry||0)<=0){toast('TAMING NEEDS 1 🍓 OR 🍐 — GATHER FRUIT ON A LIVING WORLD');return false;}
+  if((INV.fruit||0)>0)INV.fruit--;else INV.berry--;
+  cr.tamed=true;
+  if(!GAME.tamed.some(t=>t.body===b.name&&t.name===cr.name))GAME.tamed.push({body:b.name,name:cr.name});
+  grantRep('veilkeepers',8);factionProgress('tame',1);
+  recordDiscovery('Companion',`${cr.name} (Tamed)`,b.name,'Tamed with fruit. This creature now follows its explorer.');
+  comicPop('COMPANION TAMED!','#e6ff7a',50,42);
+  toast(`🐾 ${cr.name} NOW FOLLOWS YOU`);
+  updateResHUD();saveGame(true);
+  return true;
+}
+function activeCompanion(){
+  const b=PL.mode==='walk'||PL.mode==='rover'?PL.body:null;if(!b)return null;
+  return (b.creatures||[]).find(c=>c.tamed)||null;
+}
+function updateCompanionHUD(){
+  const el=$('petChip');if(!el)return;
+  const c=activeCompanion();
+  el.classList.toggle('on',!!c);
+  if(c)el.textContent=`🐾 ${c.name} · COMPANION`;
+}
+let photoMode=false,lastPhoto=null,lastPhotoEntry=null;
+function togglePhotoMode(force){
+  if(modalOpen&&force!==false)return;
+  photoMode=force===undefined?!photoMode:!!force;
+  document.body.classList.toggle('photoMode',photoMode);
+  if(photoMode){toast('📷 PHOTO MODE — ENTER TO CAPTURE, P TO EXIT');SFX.ui();}
+  else{SFX.ui();}
+}
+function findPhotoCreature(){
+  const b=PL.mode==='walk'||PL.mode==='rover'?PL.body:(PL.near&&PL.near.creatures?PL.near:null);
+  if(!b||!b.creatures)return null;
+  camera.getWorldDirection(_f);
+  let best=null,bestD=32;
+  for(const cr of b.creatures){
+    _a.copy(b.center).add(cr.mesh.position);
+    const d=_a.distanceTo(camera.position);if(d>bestD)continue;
+    _b.copy(_a).sub(camera.position).normalize();
+    if(_b.dot(_f)<0.45)continue;
+    bestD=d;best={cr,b};
+  }
+  return best;
+}
+function capturePhoto(){
+  if(!photoMode)return;
+  const hit=findPhotoCreature();
+  renderer.render(scene,camera);
+  let url=null;
+  try{url=renderer.domElement.toDataURL('image/png');}catch(_){}
+  const entry={name:hit?hit.cr.name:'Scenery',body:hit?hit.b.name:(PL.body?PL.body.name:PL.currentSys.name),creature:!!hit,time:Date.now()};
+  try{
+    const tc=document.createElement('canvas');
+    tc.width=320;tc.height=Math.max(1,Math.round(320*renderer.domElement.height/Math.max(1,renderer.domElement.width)));
+    tc.getContext('2d').drawImage(renderer.domElement,0,0,tc.width,tc.height);
+    entry.thumb=tc.toDataURL('image/jpeg',0.62);
+  }catch(_){}
+  GAME.photoLog.unshift(entry);if(GAME.photoLog.length>24)GAME.photoLog.length=24;
+  if(hit){
+    hit.cr.photoed=true;
+    factionProgress('photo',1);grantRep('cartographers',3);
+    if(!hit.cr.scanned){hit.cr.scanned=true;recordDiscovery('Species',hit.cr.name,hit.b.name,'Alien fauna documented in a field photograph.');}
+    else toast(`📷 PHOTOGRAPHED: ${hit.cr.name}`);
+    checkFaunaCatalog(hit.b);
+  }else toast('📷 SCENERY CAPTURED — FIND A CREATURE FOR CARTOGRAPHER PHOTOS');
+  lastPhoto=url;lastPhotoEntry=entry;
+  GAME.photoLog[0]=entry;saveGame(true);
+  const flash=$('photoFlash');flash.classList.remove('snap');void flash.offsetWidth;flash.classList.add('snap');
+  SFX.scan();
+  togglePhotoMode(false);
+  renderPhotoModal(url,entry);openModal('photoModal');
+}
+function renderPhotoModal(img,entry){
+  const body=$('photoBody');
+  const head=img?`<div style="text-align:center;margin-bottom:10px"><img src="${img}" alt="capture" style="max-width:100%;max-height:46vh;border:3px solid var(--ink);border-radius:12px;box-shadow:4px 4px 0 var(--ink)"></div>
+    <div class="uDesc" style="text-align:center;margin-bottom:8px">${entry.name} · ${entry.body}${entry.creature?' · CARTOGRAPHER PHOTO +3 REP':''}</div>
+    <div style="display:flex;gap:8px;justify-content:center;margin-bottom:10px"><button class="uBtn" id="btnPhotoSave" style="width:auto">⬇ DOWNLOAD</button></div>`:'';
+  const log=GAME.photoLog.length?GAME.photoLog.map(p=>`<div class="jItem">${p.thumb?`<img src="${p.thumb}" alt="" style="width:96px;height:60px;object-fit:cover;border:2px solid var(--ink);border-radius:7px;flex:none">`:''}<div style="flex:1"><div style="font-family:var(--display);font-size:18px">${p.name}</div><div style="font-size:11px;font-weight:700">${p.body} · ${new Date(p.time).toLocaleString()}</div></div><span class="jBadge" style="background:${p.creature?'var(--mint)':'var(--sky)'}">${p.creature?'CREATURE':'SCENERY'}</span></div>`).join(''):'<div style="text-align:center;padding:18px;font-weight:700">No photos yet. Press <b>P</b> in the field, then <b>ENTER</b> to capture.</div>';
+  body.innerHTML=head+`<div style="font-family:var(--display);font-size:20px;color:#5a2ca0;margin:4px 0 8px">PHOTO ARCHIVE · ${GAME.photoLog.length}</div>`+log;
+  const dl=$('btnPhotoSave');
+  if(dl&&lastPhoto)dl.addEventListener('click',()=>{
+    const a=document.createElement('a');a.href=lastPhoto;a.download='cosmic_hop_'+Date.now()+'.png';document.body.appendChild(a);a.click();a.remove();
+    toast('PHOTO DOWNLOADED!');
+  });
+}
+
+/* ---- OUTPOST DEPTH: STORAGE, FARMS, TELEPORTER NETWORK & BASE VISITS ---- */
+const STORE_KEYS=['fe','ae','so','vd','lum','bp','vw','seed','storm'];
+const STORE_CAP=50;
+let baseEntry=null,baseTimer=null;
+function ensureOutpostDefaults(entry){
+  if(!entry)return entry;
+  if(!entry.store||typeof entry.store!=='object')entry.store={};
+  for(const k of STORE_KEYS)entry.store[k]=clamp(+entry.store[k]||0,0,STORE_CAP);
+  if(!entry.farm||typeof entry.farm!=='object')entry.farm={planted:false,readyAt:0};
+  entry.teleporter=!!entry.teleporter;
+  return entry;
+}
+function outpostMeshFor(entry){
+  for(const b of bodies)for(const op of b.outposts)if(op.id===entry.id)return {b,op};
+  return null;
+}
+function syncOutpostVisuals(entry){
+  const hit=outpostMeshFor(entry);if(!hit)return;
+  const {op}=hit;
+  if(entry.teleporter&&!op.tpMesh){
+    const ring=new THREE.Mesh(merge([
+      [new THREE.TorusGeometry(0.9,0.08,5,18),0x39c6ff,Mx(0,0.5,0,Math.PI/2,0,0)],
+      [new THREE.CylinderGeometry(0.82,0.82,0.05,16),0x9dfcff,Mx(0,0.5,0)],
+      [new THREE.OctahedronGeometry(0.16,0),0x7dffc4,Mx(0.55,0.95,0.55)],
+      [new THREE.OctahedronGeometry(0.16,0),0x7dffc4,Mx(-0.55,0.95,-0.55)]
+    ]),new THREE.MeshToonMaterial({vertexColors:true,gradientMap:gradTex,emissive:0x39c6ff,emissiveIntensity:0.6}));
+    ring.position.set(0,0,-1.9);op.mesh.add(ring);op.tpMesh=ring;
+  }
+  const f=entry.farm;
+  if(f&&f.planted&&!op.farmMesh){
+    const g=new THREE.Group();
+    const soil=new THREE.Mesh(new THREE.BoxGeometry(1.7,0.08,1.7),toon(0x6b5a3e));soil.position.y=0.06;g.add(soil);
+    const sprouts=new THREE.Group();
+    for(let i=0;i<5;i++){const m=new THREE.Mesh(new THREE.ConeGeometry(0.14,0.55,5),toon(0x5df2c0));m.position.set((i%3-1)*0.45,0.35,((i/3|0)-0.5)*0.45);sprouts.add(m);}
+    g.add(sprouts);g.position.set(0,0,2.0);op.mesh.add(g);op.farmMesh=g;op.farmCrops=sprouts;
+  }
+  if(op.farmMesh)op.farmMesh.visible=!!(f&&f.planted);
+  if(op.farmCrops){
+    const p=f&&f.planted?clamp(1-(f.readyAt-Date.now())/180000,0.12,1):0.12;
+    op.farmCrops.scale.y=0.35+p*0.9;
+  }
+}
+function openBase(entry){
+  ensureOutpostDefaults(entry);baseEntry=entry;
+  $('baseTitle').textContent=`🏠 ${entry.body} BASE · LV.${entry.lvl}`;
+  renderBase();openModal('baseModal');SFX.ui();
+}
+function closeBase(){
+  clearTimeout(baseTimer);baseEntry=null;
+  $('baseModal').classList.remove('open');modalOpen=false;
+}
+function renderBase(){
+  if(!baseEntry)return;
+  ensureOutpostDefaults(baseEntry);
+  syncOutpostVisuals(baseEntry);
+  const body=$('baseBody');if(!body)return;
+  const e=baseEntry;
+  const storage=STORE_KEYS.map(k=>{
+    const have=e.store[k]||0,inv=INV[k]||0,meta=RES_META[k]||{label:k.toUpperCase()};
+    return `<div class="baseRow"><span class="nm">${meta.label}</span><span class="st">BASE ${have}/${STORE_CAP} · PACK ${inv}</span>
+      <button class="uBtn" data-dep="${k}" ${(have>=STORE_CAP||inv<=0)?'disabled':''}>STORE 10</button>
+      <button class="uBtn sky" data-wd="${k}" ${have<=0?'disabled':''}>TAKE 10</button></div>`;
+  }).join('');
+  const f=e.farm,now=Date.now(),ready=f.planted&&now>=f.readyAt;
+  let farm;
+  if(!f.planted)farm=`<div class="uDesc">A tilled xeno-plot. Plant a crop with local minerals and harvest food after 3 minutes — even while you are away.</div>
+    <button class="uBtn" id="btnPlant" ${(INV.fe>=4&&INV.ae>=2)?'':'disabled'} style="margin-top:8px">PLANT XENO CROP · 4 FE + 2 AE</button>`;
+  else if(ready)farm=`<div class="uDesc">The xeno crop is ripe and glowing.</div><button class="uBtn buy" id="btnHarvest" style="margin-top:8px">HARVEST · 5 🍎 + 2 🍐</button>`;
+  else farm=`<div class="uDesc">Crop growing… ready in <b>${Math.ceil((f.readyAt-now)/1000)}s</b>. It keeps growing while you explore.</div>`;
+  const tps=GAME.outposts.filter(o=>o!==e&&ensureOutpostDefaults(o).teleporter);
+  const tp=e.teleporter?`<div class="uDesc">Teleporter pad online. ${tps.length} linked base${tps.length===1?'':'s'}.</div>
+    <div style="display:flex;flex-direction:column;gap:6px;margin-top:8px">${tps.map(t=>`<button class="uBtn sky" data-tp="${t.id}">⚡ ${t.body} · LV.${t.lvl}</button>`).join('')||'<div class="uDesc">Build a teleporter at another outpost to link the network.</div>'}</div>`
+    :`<div class="uDesc">Build a pad to fast-travel between your outposts across systems.</div><button class="uBtn void" id="btnTpBuild" style="margin-top:8px" ${(INV.fe>=15&&INV.ae>=5&&INV.so>=3)?'':'disabled'}>BUILD TELEPORTER · 15 FE · 5 AE · 3 SO</button>`;
+  const upCost={fe:20*e.lvl,ae:12*e.lvl,so:6*e.lvl,vw:2*e.lvl};
+  const max=e.lvl>=5,canUp=!max&&INV.fe>=upCost.fe&&INV.ae>=upCost.ae&&INV.so>=upCost.so&&INV.vw>=upCost.vw;
+  body.innerHTML=`
+    <div class="uCard" style="margin-bottom:10px"><div><div class="uTitle"><span>${e.body} FRONTIER BASE</span><span class="uLvl">LV.${e.lvl}</span></div>
+      <div class="uDesc" style="margin-top:5px">Crew aboard: <b>${GAME.crew||0}</b> · Teleporter: <b>${e.teleporter?'ONLINE':'NOT BUILT'}</b> · Farm: <b>${f.planted?(ready?'READY':'GROWING'):'EMPTY'}</b></div></div>
+      <button class="uBtn" id="btnBaseUp" ${max||!canUp?'disabled':''}>${max?'MAX LEVEL':`UPGRADE TO LV.${e.lvl+1} · ${upCost.fe} FE / ${upCost.ae} AE / ${upCost.so} SO / ${upCost.vw} VW`}</button></div>
+    <div class="uCard" style="margin-bottom:10px"><div class="uTitle"><span>📦 STORAGE</span><span class="uLvl">${STORE_CAP} / RESOURCE</span></div><div class="baseGrid">${storage}</div></div>
+    <div class="uCard" style="margin-bottom:10px"><div class="uTitle"><span>🌱 XENO FARM</span><span class="uLvl">${f.planted?(ready?'HARVEST READY':'GROWING'):'IDLE'}</span></div>${farm}</div>
+    <div class="uCard"><div class="uTitle"><span>⚡ TELEPORTER NETWORK</span><span class="uLvl">${e.teleporter?'ONLINE':'OFFLINE'}</span></div>${tp}</div>`;
+  body.querySelectorAll('[data-dep]').forEach(b=>b.addEventListener('click',()=>{
+    const k=b.dataset.dep,room=STORE_CAP-(e.store[k]||0),amt=Math.min(10,room,INV[k]||0);
+    if(amt<=0)return;INV[k]-=amt;e.store[k]=(e.store[k]||0)+amt;SFX.ui();updateResHUD();saveGame(true);renderBase();
+  }));
+  body.querySelectorAll('[data-wd]').forEach(b=>b.addEventListener('click',()=>{
+    const k=b.dataset.wd,amt=Math.min(10,e.store[k]||0);if(amt<=0)return;
+    e.store[k]-=amt;INV[k]=(INV[k]||0)+amt;SFX.ui();updateResHUD();saveGame(true);renderBase();
+  }));
+  const bp=$('btnPlant');
+  if(bp)bp.addEventListener('click',()=>{
+    if(INV.fe<4||INV.ae<2)return;
+    INV.fe-=4;INV.ae-=2;e.farm={planted:true,readyAt:Date.now()+180000};
+    SFX.craft();updateResHUD();saveGame(true);renderBase();toast('🌱 XENO CROP PLANTED — READY IN 3 MINUTES');
+  });
+  const bh=$('btnHarvest');
+  if(bh)bh.addEventListener('click',()=>{
+    if(!e.farm.planted||Date.now()<e.farm.readyAt)return;
+    INV.berry=(INV.berry||0)+5;INV.fruit=(INV.fruit||0)+2;
+    e.farm={planted:false,readyAt:0};
+    SFX.coin();updateResHUD();saveGame(true);renderBase();toast('🌾 HARVESTED +5 🍎 +2 🍐');
+  });
+  const bt=$('btnTpBuild');
+  if(bt)bt.addEventListener('click',()=>{
+    if(INV.fe<15||INV.ae<5||INV.so<3)return;
+    INV.fe-=15;INV.ae-=5;INV.so-=3;e.teleporter=true;
+    SFX.upgrade();updateResHUD();saveGame(true);syncOutpostVisuals(e);renderBase();toast('⚡ TELEPORTER ONLINE — LINK OTHER BASES');
+  });
+  body.querySelectorAll('[data-tp]').forEach(b=>b.addEventListener('click',()=>{
+    const t=GAME.outposts.find(x=>x.id===b.dataset.tp);
+    if(t)teleportToOutpost(t);
+  }));
+  const bu=$('btnBaseUp');
+  if(bu)bu.addEventListener('click',()=>{
+    if(upgradeOutpost(e)){saveGame(true);syncOutpostVisuals(e);renderBase();}
+  });
+  clearTimeout(baseTimer);
+  if(f.planted&&!ready)baseTimer=setTimeout(()=>{if($('baseModal').classList.contains('open'))renderBase();},1000);
+}
+function teleportToOutpost(target){
+  const b=bodies.find(x=>x.name===target.body);if(!b){toast('BASE LOCATION LOST');return;}
+  const dir=new V3().fromArray(target.dir||[0,1,0]);if(dir.lengthSq()<1e-6)dir.set(0,1,0);dir.normalize();
+  clearTimeout(baseTimer);baseEntry=null;
+  closeModals();
+  if(b.sys!==activeSystemId)switchActiveSystem(b.sys);
+  const gr=b.groundR(dir.x,dir.y,dir.z);
+  PL.mode='landed';PL.L=null;PL.T=null;PL.body=b;PL.local.copy(dir).multiplyScalar(gr+ship.restH);
+  astro.group.visible=false;rover.active=false;
+  ship.group.position.copy(b.center).add(PL.local);
+  ship.gear.visible=true;ship.gear.scale.y=1;
+  ship.group.quaternion.setFromRotationMatrix(setBasis(_m,_a.set(0,0,0),tangentBasis(dir)[0],dir));
+  PL.speed=0;PL.vel.set(0,0,0);PL.near=b;PL.alt=0;
+  b.visited=true;
+  SFX.warp();toast(`⚡ ARRIVED AT ${target.body} BASE`);
+  updatePassport();saveGame(true);
+}
+function visitOutpostFromOrbit(entry){
+  if(!entry)return;
+  if(PL.mode==='walk'||PL.mode==='rover'){astro.group.visible=false;rover.active=false;}
+  teleportToOutpost(entry);
+}
+
+
 function elysNodesActive(){return ELYS.nodes.filter(n=>n.activated).length;}
 function elysPylonsLit(){let c=0;for(const n of ELYS.nodes)for(const p of n.pylons)if(p.lit)c++;return c;}
 function elysRestorePct(){
@@ -1364,7 +1808,7 @@ function spawnPlanetaryEcosystem(b,rnd,cfg){
     addOutline(m,OL_PROP);
     parent.add(m);
     const spName=`${b.name} ${speciesNames[(i+b.R)%speciesNames.length]}`;
-    b.creatures.push({mesh:m,dir:d.clone(),yaw:rnd()*TAU,phase:rnd()*TAU,hover:i%2===0?0.55:0.04,name:spName,scanned:false});
+    b.creatures.push({mesh:m,dir:d.clone(),yaw:rnd()*TAU,phase:rnd()*TAU,hover:i%2===0?0.55:0.04,name:spName,scanned:false,tamed:false,photoed:false});
     i++;
   }
 
@@ -1428,9 +1872,335 @@ function spawnPlanetaryEcosystem(b,rnd,cfg){
     b.ruins.push({mesh:rm,localPos:lp,dir:d.clone(),name:`${b.name} Precursor Monolith`,pylons,solved:false,scanned:false});
     r++;
   }
+
+  // 4. Frontier points of interest: wrecks, probes, vaults, glyphs & survivors
+  spawnPOIs(b,rnd);
 }
 
-/* ---- Orbiting Mineable Space Asteroids ---- */
+/* ---- Procedural Points of Interest, Treasure & Storm Crystal Rushes ---- */
+const poiGeos={};
+function poiGeo(kind){
+  if(poiGeos[kind])return poiGeos[kind];
+  let p;
+  if(kind==='wreck')p=[
+    [new THREE.CylinderGeometry(0.55,0.8,3.6,9),0xc25b3b,Mx(0,1.0,0,0,0,1.32)],
+    [new THREE.ConeGeometry(0.58,1.3,9),0x8a889c,Mx(0.95,1.98,-0.2,0,0,1.32)],
+    [new THREE.BoxGeometry(2.9,0.14,1.15),0xb24a32,Mx(0.2,0.55,0.45,0,0.2,0.18)],
+    [new THREE.BoxGeometry(0.5,0.55,1.2),0x4a4960,Mx(-0.8,0.4,-1.1,0.1,0.25,0.35)],
+    [new THREE.CylinderGeometry(0.2,0.3,0.85,7),0x6b607a,Mx(0.7,0.3,1.5,Math.PI/2,0,0)],
+    [new THREE.BoxGeometry(0.5,0.4,0.45),0xffd23f,Mx(1.55,0.2,0.4,0,0.4,0.6)]
+  ];
+  else if(kind==='probe')p=[
+    [new THREE.SphereGeometry(0.5,10,8),0xbfc6d8,Mx(0,1.35,0,0,0,0,1,0.85,1)],
+    [new THREE.ConeGeometry(0.62,0.55,10),0x39c6ff,Mx(0,1.85,0,Math.PI,0,0)],
+    [new THREE.CylinderGeometry(0.04,0.04,1.2,5),0x8a889c,Mx(0.45,1.5,0,0,0,-0.8)],
+    [new THREE.SphereGeometry(0.13,6,5),0xff4d6d,Mx(0.92,1.08,0)],
+    [new THREE.CylinderGeometry(0.04,0.06,1.25,5),0x8a889c,Mx(-0.3,0.62,-0.25,0.5,0,0.35)],
+    [new THREE.CylinderGeometry(0.04,0.06,1.25,5),0x8a889c,Mx(0.35,0.62,-0.2,0.5,0,-0.35)],
+    [new THREE.CylinderGeometry(0.04,0.06,1.25,5),0x8a889c,Mx(0,0.62,0.45,-0.5,0,0)]
+  ];
+  else if(kind==='vault')p=[
+    [new THREE.BoxGeometry(2.7,0.5,1.5),0x4f466e,Mx(0,0.25,0)],
+    [new THREE.BoxGeometry(2.5,2.6,1.1),0x3b3352,Mx(0,1.65,0)],
+    [new THREE.BoxGeometry(1.9,2.15,0.16),0x5a5078,Mx(0,1.55,-0.6)],
+    [new THREE.BoxGeometry(0.18,2.4,0.2),0x9d4edd,Mx(-1.05,1.6,-0.62)],
+    [new THREE.BoxGeometry(0.18,2.4,0.2),0xffd23f,Mx(1.05,1.6,-0.62)],
+    [new THREE.BoxGeometry(2.15,0.16,0.2),0x9d4edd,Mx(0,2.6,-0.62)],
+    [new THREE.BoxGeometry(2.15,0.16,0.2),0xffd23f,Mx(0,0.6,-0.62)],
+    [new THREE.BoxGeometry(0.5,0.5,0.3),0xff4d6d,Mx(0,1.55,-0.72)]
+  ];
+  else if(kind==='glyph')p=[
+    [new THREE.CylinderGeometry(0.28,0.42,1.9,6),0x4f466e,Mx(0,0.95,0)],
+    [new THREE.ConeGeometry(0.3,0.45,6),0x5a5078,Mx(0,2.1,0)],
+    [new THREE.OctahedronGeometry(0.22,0),0x9dfcff,Mx(0,1.35,-0.3)]
+  ];
+  else if(kind==='npc')p=[
+    [new THREE.ConeGeometry(1.05,1.6,7),0xe07a4f,Mx(0,0.8,0)],
+    [new THREE.CylinderGeometry(0.04,0.06,2.2,5),0x8a889c,Mx(1.25,1.1,0.3)],
+    [new THREE.SphereGeometry(0.16,7,6),0xffd23f,Mx(1.25,2.25,0.3)],
+    [new THREE.BoxGeometry(0.65,0.55,0.65),0xb98d55,Mx(-1.1,0.28,0.45,0,0.3,0)],
+    [new THREE.SphereGeometry(0.22,8,6),0xf0cfa0,Mx(0.2,0.95,-1.15)],
+    [new THREE.CylinderGeometry(0.17,0.22,0.75,7),0x39c6ff,Mx(0.2,0.45,-1.15)]
+  ];
+  else p=[
+    [new THREE.ConeGeometry(1.25,0.55,9),0x6b5a3e,Mx(0,0.22,0)],
+    [new THREE.BoxGeometry(1.15,0.1,0.15),0xffd23f,Mx(0,0.42,0,0,0,0.7)],
+    [new THREE.BoxGeometry(1.15,0.1,0.15),0xffd23f,Mx(0,0.42,0,0,0,-0.7)],
+    [new THREE.CylinderGeometry(0.035,0.05,1.9,4),0xb9a382,Mx(0.8,0.95,0.2)],
+    [new THREE.SphereGeometry(0.12,7,6),0x5df2c0,Mx(0.8,1.95,0.2)]
+  ];
+  return poiGeos[kind]=merge(p);
+}
+function poiSite(b,rnd,minGap=8){
+  for(let t=0;t<160;t++){
+    const d=randUnit(rnd),h=b.heightAt(d.x,d.y,d.z);
+    if(b.liquid&&!b.liquidSolid&&h<0.45)continue;
+    const gr=b.groundR(d.x,d.y,d.z),lp=d.clone().multiplyScalar(gr);
+    if(b.colliders.some(c=>c.p.distanceToSquared(lp)<(c.r+2.2)*(c.r+2.2)))continue;
+    if(b.pois.some(p=>p.localPos.distanceToSquared(lp)<minGap*minGap))continue;
+    if(b.ruins.some(r=>r.localPos.distanceToSquared(lp)<36))continue;
+    if(b.caves.some(c=>c.localPos.distanceToSquared(lp)<36))continue;
+    if(b.outposts.some(o=>o.localPos.distanceToSquared(lp)<64))continue;
+    return {dir:d,gr,lp};
+  }
+  return null;
+}
+function poiStateOf(id){return GAME.poiState[id]||null;}
+function savePOIState(p,extra){
+  const st=Object.assign({},GAME.poiState[p.id]||{},extra||{});
+  GAME.poiState[p.id]=st;saveGame(true);
+}
+function spawnPOI(b,kind,idx,rnd){
+  const site=poiSite(b,rnd,10);if(!site)return null;
+  const id=`${b.name}:${kind}:${idx}`;
+  const m=new THREE.Mesh(poiGeo(kind),vcToon);
+  m.matrixAutoUpdate=false;
+  m.matrix.copy(placeM(site.dir,site.gr-0.05,rnd()*TAU,kind==='vault'?1.15:1.1));
+  addOutline(m,kind==='vault'?OL_BIG:OL_PROP);
+  (b.detail||b.group).add(m);
+  const p={id,kind,name:'',body:b,mesh:m,dir:site.dir.clone(),localPos:site.lp,gr:site.gr,scanned:false,tamed:false,found:0};
+  if(kind!=='glyph'&&kind!=='cache')b.colliders.push({p:site.lp,r:kind==='vault'?1.9:1.2});
+  const st=poiStateOf(id)||{};
+  if(kind==='wreck'){
+    p.name=`${b.name} Crashed Hauler`;p.salvage=st.salvage||0;
+    p.label=p.salvage>=3?'WRECK PICKED CLEAN':`SALVAGE CRASHED HAULER (${p.salvage}/3)`;
+  }else if(kind==='probe'){
+    p.name=`${b.name} Derelict Probe`;p.repaired=!!st.repaired;
+    p.label=p.repaired?'PROBE ALREADY ONLINE':'REPAIR DERELICT PROBE — 8 FE';
+  }else if(kind==='vault'){
+    p.name=`${b.name} Sealed Vault`;p.code=st.code||(100+Math.floor(rnd()*900));p.opened=!!st.opened;p.kind='vault';
+    if(!st.code)GAME.poiState[id]=Object.assign({},GAME.poiState[id],{code:p.code});
+    p.seal=new THREE.Mesh(new THREE.OctahedronGeometry(0.3,0),new THREE.MeshBasicMaterial({color:p.opened?0x5df2c0:0xff4d6d}));
+    p.seal.position.set(0,1.55,0.02);m.add(p.seal);
+    if(p.opened)p.seal.visible=false;
+    const [e1,e2]=tangentBasis(site.dir);
+    for(let g=0;g<3;g++){
+      const gd=site.dir.clone().addScaledVector(e1,Math.cos(g*TAU/3)*7.5/b.R).addScaledVector(e2,Math.sin(g*TAU/3)*7.5/b.R).normalize();
+      const ggr=b.groundR(gd.x,gd.y,gd.z);
+      const gm=new THREE.Mesh(poiGeo('glyph'),vcToon);gm.matrixAutoUpdate=false;gm.matrix.copy(placeM(gd,ggr-0.04,0,1));addOutline(gm,OL_PROP);(b.detail||b.group).add(gm);
+      const gid=`${id}:g${g}`,gst=poiStateOf(gid)||{};
+      const gp={id:gid,kind:'glyph',parent:p,digit:+String(p.code)[g],found:!!gst.found,name:`${b.name} Glyph Stone`,mesh:gm,dir:gd.clone(),localPos:gd.clone().multiplyScalar(ggr),gr:ggr,scanned:false,body:b};
+      gp.label=gp.found?`GLYPH STONE — DIGIT ${gp.digit}`:'TOUCH GLYPH STONE';
+      if(gp.found)gp.mesh.material=new THREE.MeshToonMaterial({vertexColors:true,gradientMap:gradTex,emissive:0x9dfcff,emissiveIntensity:0.65});
+      b.pois.push(gp);
+    }
+  }else if(kind==='npc'){
+    p.name=`${b.name} Stranded Survivor`;p.rescued=!!st.rescued;
+    p.label=p.rescued?'SURVIVOR RESCUED':'RESCUE STRANDED SURVIVOR';
+  }
+  p.label=p.label||p.name;
+  b.pois.push(p);
+  return p;
+}
+function spawnPOIs(b,rnd){
+  if(!b||b.pois.length)return;
+  const kinds=['wreck','probe','vault','npc','wreck','probe'];
+  for(let i=0;i<kinds.length;i++)spawnPOI(b,kinds[i],i,rnd);
+}
+function spawnTreasureCache(b,dir,id){
+  id=id||('cache_'+Date.now().toString(36)+Math.floor(Math.random()*999));
+  let site=null;
+  for(let t=0;t<90;t++){
+    const d=dir.clone().addScaledVector(tangentBasis(dir)[0],(t%2?1:-1)*(0.12+0.02*(t%9))).normalize();
+    const h=b.heightAt(d.x,d.y,d.z);if(b.liquid&&!b.liquidSolid&&h<0.4)continue;
+    const gr=b.groundR(d.x,d.y,d.z);site={dir:d,gr,lp:d.clone().multiplyScalar(gr)};break;
+  }
+  if(!site)site={dir:dir.clone(),gr:b.groundR(dir.x,dir.y,dir.z),lp:dir.clone().multiplyScalar(b.groundR(dir.x,dir.y,dir.z))};
+  const m=new THREE.Mesh(poiGeo('cache'),vcToon);m.matrixAutoUpdate=false;m.matrix.copy(placeM(site.dir,site.gr-0.05,Math.random()*TAU,1.1));addOutline(m,OL_PROP);(b.detail||b.group).add(m);
+  const st=poiStateOf(id)||{};
+  const p={id,kind:'cache',name:`${b.name} Buried Cache`,mesh:m,dir:site.dir.clone(),localPos:site.lp,gr:site.gr,dug:!!st.dug,scanned:true,mapMarker:true,body:b,label:st.dug?'CACHE ALREADY DUG':'DIG BURIED CACHE'};
+  if(p.dug)m.visible=false;
+  b.pois.push(p);
+  if(!GAME.treasure.some(t=>t.id===id))GAME.treasure.push({id,body:b.name,dir:[site.dir.x,site.dir.y,site.dir.z]});
+  return p;
+}
+function rebuildTreasureCaches(){
+  for(const t of GAME.treasure){
+    const b=bodies.find(x=>x.name===t.body);if(!b||!Array.isArray(t.dir))continue;
+    if(b.pois.some(p=>p.id===t.id))continue;
+    const d=new V3().fromArray(t.dir);if(d.lengthSq()<1e-6)continue;
+    spawnTreasureCache(b,d.normalize(),t.id);
+  }
+}
+function readTreasureMap(){
+  if(PL.mode!=='walk'&&PL.mode!=='rover'&&PL.mode!=='landed'){toast('LAND ON A WORLD BEFORE READING A TREASURE MAP');return;}
+  if(!PL.body||!PL.body.landable){toast('NO SOLID GROUND TO SEARCH HERE');return;}
+  if((INV.maps||0)<=0){toast('NO TREASURE MAPS — SALVAGE PROBES, WRECKS & VAULTS');return;}
+  const b=PL.body,dir=PL.mode==='walk'?astro.dir.clone():(PL.mode==='rover'?rover.dir.clone():PL.local.clone().normalize());
+  const [e1]=tangentBasis(dir);
+  dir.addScaledVector(e1,(0.5+Math.random()*0.4)/b.R).normalize();
+  const p=spawnTreasureCache(b,dir);
+  INV.maps--;updateResHUD();saveGame(true);
+  SFX.discover();comicPop('TREASURE MAP DECRYPTED!','#ffd23f',50,38);
+  toast('✦ BURIED CACHE MARKED — FOLLOW THE ✦ MARKER ON FOOT');
+}
+function handlePOI(p){
+  if(!p)return false;
+  if(p.kind==='glyph'){
+    if(p.found){toast(`THIS GLYPH READS DIGIT ${p.digit}`);return true;}
+    p.found=true;p.label=`GLYPH STONE — DIGIT ${p.digit}`;p.mesh.material=new THREE.MeshToonMaterial({vertexColors:true,gradientMap:gradTex,emissive:0x9dfcff,emissiveIntensity:0.65});
+    savePOIState(p,{found:true});SFX.puzzleNode(p.digit%3);
+    comicPop(`GLYPH ${p.digit}`,'#9dfcff',50,44);
+    toast(`GLYPH STONE REVEALS DIGIT ${p.digit} — THE VAULT REMEMBERS`);
+    return true;
+  }
+  if(p.kind==='vault'){
+    if(p.opened){toast('THE VAULT IS EMPTY — ITS SECRETS ARE YOURS');return true;}
+    const glyphs=PL.body.pois.filter(x=>x.kind==='glyph'&&x.parent===p);
+    const found=glyphs.filter(x=>x.found).length;
+    if(found<3){toast(`VAULT SEALED — TOUCH ${3-found} MORE GLYPH STONE${3-found>1?'S':''}`);return true;}
+    openVaultCode(p);return true;
+  }
+  if(p.kind==='wreck'){
+    if(p.salvage>=3){toast('NOTHING LEFT IN THE WRECK BUT SCORCHED METAL');return true;}
+    p.salvage++;
+    const loot=['fe','ae','so'][(p.salvage-1)%3];
+    INV[loot]=(INV[loot]||0)+6;
+    earnGold(18,true);INV.rp=(INV.rp||0)+1;
+    if(p.salvage===1&&Math.random()<0.6){INV.maps=(INV.maps||0)+1;toast('SALVAGED A TREASURE MAP FROM THE COCKPIT!');}
+    if(p.salvage>=3){earnGold(45,true);INV.rp=(INV.rp||0)+3;if(Math.random()<0.25)INV.outpostKit=(INV.outpostKit||0)+1;comicPop('WRECK FULLY SALVAGED!','#ffd23f',50,42);}
+    else comicPop(`SALVAGE ${p.salvage}/3`,'#ff922b',50,42);
+    p.label=p.salvage>=3?'WRECK PICKED CLEAN':`SALVAGE CRASHED HAULER (${p.salvage}/3)`;
+    savePOIState(p,{salvage:p.salvage});factionProgress('salvage',1);grantRep('guild',4);
+    SFX.minePop();updateResHUD();return true;
+  }
+  if(p.kind==='probe'){
+    if(p.repaired){toast('THE PROBE HUMS QUIETLY — DATA ALREADY RECOVERED');return true;}
+    if((INV.fe||0)<8){toast('REPAIR NEEDS 8 FERRITE');return true;}
+    INV.fe-=8;p.repaired=true;INV.rp=(INV.rp||0)+3;INV.maps=(INV.maps||0)+1;INV.lum=(INV.lum||0)+1;
+    earnGold(30,true);p.label='PROBE ALREADY ONLINE';
+    savePOIState(p,{repaired:true});factionProgress('salvage',1);grantRep('cartographers',9);
+    recordDiscovery('Derelict Tech',p.name,p.body.name,'Restored a derelict survey probe and recovered its star charts.');
+    SFX.upgrade();updateResHUD();return true;
+  }
+  if(p.kind==='npc'){
+    if(p.rescued){toast('THE SURVIVOR IS SAFE ABOARD THE GUILD RELAY');return true;}
+    p.rescued=true;GAME.crew=(GAME.crew||0)+1;
+    earnGold(45,true);INV.medkit=(INV.medkit||0)+1;INV.maps=(INV.maps||0)+1;INV.rp=(INV.rp||0)+2;
+    p.label='SURVIVOR RESCUED';
+    savePOIState(p,{rescued:true});factionProgress('rescue',1);grantRep('guild',14);
+    recordDiscovery('Survivor',p.name,p.body.name,'Rescued a stranded frontier colonist. The Guild owes you one.');
+    SFX.discover();updateResHUD();return true;
+  }
+  if(p.kind==='cache'){
+    if(p.dug){toast('THIS CACHE HAS ALREADY BEEN EMPTIED');return true;}
+    p.dug=true;p.mesh.visible=false;
+    earnGold(90,true);INV.lum=(INV.lum||0)+2;INV.seed=(INV.seed||0)+1;INV.rp=(INV.rp||0)+4;
+    savePOIState(p,{dug:true});factionProgress('treasure',1);grantRep('cartographers',8);
+    recordDiscovery('Treasure',p.name,p.body.name,'Followed a coded treasure map to a buried frontier cache.');
+    comicPop('BURIED TREASURE!','#ffd23f',50,40);SFX.discover();updateResHUD();return true;
+  }
+  return false;
+}
+function spawnStormCrystals(b){
+  if(!b||!b.landable)return;
+  clearStormCrystals(b);
+  const refDir=PL.mode==='walk'?astro.dir.clone():(PL.mode==='rover'?rover.dir.clone():(PL.mode==='landed'&&PL.body===b?PL.local.clone().normalize():new V3().subVectors(ship.group.position,b.center).normalize()));
+  const [e1,e2]=tangentBasis(refDir);
+  const rnd=mulberry32((Date.now()/1000|0)+b.name.length*71);
+  for(let i=0;i<5;i++){
+    const a=rnd()*TAU,rad=(16+rnd()*46)/b.R;
+    let d=refDir.clone().addScaledVector(e1,Math.cos(a)*rad).addScaledVector(e2,Math.sin(a)*rad).normalize();
+    const h=b.heightAt(d.x,d.y,d.z);if(b.liquid&&!b.liquidSolid&&h<0.35){d=refDir.clone();}
+    const gr=b.groundR(d.x,d.y,d.z),lp=d.clone().multiplyScalar(gr);
+    const m=new THREE.Mesh(poiGeos.stormCrystal||(poiGeos.stormCrystal=merge([
+      [new THREE.OctahedronGeometry(0.55,0),0xa0f0ff,Mx(0,0.75,0,0,0,0,0.8,1.8,0.8)],
+      [new THREE.OctahedronGeometry(0.32,0),0xffffff,Mx(0.4,0.45,0.15,0.2,0.3,0.3,0.7,1.2,0.7)],
+      [new THREE.OctahedronGeometry(0.28,0),0xa0f0ff,Mx(-0.35,0.35,-0.2,-0.2,0.1,-0.3,0.7,1,0.7)]
+    ])),new THREE.MeshToonMaterial({vertexColors:true,gradientMap:gradTex,emissive:0xa0f0ff,emissiveIntensity:0.9}));
+    m.position.copy(lp);addOutline(m,OL_PROP);(b.detail||b.group).add(m);
+    const node={mesh:m,localPos:lp,dir:d.clone(),type:'storm',hp:2,maxHp:2,depleted:false,respawnT:0,scanned:true,storm:true};
+    b.nodes.push(node);b.stormNodes.push(node);
+  }
+  comicPop('⚡ STORM CRYSTAL RUSH!','#a0f0ff',50,38);
+  toast('⚡ STORM CRYSTALS ERUPTED NEARBY — MINE THEM BEFORE THE STORM ENDS');
+}
+function clearStormCrystals(b){
+  if(!b||!b.stormNodes)return;
+  for(const n of b.stormNodes){
+    if(n.mesh){if(n.mesh.parent)n.mesh.parent.remove(n.mesh);}
+    const i=b.nodes.indexOf(n);if(i>=0)b.nodes.splice(i,1);
+  }
+  b.stormNodes.length=0;
+}
+function clearAllStormCrystals(){for(const b of bodies)clearStormCrystals(b);}
+function ensureBodyPois(b){
+  if(!b||!b.landable||!b.pois||b.pois.length||!b.detail)return;
+  spawnPOIs(b,mulberry32((b.name.length*7919+b.R*31+7)|0));
+  applyPOIStateToBodies();
+}
+function applyPOIStateToBodies(){
+  for(const b of bodies){
+    if(!b.pois)continue;
+    for(const p of b.pois){
+      const st=poiStateOf(p.id);if(!st)continue;
+      if(p.kind==='wreck'&&st.salvage!=null){p.salvage=st.salvage;p.label=p.salvage>=3?'WRECK PICKED CLEAN':`SALVAGE CRASHED HAULER (${p.salvage}/3)`;}
+      if(p.kind==='probe'&&st.repaired){p.repaired=true;p.label='PROBE ALREADY ONLINE';}
+      if(p.kind==='npc'&&st.rescued){p.rescued=true;p.label='SURVIVOR RESCUED';}
+      if(p.kind==='vault'){
+        if(st.code)p.code=st.code;
+        if(st.opened){p.opened=true;if(p.seal)p.seal.visible=false;}
+      }
+      if(p.kind==='glyph'&&st.found){
+        p.found=true;p.label=`GLYPH STONE — DIGIT ${p.digit}`;
+        p.mesh.material=new THREE.MeshToonMaterial({vertexColors:true,gradientMap:gradTex,emissive:0x9dfcff,emissiveIntensity:0.65});
+      }
+      if(p.kind==='cache'&&st.dug){p.dug=true;p.label='CACHE ALREADY DUG';p.mesh.visible=false;}
+    }
+    for(const p of b.pois){
+      if(p.kind==='vault'&&!(GAME.poiState[p.id]&&GAME.poiState[p.id].code)){
+        GAME.poiState[p.id]=Object.assign({},GAME.poiState[p.id],{code:p.code});
+      }
+    }
+  }
+}
+function sectorInfo(b,dir){
+  if(!b||!dir)return '';
+  const lat=Math.asin(clamp(dir.y,-1,1))*180/Math.PI;
+  const lon=((Math.atan2(dir.z,dir.x)*180/Math.PI)+360)%360;
+  const band=Math.abs(lat)>66?'POLAR':lat>33?'NORTHERN':lat>10?'TEMPERATE':lat>-10?'EQUATORIAL':'SOUTHERN';
+  const cell=`${Math.floor(Math.abs(lat)/12)}${lat>=0?'N':'S'}·${Math.floor(lon/12)}E`;
+  return `🛰 ${b.name} · ${band} SECTOR ${cell}`;
+}
+function openVaultCode(p){
+  if(!p)return;
+  const seq=[];
+  const digits=String(p.code).split('').map(Number);
+  const keys=[...new Set([...digits,0,1,2,3,4,5,6,7,8,9])];
+  for(let i=keys.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[keys[i],keys[j]]=[keys[j],keys[i]];}
+  const draw=()=>{
+    $('codeReadout').textContent=(seq.join('')+'___').slice(0,3);
+    $('codeMsg').textContent=seq.length<3?'Enter the three-glyph sequence.': 'Sequence ready — press UNSEAL.';
+  };
+  $('codeGrid').innerHTML='';
+  for(const d of keys){
+    const b=document.createElement('button');b.type='button';b.className='uBtn';b.textContent=d;
+    b.addEventListener('click',()=>{if(seq.length>=3){seq.length=0;}seq.push(d);SFX.puzzleNode(seq.length-1);draw();});
+    $('codeGrid').appendChild(b);
+  }
+  $('codeClear').onclick=()=>{seq.length=0;SFX.ui();draw();};
+  $('codeEnter').onclick=()=>{
+    if(seq.length<3){toast('ENTER ALL THREE GLYPHS');return;}
+    const guess=+seq.join('');
+    if(guess!==p.code){
+      SFX.alarm();seq.length=0;draw();
+      $('codeMsg').textContent='THE SEAL REJECTS THE SEQUENCE — TRY AGAIN.';
+      return;
+    }
+    p.opened=true;if(p.seal)p.seal.visible=false;
+    savePOIState(p,{opened:true});
+    earnGold(160,true);INV.rp=(INV.rp||0)+8;INV.lum=(INV.lum||0)+3;INV.bp=(INV.bp||0)+2;INV.seed=(INV.seed||0)+1;INV.storm=(INV.storm||0)+2;INV.maps=(INV.maps||0)+1;
+    grantRep('cartographers',15);factionProgress('treasure',1);
+    recordDiscovery('Vault',p.name,p.body.name,'Cracked a three-glyph precursor vault and recovered its sealed archive.');
+    comicPop('VAULT UNSEALED!','#ffd23f',50,40);SFX.discover();updateResHUD();
+    closeModals();toast('🔓 VAULT OPENED — +160 🪙 · +8 RP · RARE CRYSTALS & A MAP');
+  };
+  draw();
+  openModal('codeModal');SFX.ui();
+}
+
+
+
 const asteroids=[];
 function buildAsteroids(){
   const geo=merge([
@@ -2726,9 +3496,11 @@ function placeOutpostOnPlanet(b,dir,typeLabel='SHELTER'){
   const lp=dir.clone().multiplyScalar(gr);
   if(b.outposts.some(o=>o.localPos.distanceTo(lp)<11)){toast('TOO CLOSE TO ANOTHER OUTPOST — PICK OPEN GROUND');return null;}
   const entry={id:'op'+Date.now().toString(36)+Math.floor(Math.random()*999),body:b.name,dir:[dir.x,dir.y,dir.z],lvl:1};
+  ensureOutpostDefaults(entry);
   const op=spawnOutpostMesh(b,dir,1);op.id=entry.id;
   b.outposts.push(op);b.colliders.push({p:lp,r:1.5});
   GAME.outposts.push(entry);
+  factionProgress('build',1);grantRep('guild',10);
   advanceMission('outpost',1);checkAchievements();checkMilestones();
   return lp;
 }
@@ -2757,6 +3529,7 @@ function rebuildSavedOutposts(){
     dir.normalize();
     const op=spawnOutpostMesh(b,dir,clamp(entry.lvl||1,1,5));op.id=entry.id;
     b.outposts.push(op);b.colliders.push({p:op.localPos,r:1.5});
+    ensureOutpostDefaults(entry);syncOutpostVisuals(entry);
   }
 }
 
@@ -2844,6 +3617,15 @@ function triggerScan(){
       recordDiscovery('Mineral',`${RES_META[nd.type].label} Deposit`,b.name,`High-purity ${RES_META[nd.type].label} crystal cluster.`);
     }
   }
+  for(const poi of (b.pois||[])){
+    if(poi.kind==='glyph')continue;
+    _a.copy(b.center).add(poi.localPos);
+    if(ref.distanceTo(_a)<scanWave.maxR&&!poi.scanned){
+      poi.scanned=true;found++;
+      const cat=poi.kind==='wreck'?'Wreck':poi.kind==='probe'?'Derelict Tech':poi.kind==='vault'?'Vault':poi.kind==='npc'?'Survivor':'Treasure';
+      recordDiscovery(cat,poi.name,b.name,'Frontier point of interest charted by Terrain Pulse Scanner.');
+    }
+  }
   if(b.netNodes)for(const nn of b.netNodes){
     _a.copy(b.center).add(nn.localPos);
     if(ref.distanceTo(_a)<scanWave.maxR&&!nn.scanned){
@@ -2873,7 +3655,8 @@ function openModal(id){
 }
 function closeModals(){
   modalOpen=false;
-  ['upgradeModal','craftModal','journalModal','mapModal','settingsModal','shopModal','helpModal','confirmModal'].forEach(id=>$(id).classList.remove('open'));
+  ['upgradeModal','craftModal','journalModal','mapModal','settingsModal','shopModal','helpModal','confirmModal','codeModal','baseModal','photoModal'].forEach(id=>$(id).classList.remove('open'));
+  clearTimeout(baseTimer);
 }
 function askConfirm(title,msg,btns){
   $('cfTitle').textContent=title;$('cfMsg').textContent=msg;
@@ -2915,8 +3698,20 @@ $('closeJournal').addEventListener('click',e=>{e.stopPropagation();closeModals()
 $('journalModal').addEventListener('click',e=>{if(e.target===$('journalModal'))closeModals();});
 $('tabMissions').addEventListener('click',()=>{journalTab='missions';renderJournalModal();});
 $('tabDisc').addEventListener('click',()=>{journalTab='disc';renderJournalModal();});
+$('tabFactions').addEventListener('click',()=>{journalTab='factions';renderJournalModal();});
+$('tabFauna').addEventListener('click',()=>{journalTab='fauna';renderJournalModal();});
 $('tabResearch').addEventListener('click',()=>{journalTab='research';renderJournalModal();});
 $('tabSave').addEventListener('click',()=>{journalTab='save';renderJournalModal();});
+
+$('closeCode').addEventListener('click',e=>{e.stopPropagation();closeModals();});
+$('codeModal').addEventListener('click',e=>{if(e.target===$('codeModal'))closeModals();});
+$('closeBase').addEventListener('click',e=>{e.stopPropagation();closeBase();});
+$('baseModal').addEventListener('click',e=>{if(e.target===$('baseModal'))closeBase();});
+$('closePhoto').addEventListener('click',e=>{e.stopPropagation();closeModals();});
+$('photoModal').addEventListener('click',e=>{if(e.target===$('photoModal'))closeModals();});
+$('btnPhoto').addEventListener('click',e=>{e.stopPropagation();SFX.init();togglePhotoMode();});
+$('photoSnap').addEventListener('click',e=>{e.stopPropagation();capturePhoto();});
+$('photoExit').addEventListener('click',e=>{e.stopPropagation();togglePhotoMode(false);});
 
 let mapTab='radar';
 $('btnMap').addEventListener('click',e=>{e.stopPropagation();SFX.init();renderStarMap();openModal('mapModal');});
@@ -2930,7 +3725,14 @@ $('btnMute').addEventListener('click',e=>{e.stopPropagation();SFX.init();const m
 addEventListener('keydown',e=>{
   if(e.code==='Space'||e.code.startsWith('Arrow')||e.code==='Tab')e.preventDefault();
   if(!started)return;
+  if(photoMode){
+    if(e.code==='KeyP'||e.code==='Escape'){togglePhotoMode(false);return;}
+    if(e.code==='Enter'){capturePhoto();return;}
+    return;
+  }
   if(e.code==='Escape'){closeModals();return;}
+  if(e.code==='KeyP'&&!modalOpen){togglePhotoMode();return;}
+  if(e.code==='KeyT'&&!modalOpen){readTreasureMap();return;}
   if(e.code==='KeyG'&&!modalOpen){eatFood();return;}
   if(e.code==='KeyH'&&!modalOpen){useMedkit();return;}
   if(e.code==='KeyI'){if($('helpModal').classList.contains('open'))closeModals();else{SFX.init();openModal('helpModal');}return;}
@@ -2992,7 +3794,7 @@ bMine.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();
 for(const ev of ['pointerup','pointercancel','lostpointercapture'])bMine.addEventListener(ev,()=>{mineHeld=false;bMine.classList.remove('held');});
 
 function readInput(){
-  if(modalOpen){input.mx=input.my=0;input.boost=input.up=input.mine=false;return;}
+  if(modalOpen||photoMode){input.mx=input.my=0;input.boost=input.up=input.mine=false;return;}
   input.mx=clamp(((keys.KeyD||keys.ArrowRight)?1:0)-((keys.KeyA||keys.ArrowLeft)?1:0)+stick.x,-1,1);
   input.my=clamp(((keys.KeyW||keys.ArrowUp)?1:0)-((keys.KeyS||keys.ArrowDown)?1:0)+stick.y,-1,1);
   input.boost=!!(keys.ShiftLeft||keys.ShiftRight||boostHeld);
@@ -3097,6 +3899,30 @@ function renderShop(){
       c.claimed=true;
       SFX.coin();updateResHUD();saveGame(true);renderShop();
       toast(`CONTRACT COMPLETE — +${c.gold} 🪙 +${c.rp} RP${c.item?' +1 '+c.item.toUpperCase():''}`);
+    }));
+    const stormCard=document.createElement('div');stormCard.className='uCard';
+    stormCard.innerHTML=`<div><div class="uTitle"><span>⚡ STORM CRYSTAL RUSH</span><span class="uLvl">PACK: ${INV.storm||0}</span></div>
+      <div class="uDesc" style="margin-top:5px">Crystals that erupt during solar storms. Brokers pay a premium — 96 🪙 each. Veilkeepers also pay REP for them in the field.</div></div>
+      <div style="display:flex;gap:6px"><button class="uBtn" data-storm="1" ${(INV.storm||0)>0?'':'disabled'}>SELL 1 · 96 🪙</button><button class="uBtn sky" data-storm="all" ${(INV.storm||0)>0?'':'disabled'}>SELL ALL</button></div>`;
+    grid.appendChild(stormCard);
+    stormCard.querySelectorAll('[data-storm]').forEach(b=>b.addEventListener('click',()=>{
+      const n=b.dataset.storm==='all'?(INV.storm||0):1;if(n<=0)return;
+      INV.storm-=n;earnGold(n*96,false);SFX.coin();updateResHUD();saveGame(true);renderShop();
+      toast(`SOLD ${n} STORM CRYSTAL${n>1?'S':''} — +${n*96} 🪙`);
+    }));
+    ensureFactionContracts();
+    for(const ct of GAME.factionContracts){
+      const f=factionById(ct.faction)||{icon:'📜',name:'FRONTIER'};
+      const ok=!ct.claimed&&(ct.type==='deliver'?(INV[ct.k]||0)>=ct.goal:ct.prog>=ct.goal);
+      const card=document.createElement('div');card.className='uCard';
+      card.innerHTML=`<div><div class="uTitle"><span>${f.icon} ${ct.label}</span><span class="uLvl">${ct.weekly?'WEEKLY':ct.claimed?'✓':(ct.type==='deliver'?`${INV[ct.k]||0}/${ct.goal}`:`${ct.prog}/${ct.goal}`)}</span></div>
+        <div class="uDesc" style="margin-top:5px">${ct.desc||''} → +${ct.reward.gold} 🪙 +${ct.reward.rp} RP +${ct.reward.rep} REP</div></div>
+        <button class="uBtn buy" data-fcEx="${ct.id}" ${ok?'':'disabled'}>${ct.claimed?'✓ COMPLETE':ok?'CLAIM':'IN PROGRESS'}</button>`;
+      grid.appendChild(card);
+    }
+    grid.querySelectorAll('[data-fcEx]').forEach(b=>b.addEventListener('click',()=>{
+      const ct=GAME.factionContracts.find(x=>x.id===b.dataset.fcEx);
+      if(claimFactionContract(ct))renderShop();
     }));
     return;
   }
@@ -3232,12 +4058,23 @@ function renderCraftModal(){
         const max=e.lvl>=5,canUp=!max&&(INV.fe||0)>=cost.fe&&(INV.ae||0)>=cost.ae&&(INV.so||0)>=cost.so&&(INV.vw||0)>=cost.vw;
         const row=document.createElement('div');row.style.cssText='display:flex;align-items:center;gap:8px;justify-content:space-between;background:rgba(23,15,36,.08);border-radius:8px;padding:5px 7px';
         row.innerHTML=`<div style="font-family:var(--sans);font-size:11px;font-weight:800">${e.body}<br><span style="color:#6c3fc5">LV.${e.lvl} ${max?'· MAX':''}</span></div>
-          <button class="uBtn" style="width:auto;padding:4px 9px;font-size:14px" data-op="${e.id}" ${max||!canUp?'disabled':''}>${max?'MAX':`UPGRADE · ${cost.fe} FE / ${cost.ae} AE / ${cost.vw} VW`}</button>`;
+          <div style="display:flex;gap:5px;flex-wrap:wrap;justify-content:flex-end">
+          <button class="uBtn buy" style="width:auto;padding:4px 8px;font-size:11px" data-bc="${e.id}" ${(onSurface&&PL.body&&PL.body.name===e.body)?'':'disabled'}>🏠 BASE CONTROL</button>
+          <button class="uBtn sky" style="width:auto;padding:4px 8px;font-size:11px" data-vi="${e.id}">VISIT</button>
+          <button class="uBtn" style="width:auto;padding:4px 9px;font-size:11px" data-op="${e.id}" ${max||!canUp?'disabled':''}>${max?'MAX':`UPGRADE · ${cost.fe} FE / ${cost.ae} AE / ${cost.vw} VW`}</button></div>`;
         list.appendChild(row);
       }
       list.querySelectorAll('[data-op]').forEach(b=>b.addEventListener('click',()=>{
         const e=GAME.outposts.find(x=>x.id===b.dataset.op);
         if(upgradeOutpost(e)){saveGame(true);renderCraftModal();}
+      }));
+      list.querySelectorAll('[data-bc]').forEach(b=>b.addEventListener('click',()=>{
+        const e=GAME.outposts.find(x=>x.id===b.dataset.bc);
+        if(!e)return;closeModals();openBase(e);
+      }));
+      list.querySelectorAll('[data-vi]').forEach(b=>b.addEventListener('click',()=>{
+        const e=GAME.outposts.find(x=>x.id===b.dataset.vi);
+        if(!e)return;closeModals();visitOutpostFromOrbit(e);
       }));
     }
 
@@ -3269,6 +4106,8 @@ function renderCraftModal(){
 function renderJournalModal(){
   $('tabMissions').classList.toggle('active',journalTab==='missions');
   $('tabDisc').classList.toggle('active',journalTab==='disc');
+  $('tabFactions').classList.toggle('active',journalTab==='factions');
+  $('tabFauna').classList.toggle('active',journalTab==='fauna');
   $('tabResearch').classList.toggle('active',journalTab==='research');
   $('tabSave').classList.toggle('active',journalTab==='save');
   const body=$('journalBody');body.innerHTML='';
@@ -3294,6 +4133,57 @@ function renderJournalModal(){
         body.appendChild(el);
       }
     }
+  }else if(journalTab==='factions'){
+    ensureFactionContracts();
+    const th=[0,20,50,100,180];
+    const repCards=FACTIONS.map(f=>{
+      const rep=GAME.rep[f.id]||0,lvl=repLevel(rep),next=repNext(rep);
+      const cur=th[lvl],pct=next?clamp((rep-cur)/(next-cur),0,1)*100:100;
+      return `<div class="fRow"><div class="ft"><span>${f.icon} ${f.name}</span><span>${REP_RANKS[lvl]}</span></div>
+        <div class="fRep"><i style="width:${pct.toFixed(1)}%"></i></div>
+        <div style="font-size:11px;font-weight:800">REP ${rep}${next?` · ${next-rep} TO ${REP_RANKS[lvl+1]}`:' · MAX RANK'}</div>
+        <div class="uDesc" style="margin-top:4px">${f.desc}</div></div>`;
+    }).join('');
+    const ctCard=ct=>{
+      const f=factionById(ct.faction)||{icon:'📜',name:'FRONTIER'};
+      const ready=ct.claimed?'CLAIMED':ct.type==='deliver'?((INV[ct.k]||0)>=ct.goal?'DELIVER NOW':'NEED CARGO'):(ct.prog>=ct.goal?'READY TO CLAIM':`${ct.prog}/${ct.goal}`);
+      const ok=!ct.claimed&&(ct.type==='deliver'?(INV[ct.k]||0)>=ct.goal:ct.prog>=ct.goal);
+      return `<div class="uCard"><div><div class="uTitle"><span>${ct.weekly?'📅 ':''}${f.icon} ${ct.label}</span><span class="uLvl">${ready}</span></div>
+        <div class="uDesc" style="margin-top:5px">${ct.desc||''}${ct.type==='deliver'?` Cargo: ${INV[ct.k]||0}/${ct.goal} ${String(ct.k).toUpperCase()}.`:` Progress: ${ct.prog}/${ct.goal}.`}</div>
+        <div class="uCost">REWARD: ${ct.reward.gold} 🪙 · ${ct.reward.rp} RP · +${ct.reward.rep} REP</div></div>
+        <button class="uBtn buy" data-fc="${ct.id}" ${ok?'':'disabled'}>${ct.claimed?'✓ COMPLETE':ok?'CLAIM REWARD':'IN PROGRESS'}</button></div>`;
+    };
+    const daily=GAME.factionContracts.filter(c=>!c.weekly),weekly=GAME.factionContracts.filter(c=>c.weekly);
+    body.innerHTML=repCards+`<div style="font-family:var(--display);font-size:21px;color:#5a2ca0;margin:10px 0 6px">📜 DAILY CONTRACTS</div>`+daily.map(ctCard).join('')+
+      `<div style="font-family:var(--display);font-size:21px;color:#5a2ca0;margin:10px 0 6px">📅 WEEKLY CONTRACT</div>`+weekly.map(ctCard).join('');
+    body.querySelectorAll('[data-fc]').forEach(b=>b.addEventListener('click',()=>{
+      const ct=GAME.factionContracts.find(x=>x.id===b.dataset.fc);
+      claimFactionContract(ct);
+    }));
+  }else if(journalTab==='fauna'){
+    const liveBodies=bodies.filter(b=>b.landable&&b.creatures&&b.creatures.length);
+    const total=liveBodies.reduce((n,b)=>n+bodySpeciesNames(b).length,0);
+    const scanned=liveBodies.reduce((n,b)=>n+bodySpeciesScanned(b).length,0);
+    let cards=liveBodies.map(b=>{
+      const names=bodySpeciesNames(b),got=bodySpeciesScanned(b);
+      const tamed=GAME.tamed.filter(t=>t.body===b.name).map(t=>t.name);
+      const reward=!!GAME.catReward[b.name];
+      const rows=names.map(n=>{
+        const cr=b.creatures.find(c=>c.name===n)||{};
+        const sc=got.includes(n)||cr.scanned,ph=cr.photoed||GAME.photoLog.some(p=>p.creature&&p.name===n&&p.body===b.name),tm=tamed.includes(n)||cr.tamed;
+        return `<div class="jItem"><div><div style="font-family:var(--display);font-size:18px">${n}</div>
+          <div style="font-size:11px;font-weight:800;opacity:.75">${sc?'SCANNED':'UNDISCOVERED'} · ${ph?'PHOTOGRAPHED':'NO PHOTO'} · ${tm?'COMPANION':'WILD'}</div></div>
+          <span class="jBadge" style="background:${sc?'var(--mint)':'#ddd'}">${sc?'✓':'?'}</span></div>`;
+      }).join('');
+      return `<div class="uCard" style="margin-bottom:9px"><div class="uTitle"><span>${b.name} FAUNA</span><span class="uLvl">${got.length}/${names.length} ${reward?'· ✅ REWARDED':''}</span></div>
+        <div class="uDesc" style="margin:5px 0 7px">Scan with [C] · photograph in Photo Mode [P] · tame a wild creature with 🍓/🍐 and [E].</div>${rows}</div>`;
+    }).join('');
+    body.innerHTML=`<div class="uCard" style="margin-bottom:9px"><div class="uTitle"><span>🐾 LIVING CATALOGUE</span><span class="uLvl">${scanned}/${total} SPECIES</span></div>
+      <div class="uDesc" style="margin-top:5px">Complete a world's fauna catalogue for +120 🪙, +5 RP, +1 BIO-PEARL and +12 Veilkeeper REP. Tamed creatures follow you on foot.</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px"><button class="uBtn sky" id="btnOpenPhotos" style="width:auto">📷 PHOTO ARCHIVE (${GAME.photoLog.length})</button>
+      <button class="uBtn" id="btnPhotoMode" style="width:auto">ENTER PHOTO MODE [P]</button></div></div>`+cards;
+    $('btnOpenPhotos').addEventListener('click',()=>{renderPhotoModal(null,null);openModal('photoModal');});
+    $('btnPhotoMode').addEventListener('click',()=>{closeModals();togglePhotoMode(true);});
   }else if(journalTab==='research'){
     const rw=r=>[r.gold?`${r.gold}🪙`:null,r.rp?`${r.rp} RP`:null,['fe','ae','so','vd','lum','bp','vw','seed'].filter(k=>r[k]).map(k=>`+${r[k]} ${k.toUpperCase()}`)].flat().filter(Boolean).join(' · ');
     body.innerHTML=`
@@ -3402,6 +4292,25 @@ function renderStarMap(){
       grid.appendChild(card);
     });
     body.appendChild(sec);
+    if(GAME.outposts.length){
+      const bsec=document.createElement('div');bsec.className='sysBlock';
+      bsec.innerHTML=`<div class="sysHeader"><span>🏠 YOUR FRONTIER BASES</span><span style="font-size:14px">${GAME.outposts.length} OUTPOST${GAME.outposts.length===1?'':'S'}</span></div>`;
+      const wrap=document.createElement('div');wrap.className='uGrid';
+      for(const op of GAME.outposts){
+        const ob=bodies.find(x=>x.name===op.body);if(!ob)continue;
+        ensureOutpostDefaults(op);
+        const card=document.createElement('div');card.className='uCard';
+        card.innerHTML=`<div><div class="uTitle"><span>🏠 ${op.body}</span><span class="uLvl">LV.${op.lvl}</span></div>
+          <div class="uDesc" style="margin-top:5px">Teleporter: <b>${op.teleporter?'ONLINE':'OFFLINE'}</b> · Farm: <b>${op.farm.planted?'PLANTED':'IDLE'}</b> · System: ${ob.sys.toUpperCase()}</div></div>
+          <button class="uBtn sky" data-base="${op.id}">🚀 VISIT BASE</button>`;
+        wrap.appendChild(card);
+      }
+      bsec.appendChild(wrap);body.appendChild(bsec);
+      bsec.querySelectorAll('[data-base]').forEach(btn=>btn.addEventListener('click',()=>{
+        const entry=GAME.outposts.find(o=>o.id===btn.dataset.base);
+        if(entry)visitOutpostFromOrbit(entry);
+      }));
+    }
     grid.querySelectorAll('[data-wp]').forEach(btn=>btn.addEventListener('click',()=>{
       waypointBody=bodies.find(b=>b.name===btn.dataset.wp)||null;
       renderStarMap();
@@ -3446,6 +4355,7 @@ function renderStarMap(){
 /* ---- 2.2s Hyperspace Tunnel Transition & Active System Switching ---- */
 function switchActiveSystem(sysId){
   activeSystemId=sysId;
+  clearAllStormCrystals();
   const sys=SYSTEMS.find(s=>s.id===sysId)||SYSTEMS[0];
   PL.currentSys=sys;
   $('sysTag').textContent=sys.name;
@@ -3453,7 +4363,7 @@ function switchActiveSystem(sysId){
   for(const b of bodies){
     const on=b.sys===sysId;
     b.group.visible=on;
-    if(on)ensureBodyTerrain(b);else disposeBodyTerrain(b);
+    if(on){ensureBodyTerrain(b);ensureBodyPois(b);}else disposeBodyTerrain(b);
   }
   for(const ast of asteroids){
     ast.mesh.visible=(ast.sys===sysId&&!ast.depleted);
@@ -3515,7 +4425,8 @@ function saveGame(silent=false){
       skins:SKIN,
       vitals:{hp:Math.round(PL.hp),food:Math.round(PL.food)},
       elys:{nodes:ELYS.nodes.map(n=>({id:n.id,activated:n.activated,pylons:n.pylons.map(p=>p.lit)})),restored:ELYS.restored},
-      game:{title:GAME.title,achievements:GAME.achievements,milestones:GAME.milestones,contracts:GAME.contracts,contractSeed:GAME.contractSeed,outposts:GAME.outposts,sysVisited:GAME.sysVisited,seenElysian:GAME.seenElysian},
+      game:{title:GAME.title,achievements:GAME.achievements,milestones:GAME.milestones,contracts:GAME.contracts,contractSeed:GAME.contractSeed,outposts:GAME.outposts,sysVisited:GAME.sysVisited,seenElysian:GAME.seenElysian,
+        rep:GAME.rep,factionContracts:GAME.factionContracts,factionSeed:GAME.factionSeed,tamed:GAME.tamed,photoLog:GAME.photoLog,catReward:GAME.catReward,poiState:GAME.poiState,treasure:GAME.treasure,crew:GAME.crew},
       hazard:{stormActive:PL.stormActive,stormTimer:PL.stormTimer,stormWarned:PL.stormWarned,pollenActive:PL.pollenActive,pollenTimer:PL.pollenTimer,pollenWarned:PL.pollenWarned}
     };
     localStorage.setItem('cosmic_hop_gf_save',JSON.stringify(data));
@@ -3564,6 +4475,17 @@ function loadGame(){
       GAME.outposts=Array.isArray(data.game.outposts)?data.game.outposts:[];
       GAME.sysVisited=Array.isArray(data.game.sysVisited)&&data.game.sysVisited.length?data.game.sysVisited:['solara'];
       GAME.seenElysian=!!data.game.seenElysian;
+      const repSrc=data.game.rep&&typeof data.game.rep==='object'?data.game.rep:{};
+      GAME.rep={guild:clamp(+repSrc.guild||0,0,9999),veilkeepers:clamp(+repSrc.veilkeepers||0,0,9999),cartographers:clamp(+repSrc.cartographers||0,0,9999)};
+      GAME.factionContracts=Array.isArray(data.game.factionContracts)?data.game.factionContracts.filter(c=>c&&c.id&&c.faction&&c.type).map(c=>({id:c.id,faction:c.faction,type:c.type,k:c.k||null,goal:+c.goal||1,prog:clamp(+c.prog||0,0,+c.goal||1),label:c.label||'CONTRACT',desc:c.desc||'',weekly:!!c.weekly,claimed:!!c.claimed,reward:c.reward&&typeof c.reward==='object'?c.reward:{gold:80,rp:3,rep:8}})):[];
+      GAME.factionSeed=data.game.factionSeed&&typeof data.game.factionSeed==='object'?{day:+data.game.factionSeed.day||0,week:+data.game.factionSeed.week||0}:{day:0,week:0};
+      GAME.tamed=Array.isArray(data.game.tamed)?data.game.tamed.filter(t=>t&&t.body&&t.name):[];
+      GAME.photoLog=Array.isArray(data.game.photoLog)?data.game.photoLog.filter(p=>p&&p.name).slice(0,24):[];
+      GAME.catReward=data.game.catReward&&typeof data.game.catReward==='object'?data.game.catReward:{};
+      GAME.poiState=data.game.poiState&&typeof data.game.poiState==='object'?data.game.poiState:{};
+      GAME.treasure=Array.isArray(data.game.treasure)?data.game.treasure.filter(t=>t&&t.id&&t.body&&Array.isArray(t.dir)):[];
+      GAME.crew=clamp(+data.game.crew||0,0,999);
+      for(const op of GAME.outposts)ensureOutpostDefaults(op);
     }
     if(data.hazard){
       PL.stormActive=!!data.hazard.stormActive;
@@ -3587,11 +4509,17 @@ function loadGame(){
       if(data.elys.restored){ELYS.restored=true;applyBloomState();}
     }
     rebuildSavedOutposts();
+    applyPOIStateToBodies();
+    applyTamedState();
+    rebuildTreasureCaches();
+    ensureFactionContracts();
+    for(const op of GAME.outposts)ensureOutpostDefaults(op);
     updateElyHUD();
     if(data.sys&&SYSTEMS.some(s=>s.id===data.sys)){
       switchActiveSystem(data.sys);
       const startB=bodies.find(b=>b.sys===data.sys&&!b.moon&&b.kind!=='sun');
       if(startB)warpToBody(startB);
+      if(PL.stormActive&&startB)spawnStormCrystals(startB);
     }
     updateResHUD();updatePassport();updateMissionHUD();
     return true;
@@ -3657,7 +4585,17 @@ function updateMining(dt){
 
       if(bestTarget.kind==='node'){
         bestTarget.node.hp--;
-        if(bestTarget.node.hp<=0){bestTarget.node.depleted=true;bestTarget.node.mesh.visible=false;bestTarget.node.respawnT=40;}
+        if(bestTarget.node.hp<=0){
+          bestTarget.node.depleted=true;bestTarget.node.mesh.visible=false;
+          if(bestTarget.node.storm){
+            const sb=searchBodies[0];
+            if(sb&&sb.stormNodes){const si=sb.stormNodes.indexOf(bestTarget.node);if(si>=0)sb.stormNodes.splice(si,1);}
+            const ni=sb?sb.nodes.indexOf(bestTarget.node):-1;if(ni>=0)sb.nodes.splice(ni,1);
+            INV.rp=(INV.rp||0)+1;factionProgress('storm',1);earnGold(14,true);
+            comicPop('STORM CRYSTAL HARVESTED!','#a0f0ff',50,38);
+            toast('⚡ STORM CRYSTAL SECURED — TRADE IT AT THE EXCHANGE');
+          }else bestTarget.node.respawnT=40;
+        }
       }else{
         bestTarget.ast.hp--;
         if(bestTarget.ast.hp<=0){bestTarget.ast.depleted=true;bestTarget.ast.mesh.visible=false;bestTarget.ast.respawnT=45;}
@@ -3677,11 +4615,25 @@ function updateEcosystemAndHazards(dt,t){
   // Animate Alien Wildlife on nearby/active planet
   const activeB=(PL.mode==='walk'||PL.mode==='rover')?PL.body:PL.near;
   if(activeB && activeB.creatures){
+    const groundMode=(PL.mode==='walk'||PL.mode==='rover')&&PL.body===activeB;
+    const footLocal=groundMode?(PL.mode==='walk'?astro.group.position:rover.localPos):null;
     for(const cr of activeB.creatures){
-      cr.yaw+=(Math.sin(t*0.7+cr.phase)*0.6)*dt;
-      const [e1,e2]=tangentBasis(cr.dir);
-      _f.copy(e1).multiplyScalar(Math.cos(cr.yaw)).addScaledVector(e2,Math.sin(cr.yaw));
-      cr.dir.addScaledVector(_f,(1.1*dt)/activeB.R).normalize();
+      if(cr.tamed&&groundMode){
+        const dist=cr.mesh.position.distanceTo(footLocal);
+        if(dist>2.7){
+          _a.copy(footLocal).normalize();
+          _f.copy(_a).addScaledVector(cr.dir,-cr.dir.dot(_a));
+          if(_f.lengthSq()<1e-4)_f.copy(tangentBasis(cr.dir)[0]);
+          _f.normalize();
+          cr.dir.lerp(_a,1-Math.exp(-dt*1.8)).normalize();
+        }else _f.copy(tangentBasis(cr.dir)[0]);
+        cr.yaw+=Math.sin(t*2+cr.phase)*0.3*dt;
+      }else{
+        cr.yaw+=(Math.sin(t*0.7+cr.phase)*0.6)*dt;
+        const [e1,e2]=tangentBasis(cr.dir);
+        _f.copy(e1).multiplyScalar(Math.cos(cr.yaw)).addScaledVector(e2,Math.sin(cr.yaw));
+        cr.dir.addScaledVector(_f,(1.1*dt)/activeB.R).normalize();
+      }
       const gr=activeB.groundR(cr.dir.x,cr.dir.y,cr.dir.z)+cr.hover+Math.abs(Math.sin(t*4.5+cr.phase))*0.18;
       cr.mesh.position.copy(cr.dir).multiplyScalar(gr);
       cr.mesh.quaternion.setFromRotationMatrix(setBasis(_m,_a.set(0,0,0),_f,cr.dir));
@@ -3698,7 +4650,13 @@ function updateEcosystemAndHazards(dt,t){
       if(localPos.distanceTo(cvItem.localPos)<5.5)PL.sheltered=true;
     }
     for(const op of b.outposts){
-      if(localPos.distanceTo(op.localPos)<6.5)PL.sheltered=true;
+      if(localPos.distanceTo(op.localPos)<6.5){
+        PL.sheltered=true;
+        if(!PL.nearInteract){
+          const entry=GAME.outposts.find(e=>e.id===op.id);
+          if(entry)PL.nearInteract={kind:'outpost',entry,label:`BASE CONTROL — ${b.name} LV.${entry.lvl}`};
+        }
+      }
     }
     if(rover.deployed && rover.body===b && PL.mode==='walk' && localPos.distanceTo(rover.localPos)<3.5){
       PL.nearInteract={kind:'rover',label:'DRIVE NOMAD ROVER'};
@@ -3723,6 +4681,23 @@ function updateEcosystemAndHazards(dt,t){
         }
       }
     }
+    let poiBest=null,poiBestD=1e9;
+    for(const p of b.pois){
+      if(p.kind==='cache'&&p.dug)continue;
+      const reach=p.kind==='cache'?4.4:3.9;
+      const d=localPos.distanceTo(p.localPos);
+      if(d<reach&&d<poiBestD){poiBestD=d;poiBest=p;}
+    }
+    if(poiBest&&(!PL.nearInteract||PL.nearInteract.kind==='rover'||PL.nearInteract.kind==='poi')){
+      PL.nearInteract={kind:'poi',poi:poiBest,label:poiBest.label||poiBest.name};
+    }
+    if(!PL.nearInteract)for(const cr of b.creatures){
+      if(cr.tamed)continue;
+      if(localPos.distanceTo(cr.mesh.position)<3.2){
+        PL.nearInteract={kind:'tame',creature:cr,label:`TAME ${cr.name.toUpperCase()} — 1 FRUIT`};
+        break;
+      }
+    }
   }
   if(activeSystemId==='elysian'&&PL.mode==='fly'&&ELYS.bloom){
     const bd=ship.group.position.distanceTo(ELYS.bloom.center);
@@ -3744,10 +4719,12 @@ function updateEcosystemAndHazards(dt,t){
       PL.stormActive=true;PL.stormDur=35+Math.random()*10;PL.stormTimer=PL.stormDur;PL.stormWarned=false;
       toast('☀️ SOLAR STORM — FIND SHELTER (caves, outposts or your ship)');
       comicPop('SOLAR STORM','#ffb27a',50,32);
+      const stormB=(PL.mode==='walk'||PL.mode==='rover'||PL.mode==='landed')?PL.body:(PL.near&&PL.near.landable?PL.near:null);
+      if(stormB)spawnStormCrystals(stormB);
     }
   }else{
     if(!blockedForHazard)PL.stormTimer-=dt;
-    if(PL.stormTimer<=0){PL.stormActive=false;PL.stormTimer=360+Math.random()*120;PL.stormWarned=false;toast('☀️ The solar storm has passed.');}
+    if(PL.stormTimer<=0){PL.stormActive=false;PL.stormTimer=360+Math.random()*120;PL.stormWarned=false;clearAllStormCrystals();toast('☀️ The solar storm has passed.');}
   }
 
   if(elysian&&!PL.pollenActive){
@@ -3831,6 +4808,15 @@ function handleInteract(){
   if(PL.nearInteract.kind==='rover'){
     PL.mode='rover';rover.active=true;astro.group.visible=false;
     toast('DRIVING NOMAD ROVER · [E] TO EXIT');
+    return true;
+  }
+  if(PL.nearInteract.kind==='poi')return handlePOI(PL.nearInteract.poi);
+  if(PL.nearInteract.kind==='tame')return tameCreature(PL.body,PL.nearInteract.creature);
+  if(PL.nearInteract.kind==='outpost'){
+    const entry=PL.nearInteract.entry;
+    if(!entry)return false;
+    if(PL.mode==='rover')exitRover();
+    openBase(entry);
     return true;
   }
   if(PL.nearInteract.kind==='pylon'){
@@ -3942,9 +4928,27 @@ function tryLand(){
   if(_f.lengthSq()<0.01)_f.copy(tangentBasis(site)[0]);_f.normalize();
   const q1=new Q().setFromRotationMatrix(setBasis(_m,_a.set(0,0,0),_f,site));
   const r1=b.groundR(site.x,site.y,site.z)+ship.restH;
-  PL.L={b,d0,d1:site,r0,r1,q0:ship.group.quaternion.clone(),q1,t:0,dur:clamp((r0-r1)/16+Math.acos(clamp(d0.dot(site),-1,1))*b.R/22,2.4,7)};
-  PL.body=b;PL.mode='landing';PL.speed=0;PL.vel.set(0,0,0);orbit.yaw=0;orbit.pitch=0.42;ship.gear.visible=true;
-  SFX.setEngine(0,false,false);
+  PL.D={b,d0:d0.clone(),site:site.clone(),r0,r1,q0:ship.group.quaternion.clone(),q1,t:0,dur:clamp((r0-r1)/22+2.2,2.8,7)};
+  PL.body=b;PL.mode='descend';PL.speed=0;PL.vel.set(0,0,0);orbit.yaw=0;orbit.pitch=0.42;ship.gear.visible=true;
+  $('entryFx').classList.add('on');
+  toast(`DESCENDING TO ${b.name} — ${sectorInfo(b,site).replace('🛰 ','')}`);
+  SFX.setEngine(0.5,false,false);
+}
+function finishTouchdown(b,site,r1){
+  PL.mode='landed';PL.local.copy(site).multiplyScalar(r1);PL.D=null;PL.L=null;$('entryFx').classList.remove('on');
+  ship.gear.visible=true;ship.gear.scale.y=1;
+  if(!b.visited){b.visited=true;SFX.discover();earnGold(25,true);updatePassport();saveGame(true);toast('NEW WORLD DISCOVERED: '+b.name+'! +25 🪙');}else toast('TOUCHDOWN!');
+}
+function updateDescend(dt){
+  const D=PL.D,b=D.b;if(!D)return;
+  D.t=Math.min(1,D.t+dt/D.dur);const e=sstep(0,1,D.t);
+  _a.copy(D.d0).lerp(D.site,e).normalize();
+  const r=Math.max(lerp(D.r0,D.r1,Math.pow(e,1.2)),b.groundR(_a.x,_a.y,_a.z)+ship.restH+(1-e)*7*Math.min(1,D.t*3));
+  ship.group.position.copy(b.center).addScaledVector(_a,r);
+  ship.group.quaternion.copy(D.q0).slerp(D.q1,sstep(0.08,0.85,D.t));
+  ship.gear.scale.y=Math.max(0.01,sstep(0.2,0.9,D.t));ship.flameT=0.65*(1-sstep(0.55,1,D.t));
+  ship.model.rotation.z*=Math.exp(-dt*4);ship.model.rotation.x*=Math.exp(-dt*4);
+  if(D.t>=1)finishTouchdown(b,D.site,D.r1);
 }
 function updateLanding(dt){
   const L=PL.L,b=L.b;L.t=Math.min(1,L.t+dt/L.dur);const e=sstep(0,1,L.t);
@@ -4076,6 +5080,14 @@ function updateCamera(dt,snap){
     _b.copy(g.position).addScaledVector(_f,6).addScaledVector(_u,1);
     camera.up.copy(camUp);camera.lookAt(_b);
     camera.fov=lerp(camera.fov,baseFov+sp*20,1-Math.exp(-dt*3));
+  }else if(PL.mode==='descend'){
+    const b=PL.body;_u.subVectors(g.position,b.center).normalize();
+    _f.set(0,0,-1).applyQuaternion(g.quaternion);
+    _a.copy(g.position).addScaledVector(_f,-13).addScaledVector(_u,5);
+    camera.position.lerp(_a,1-Math.exp(-dt*4.5));clampCamToGround(b);
+    camUp.lerp(_u,1-Math.exp(-dt*3.5)).normalize();camera.up.copy(camUp);
+    camera.lookAt(_b.copy(g.position).addScaledVector(_f,8).addScaledVector(_u,-4));
+    camera.fov=lerp(camera.fov,baseFov+8,1-Math.exp(-dt*3));
   }else if(PL.mode==='walk'){
     const b=PL.body,A=astro;_u.copy(A.dir);
     _f.copy(A.view).multiplyScalar(Math.cos(A.pitch)).addScaledVector(_u,-Math.sin(A.pitch));
@@ -4130,6 +5142,41 @@ function updateMarkers(ref){
   }
 }
 let hudT=0;
+let poiMkEl=null;
+function updatePoiMarker(){
+  if(!poiMkEl){
+    poiMkEl=document.createElement('div');poiMkEl.className='mk poi';
+    poiMkEl.innerHTML='<b style="background:#ffd23f"></b><span></span>';
+    markersEl.appendChild(poiMkEl);
+  }
+  const onField=PL.mode==='walk'||PL.mode==='rover'||PL.mode==='landed'||PL.mode==='descend';
+  const b=PL.body;
+  if(!onField||!b||!b.pois||photoMode){poiMkEl.style.display='none';return;}
+  const ref=PL.mode==='walk'?astro.group.position:(PL.mode==='rover'?rover.localPos:(PL.mode==='descend'&&PL.D?_a.copy(PL.D.site).multiplyScalar(PL.D.r1):PL.local));
+  let best=null,bd=170;
+  for(const p of b.pois){
+    if(p.kind==='cache'&&p.dug)continue;
+    if(p.kind==='glyph'&&p.found)continue;
+    if(p.kind==='vault'&&p.opened)continue;
+    if(p.kind==='wreck'&&p.salvage>=3)continue;
+    if(p.kind==='probe'&&p.repaired)continue;
+    if(p.kind==='npc'&&p.rescued)continue;
+    const d=ref.distanceTo(p.localPos);if(d<bd){bd=d;best=p;}
+  }
+  if(!best){poiMkEl.style.display='none';return;}
+  _mv.copy(b.center).add(best.localPos).applyMatrix4(camera.matrixWorldInverse);
+  const behind=_mv.z>0;_mv.applyMatrix4(camera.projectionMatrix);
+  let x=_mv.x,y=_mv.y;
+  if(behind){x=-x;y=-y;}
+  let off=behind||Math.abs(x)>0.94||Math.abs(y)>0.9;
+  if(off){const k=1/Math.max(Math.abs(x)/0.94,Math.abs(y)/0.88,1e-3);if(behind||k<1){x*=k;y*=k;}}
+  const w=innerWidth,h=innerHeight;
+  poiMkEl.className='mk poi'+(off?' off':'');
+  poiMkEl.style.display='';
+  poiMkEl.style.transform=`translate(${((x*0.5+0.5)*w).toFixed(1)}px,${((-y*0.5+0.5)*h).toFixed(1)}px) translate(-50%,${off?'-50%':'-135%'})`;
+  const tag=best.kind==='cache'?'CACHE':best.kind==='glyph'?'GLYPH':best.kind==='vault'?'VAULT':best.kind==='wreck'?'WRECK':best.kind==='probe'?'PROBE':best.kind==='npc'?'SURVIVOR':'SITE';
+  poiMkEl.lastChild.textContent=`✦ ${tag} ${Math.round(bd)}`;
+}
 /* ---- Surfaces: roads & bridges are walkable ---- */
 function onRoad(b,d){
   if(!b.roads)return false;
@@ -4146,7 +5193,7 @@ function surfR(b,d){
 PL.hp=100;PL.food=100;PL.crashT=-9;let camShake=0;
 const FOODS=[{k:'berry',food:15,hp:0,label:'GLOW BERRIES',ic:'🍓'},{k:'fruit',food:30,hp:15,label:'STAR FRUIT',ic:'🍐'},{k:'ration',food:50,hp:5,label:'SPACE RATION',ic:'🥫'}];
 function hurt(n,msg,quiet){
-  if(!(n>0)||PL.mode==='landing'||PL.mode==='takeoff')return;
+  if(!(n>0)||PL.mode==='landing'||PL.mode==='descend'||PL.mode==='takeoff')return;
   PL.hp=Math.max(0,PL.hp-n);
   if(!quiet||Math.random()<0.08){const fx=$('hurtFx');fx.classList.remove('go');void fx.offsetWidth;fx.classList.add('go');}
   if(!quiet)SFX.hurt();
@@ -4210,7 +5257,7 @@ const TUT_KEY='cosmic_hop_tut',tutFlags={};
 var tutStep;tutStep=0;try{const v=localStorage.getItem(TUT_KEY);if(v!==null)tutStep=+v||0;}catch(_){}
 const TUT=[
   {t:'FLY YOUR SHIP',d:()=>touchUI?'Drag the JOYSTICK (left side) to fly. Swipe the right side to steer. Hold BOOST to go fast!':'Hold W to fly forward, move the MOUSE to steer, hold SHIFT to boost.',ok:()=>PL.mode==='fly'&&Math.abs(PL.speed)>55},
-  {t:'LAND ON A PLANET',d:()=>`Fly close to a green world like TERRA until the LAND button lights up, then ${touchUI?'tap LAND':'press L'}. Don't hit planets too fast — crashes hurt!`,ok:()=>PL.mode==='landing'||PL.mode==='landed'||PL.mode==='walk'},
+  {t:'LAND ON A PLANET',d:()=>`Fly close to a green world like TERRA until the LAND button lights up, then ${touchUI?'tap LAND':'press L'}. Don't hit planets too fast — crashes hurt!`,ok:()=>PL.mode==='descend'||PL.mode==='landing'||PL.mode==='landed'||PL.mode==='walk'},
   {t:'HOP OUT',d:()=>`${touchUI?'Tap EXIT':'Press E'} to step outside as the astronaut. ${touchUI?'Tap ENTER':'Press E'} by the ship to climb back in.`,ok:()=>PL.mode==='walk'},
   {t:'GRAB FOOD & COINS',d:()=>'Walk into the glowing 🍓 berries, 🍐 star fruit and spinning 🪙 coins near you to collect them.',ok:()=>!!tutFlags.pick},
   {t:'MINE ORE',d:()=>`Walk up to a glowing crystal rock and ${touchUI?'hold MINE':'hold F (or the mouse button)'}. Ore pays for upgrades and gives coins.`,ok:()=>!!tutFlags.mine},
@@ -4248,6 +5295,7 @@ function updateHUD(dt){
   const b=PL.near,m=PL.mode;
   if(m==='walk'||m==='rover'){locEl.textContent=PL.body.name;subEl.textContent=(m==='rover'?'ROVER':'ON FOOT')+(PL.sheltered?' · 🛡️ SHELTERED':' · '+(PL.body.blurb||''));}
   else if(m==='landed'){locEl.textContent=PL.body.name;subEl.textContent='LANDED · 🛡️ SHIP SHELTER';}
+  else if(m==='descend'){locEl.textContent=PL.body.name;subEl.textContent='ATMOSPHERIC DESCENT · ALT '+Math.max(0,Math.round(PL.alt));}
   else if(b&&PL.alt<b.R*2.5+80){locEl.textContent=b.name;subEl.textContent='ALT '+Math.max(0,Math.round(PL.alt))+' · SPD '+Math.round(PL.speed);}
   else{locEl.textContent='DEEP SPACE';subEl.textContent='SPD '+Math.round(PL.speed)+(b?' · NEAREST '+b.name:'');}
   spdBar.style.width=(m==='fly'?clamp(Math.abs(PL.speed)/390,0,1)*100:0)+'%';
@@ -4280,7 +5328,17 @@ function updateHUD(dt){
     if(PL.targetNode)setPrompt(`${key('F')}HOLD TO MINE ${RES_META[PL.targetNode.type].label}`);
     else setPrompt(`${key('E')}EXIT ROVER`);
   }
+  else if(m==='descend'||m==='landing'){
+    setBtn(bLand,'DESCENDING',false,true);setBtn(bExit,'EXIT',true);setBtn(bBoost,'BOOST',true);setBtn(bMine,'MINE',true);setPrompt('');
+  }
   else{setBtn(bLand,m==='landing'?'LANDING':'LIFTOFF',false,true);setBtn(bExit,'EXIT',true);setBtn(bBoost,'BOOST',true);setBtn(bMine,'MINE',true);setPrompt('');}
+  const chipEl=$('sectorChip');
+  if(m==='walk'||m==='rover'||m==='landed'||m==='descend'){
+    let dir=null;
+    if(m==='walk')dir=astro.dir;else if(m==='rover')dir=rover.dir;else if(m==='descend'&&PL.D)dir=PL.D.site;else if(PL.body)dir=_a.copy(PL.local).normalize();
+    if(PL.body&&dir){chipEl.textContent=sectorInfo(PL.body,dir);chipEl.classList.add('on');}else chipEl.classList.remove('on');
+  }else chipEl.classList.remove('on');
+  updateCompanionHUD();
 }
 function actLand(){if(PL.mode==='fly')tryLand();else if(PL.mode==='landed')takeOff();else if(PL.mode==='walk')PL.jumpQ=true;}
 function actExit(){
@@ -4320,6 +5378,7 @@ function frame(dt){
   const g=ship.group;prevShip.copy(g.position);
   const anchor=PL.mode==='fly'?(PL.near&&PL.alt<PL.near.R*2.5+60?PL.near:null):PL.body;
   if(PL.mode==='fly'){if(anchor)g.position.add(anchor.delta);if(started)updateFly(dt);else ship.flameT=0.3;}
+  else if(PL.mode==='descend')updateDescend(dt);
   else if(PL.mode==='landing')updateLanding(dt);
   else if(PL.mode==='takeoff')updateTakeoff(dt);
   else{g.position.copy(PL.body.center).add(PL.local);ship.flameT=0;if(PL.mode==='walk')updateWalk(dt);else if(PL.mode==='rover')updateRover(dt);}
@@ -4359,7 +5418,7 @@ function frame(dt){
   skyGroup.position.copy(camera.position);
   const camAlt=PL.near?Math.max(0,camera.position.distanceTo(PL.near.center)-PL.near.R):1e3;
   camera.near=clamp(camAlt*0.03,0.14,2.5);camera.updateProjectionMatrix();
-  updateHUD(dt);updateMarkers(ref);
+  updateHUD(dt);updateMarkers(ref);updatePoiMarker();
   renderer.render(scene,camera);
 }
 function resize(){renderer.setSize(innerWidth,innerHeight,false);camera.aspect=innerWidth/innerHeight;baseFov=camera.aspect<1?76:62;camera.updateProjectionMatrix();}
@@ -4377,8 +5436,8 @@ document.addEventListener('fullscreenchange',()=>setTimeout(resize,120));
 
 /* ---------- 11. REFINEMENTS: autosave, dynamic resolution, audio state, settings ---------- */
 setInterval(()=>{if(started&&!window.__saveImporting)saveGame(true);},15000);                       // quiet autosave while playing
-document.addEventListener('visibilitychange',()=>{if(document.hidden&&started)saveGame(true);});
-addEventListener('pagehide',()=>{if(started)saveGame(true);});
+document.addEventListener('visibilitychange',()=>{if(document.hidden&&started&&!window.__saveImporting)saveGame(true);});
+addEventListener('pagehide',()=>{if(started&&!window.__saveImporting)saveGame(true);});
 
 /* dynamic resolution: trims the pixel ratio when the frame rate sags and wins it back when there is headroom */
 function perfSample(raw){
@@ -4442,6 +5501,7 @@ async function boot(){
     if(isTouchDev&&canFS)goFull();
     SFX.init();SFX.discover();
     if(resume)loadGame();
+    ensureFactionContracts();
     started=true;$('start').classList.add('bye');$('ui').classList.add('live');canvas.focus();PL.speed=30;
     toast(resume?'EXPEDITION RESUMED!':'WELCOME TO GALACTIC FRONTIER!');
   };
@@ -4484,7 +5544,7 @@ $('importFile').addEventListener('change',e=>{
 if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)){
   addEventListener('load',()=>{navigator.serviceWorker.register('./sw.js',{updateViaCache:'none'}).then(r=>r.update()).catch(()=>{});});
 }
-window.__game={COINS,SKIN,earnGold,PL,bodies,INV,UPGRADES,MISSIONS,DISCOVERIES,ELYS,GAME,get ship(){return ship;},get astro(){return astro;},actLand,actExit,warpToBody,switchActiveSystem,triggerScan,handleInteract,keys,look,camera,frame};
+window.__game={COINS,SKIN,earnGold,PL,bodies,INV,UPGRADES,MISSIONS,DISCOVERIES,ELYS,GAME,get ship(){return ship;},get astro(){return astro;},actLand,actExit,warpToBody,switchActiveSystem,triggerScan,handleInteract,keys,look,camera,frame,spawnStormCrystals,clearAllStormCrystals,openBase,openVaultCode,tameCreature,readTreasureMap,placeOutpostOnPlanet};
 </script>
 </body>
 </html>
