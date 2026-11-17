@@ -112,6 +112,8 @@ html,body{margin:0;height:100%;overflow:hidden;background:var(--space);color:var
 .mk.wp b{background:var(--sun)!important;border-radius:2px;transform:rotate(45deg)}
 .mk.foe b{background:#ff4d6d!important;border-radius:3px;transform:rotate(45deg);box-shadow:0 0 8px #ff4d6d}
 .mk.foe span{color:#ffd1ec}
+.mk.foe.boss b{background:#ff2d55!important;box-shadow:0 0 16px #ff2d55;transform:rotate(45deg) scale(1.5)}
+.mk.foe.boss span{color:#ffe3ee;font-weight:900}
 .mk.npc b{background:#5df2c0!important;border-radius:50%;box-shadow:0 0 8px #5df2c0}
 .mk.npc span{color:#c9ffef}
 
@@ -203,6 +205,7 @@ html,body{margin:0;height:100%;overflow:hidden;background:var(--space);color:var
 #start h1{margin:0;font-size:clamp(50px,12.5vw,124px);font-weight:400;line-height:.9;color:var(--sun);-webkit-text-stroke:3px var(--ink);text-shadow:6px 6px 0 var(--ink),10px 10px 0 var(--pop);transform:rotate(-3.5deg)}
 #start .subTitle{font-size:clamp(20px,4vw,30px);color:var(--sky);-webkit-text-stroke:1.2px var(--ink);text-shadow:3px 3px 0 var(--ink)}
 #start p{margin:0;font-size:clamp(14px,3vw,18px);color:#fff;text-shadow:2px 2px 0 var(--ink);max-width:40em;font-family:var(--sans);font-weight:600}
+#start p.credit{font-size:clamp(11px,2.2vw,13px);color:#d7e2ff;opacity:.9;font-weight:700;letter-spacing:.6px;text-shadow:1px 1px 0 var(--ink)}
 .startBtns{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-top:4px}
 #play,#contBtn{pointer-events:auto;font-family:var(--display);font-size:clamp(24px,5.5vw,40px);letter-spacing:.06em;padding:9px 34px;border:4px solid var(--ink);border-radius:14px;background:var(--mint);color:var(--ink);box-shadow:6px 6px 0 var(--ink);cursor:pointer;transform:rotate(1.5deg)}
 #contBtn{background:var(--sun);transform:rotate(-1.5deg)}
@@ -578,7 +581,7 @@ body.photoMode #ui{opacity:0!important}
           <li><b>FACTIONS</b>: rescues, salvage, photos and discoveries earn reputation and daily / weekly contracts. Claim them in <b>LOG → FACTIONS</b>.</li>
           <li><b>BASES</b>: press <kbd>E</kbd> at an outpost for storage, farms and teleporters. Visit your bases from the <b>MAP</b>.</li>
           <li><b>STORM RUSH</b>: when a solar storm hits, glowing storm crystals erupt nearby. Mine them before the storm passes!</li>
-          <li><b>ALIEN RAIDERS</b>: raider packs hunt you while you fly between worlds, arriving after a short warning. Hold <kbd>F</kbd> (or <b>FIRE</b> on phone) — your laser auto-locks the nearest raider. Their hits also chew through hull HP. Destroy them for coins, ore, Guild rep and contracts, or boost away until they jump out.</li>
+          <li><b>ALIEN RAIDERS</b>: raider packs hunt you while you fly between worlds, arriving after a short warning. Hold <kbd>F</kbd> (or <b>FIRE</b> on phone) — your laser auto-locks the nearest raider. Their hits also chew through hull HP. Destroy them for coins, ore, Guild rep and contracts, or boost away until they jump out. Systems 3–4 send alien <b>DREADNOUGHTS</b> — huge volley-firing capital ships guarded by escorts, with heavy loot.</li>
           <li><b>UNKNOWN VESSELS</b>: friendly alien ships from other star systems cruise the spacelanes. Fly close and press <kbd>E</kbd> (or tap <b>HAIL</b>) to talk — first contact with each species pays credits, Cartographer rep and codex data.</li></ul></section>
         <section><h3>📱 PHONE &amp; TABLET</h3><ul>
           <li>Left side: drag the <b>joystick</b> to fly or walk.</li>
@@ -706,6 +709,7 @@ body.photoMode #ui{opacity:0!important}
   </div>
   <button id="howBtn" type="button">❓ HOW TO PLAY</button>
   <p id="how">Fly, land, explore on foot, mine ore, collect 🪙 coins &amp; 🍓 food, stay alive — and buy cool rockets &amp; suits! A step-by-step tutorial guides you as you play.</p>
+  <p class="credit">CREATED BY SING JAYAJESDA · DEVELOPER</p>
   <div id="err" hidden></div>
 </div>
 
@@ -1229,7 +1233,8 @@ const ACH_LIST=[
   {id:'explorer',name:'GALACTIC EXPLORER',desc:'Complete every expedition mission.'},
   {id:'eternal',name:'ETERNAL EXPLORER',desc:'Restore the Eternal Bloom.'},
   {id:'raider',name:'VOID HUNTER',desc:'Destroy an alien raider in ship-to-ship combat.'},
-  {id:'envoy',name:'XENO-ENVOY',desc:'Hail an unknown species starship.'}
+  {id:'envoy',name:'XENO-ENVOY',desc:'Hail an unknown species starship.'},
+  {id:'dreadnought',name:'DREADSLAYER',desc:'Destroy an alien dreadnought in systems 3 or 4.'}
 ];
 const MILESTONES=[
   {id:'ms_d10',name:'FIELD NOTES',desc:'Log 10 discoveries.',req:()=>DISCOVERIES.length>=10,reward:{gold:80,rp:2}},
@@ -4401,6 +4406,7 @@ function switchActiveSystem(sysId){
   activeSystemId=sysId;
   endRaiderWave(false,true);
   fleeNpcs(true);
+  RAIDER.bossT=sysId==='elysian'?30+Math.random()*20:sysId==='gargantua'?55+Math.random()*35:1e9;
   clearAllStormCrystals();
   const sys=SYSTEMS.find(s=>s.id===sysId)||SYSTEMS[0];
   PL.currentSys=sys;
@@ -4685,7 +4691,7 @@ const raiderBodyGeo=merge([
 ]);
 const raiderEyeGeo=new THREE.OctahedronGeometry(0.34,0);
 const raiderGlowGeo=new THREE.OctahedronGeometry(0.5,0);
-const RAIDER={active:false,warnT:0,fightT:0,nextIn:8+Math.random()*10,list:[],bolts:[],fx:[],uid:0,audioT:0,chatterT:0,
+const RAIDER={active:false,warnT:0,fightT:0,nextIn:8+Math.random()*10,list:[],bolts:[],fx:[],uid:0,audioT:0,chatterT:0,bossT:1e9,bossWave:false,
   boltGeo:new THREE.OctahedronGeometry(0.3,0),
   boltMat:new THREE.MeshBasicMaterial({color:0xff5ccf,transparent:true,opacity:.95,blending:THREE.AdditiveBlending,depthWrite:false})};
 const _rv0=new V3(),_rv1=new V3(),_rv2=new V3(),_rv3=new V3(),_rvx=new V3(),_rvp=new V3(),_rnp=new V3(),_rm=new M4();
@@ -4696,42 +4702,52 @@ function ensureRaiderMarker(r){
   el.className='mk foe';el.innerHTML='<b></b><span></span>';el.style.display='none';
   markersEl.appendChild(el);r.mk=el;
 }
-function makeRaider(i,count){
+function makeRaider(i,count,boss=false){
   const g=new THREE.Group();
-  const hull=new THREE.Mesh(raiderBodyGeo,new THREE.MeshToonMaterial({vertexColors:true,gradientMap:gradTex,emissive:0x2d0b3a,emissiveIntensity:0.55}));
+  const hull=new THREE.Mesh(raiderBodyGeo,new THREE.MeshToonMaterial({vertexColors:true,gradientMap:gradTex,
+    color:boss?0xffc4d2:0xffffff,emissive:boss?0x7a0b22:0x2d0b3a,emissiveIntensity:boss?0.7:0.55}));
   addOutline(hull,OL_PROP);g.add(hull);
-  const eye=new THREE.Mesh(raiderEyeGeo,new THREE.MeshBasicMaterial({color:0xff4d6d}));
-  eye.position.set(0,0.03,-2.75);g.add(eye);
+  const eye=new THREE.Mesh(raiderEyeGeo,new THREE.MeshBasicMaterial({color:boss?0xff1e4d:0xff4d6d}));
+  eye.position.set(0,0.03,-2.75);eye.scale.setScalar(boss?1.5:1);g.add(eye);
   const glows=[];
-  for(const sx of [-0.62,0.62]){
-    const gl=new THREE.Mesh(raiderGlowGeo,new THREE.MeshBasicMaterial({color:0xc77dff,transparent:true,opacity:.9}));
-    gl.position.set(sx,0,2.02);g.add(gl);glows.push(gl);
+  const glowSpots=boss?[[-0.62,0,2.02],[0.62,0,2.02],[-1.3,0,0.7],[1.3,0,0.7]]:[[-0.62,0,2.02],[0.62,0,2.02]];
+  for(const p of glowSpots){
+    const gl=new THREE.Mesh(raiderGlowGeo,new THREE.MeshBasicMaterial({color:boss?0xff6b9a:0xc77dff,transparent:true,opacity:.9}));
+    gl.position.set(p[0],p[1],p[2]);g.add(gl);glows.push(gl);
   }
   const fwd=new V3(0,0,-1).applyQuaternion(ship.group.quaternion);
   const right=new V3().crossVectors(fwd,AY);if(right.lengthSq()<1e-4)right.set(1,0,0);right.normalize();
   const up=new V3().crossVectors(right,fwd).normalize();
   g.position.copy(ship.group.position)
-    .addScaledVector(fwd,100+Math.random()*35)
+    .addScaledVector(fwd,boss?150+Math.random()*30:100+Math.random()*35)
     .addScaledVector(right,(i-(count-1)/2)*52)
-    .addScaledVector(up,(Math.random()-.5)*26);
+    .addScaledVector(up,(Math.random()-.5)*(boss?34:26));
   g.scale.setScalar(0.05);
   scene.add(g);
-  const hp=5+(UPGRADES.ship.lvl>=4?2:0);
-  return {id:++RAIDER.uid,group:g,glows,eye,hp,maxHp:hp,dead:false,spawnT:0,ang:Math.random()*TAU,
-    spin:(Math.random()<.5?-1:1)*(0.3+Math.random()*.28),R:24+Math.random()*20,
-    fireT:1.2+Math.random()*1.6,flashT:0,mk:null};
+  const hp=boss?(activeSystemId==='elysian'?34:28)+UPGRADES.ship.lvl*3:5+(UPGRADES.ship.lvl>=4?2:0);
+  return {id:++RAIDER.uid,group:g,glows,eye,hp,maxHp:hp,dead:false,spawnT:0,ang:Math.random()*TAU,boss,
+    spin:(boss?-1:Math.random()<.5?-1:1)*(boss?0.16+Math.random()*0.14:0.3+Math.random()*.28),
+    R:boss?40+Math.random()*16:20+Math.random()*16,fwd:boss?24:8,
+    fireT:boss?1.8+Math.random()*1.2:1.2+Math.random()*1.2,flashT:0,mk:null};
 }
-function startRaiderWave(){
+function startRaiderWave(boss=false){
   if(RAIDER.active||!started||PL.mode!=='fly')return false;
-  const lvl=UPGRADES.ship.lvl;
-  const count=1+(lvl>=3?1:0)+(lvl>=5?1:0);
-  RAIDER.active=true;RAIDER.warnT=5;RAIDER.fightT=42;RAIDER.list=[];RAIDER.chatterT=2.2;
-  for(let i=0;i<count;i++)RAIDER.list.push(makeRaider(i,count));
+  const lvl=UPGRADES.ship.lvl,bossWave=!!boss;
+  const count=bossWave?(activeSystemId==='elysian'?3:2):1+(lvl>=3?1:0)+(lvl>=5?1:0);
+  RAIDER.active=true;RAIDER.bossWave=bossWave;RAIDER.warnT=bossWave?6:5;RAIDER.fightT=bossWave?55:42;
+  RAIDER.list=[];RAIDER.chatterT=2.2;
+  for(let i=0;i<count;i++)RAIDER.list.push(makeRaider(i,count,bossWave&&i===0));
   for(const r of RAIDER.list)ensureRaiderMarker(r);
   fleeNpcs(true);
   SFX.alienWarp();SFX.setAlien(true,0.18,0);
-  comicPop('🚨 ALIEN RAIDERS INBOUND!','#ff4d6d',50,34);
-  toast(`🚨 ${count} ALIEN RAIDER${count>1?'S':''} INBOUND — ${touchUI?'HOLD FIRE':'HOLD F'} WHEN THEY ENGAGE`);
+  if(bossWave){
+    SFX.alarm();
+    comicPop('☠ ALIEN DREADNOUGHT INBOUND!','#ff2d55',50,34);
+    toast(`☠ ALIEN DREADNOUGHT${count>1?` + ${count-1} ESCORT${count>2?'S':''}`:''} INBOUND — ${touchUI?'HOLD FIRE':'HOLD F'} WHEN IT ENGAGES`);
+  }else{
+    comicPop('🚨 ALIEN RAIDERS INBOUND!','#ff4d6d',50,34);
+    toast(`🚨 ${count} ALIEN RAIDER${count>1?'S':''} INBOUND — ${touchUI?'HOLD FIRE':'HOLD F'} WHEN THEY ENGAGE`);
+  }
   return true;
 }
 function clearRaiderBolts(){
@@ -4747,6 +4763,10 @@ function endRaiderWave(retreat=true,silent=false){
   for(const r of RAIDER.list){if(r.mk)r.mk.remove();if(r.group.parent)r.group.parent.remove(r.group);}
   RAIDER.list.length=0;clearRaiderBolts();
   RAIDER.active=false;RAIDER.warnT=0;RAIDER.fightT=0;RAIDER.nextIn=30+Math.random()*30;
+  if(RAIDER.bossWave){
+    RAIDER.bossWave=false;
+    RAIDER.bossT=activeSystemId==='elysian'?55+Math.random()*30:activeSystemId==='gargantua'?105+Math.random()*45:1e9;
+  }
   if(!silent&&retreat)toast('🛸 THE RAIDERS JUMPED OUT — SPACE IS QUIET AGAIN');
 }
 function boom(pos,color,scale=1){
@@ -4754,16 +4774,18 @@ function boom(pos,color,scale=1){
   m.position.copy(pos);m.scale.setScalar(scale*0.4);scene.add(m);
   RAIDER.fx.push({m,t:0,s:scale});
 }
-function spawnRaiderBolt(r){
+function spawnRaiderBolt(r,spread=0){
   const aim=ship.group.position.clone().addScaledVector(PL.vel,0.22);
   aim.x+=(Math.random()-.5)*10;aim.y+=(Math.random()-.5)*8;aim.z+=(Math.random()-.5)*10;
   const dir=aim.sub(r.group.position);
   const len=dir.length()||1;dir.multiplyScalar(1/len);
+  if(spread)dir.applyAxisAngle(AY,spread);
   const mesh=new THREE.Mesh(RAIDER.boltGeo,RAIDER.boltMat);
   mesh.position.copy(r.group.position).addScaledVector(dir,3.2);
-  mesh.scale.set(1,1,2.4);
+  mesh.scale.set(r.boss?1.5:1,r.boss?1.5:1,r.boss?3.4:2.4);
   scene.add(mesh);
-  RAIDER.bolts.push({mesh,vel:dir.multiplyScalar(90),life:0});
+  RAIDER.bolts.push({mesh,vel:dir.multiplyScalar(90),life:0,
+    dmg:r.boss?(touchUI?7:10):(touchUI?12:16)});
   SFX.raiderShot();
 }
 function raiderHitShip(n){
@@ -4781,11 +4803,11 @@ function raiderHitShip(n){
 }
 function updateRaiderBolts(dt){
   for(let i=RAIDER.bolts.length-1;i>=0;i--){
-    const b=RAIDER.bolts[i];b.life+=dt;
+    const b=RAIDER.bolts[i];if(!b)continue;b.life+=dt;
     b.mesh.position.addScaledVector(b.vel,dt);
     b.mesh.rotation.z+=dt*6;b.mesh.rotation.x+=dt*3;
     const hit=b.mesh.position.distanceTo(ship.group.position)<5.6;
-    if(hit){raiderHitShip(16);boom(b.mesh.position,0xff6b9a,0.45);}
+    if(hit){raiderHitShip(b.dmg||16);boom(b.mesh.position,0xff6b9a,0.45);}
     if(hit||b.life>4.2){scene.remove(b.mesh);RAIDER.bolts.splice(i,1);}
   }
 }
@@ -4803,20 +4825,29 @@ function destroyRaider(r){
   boom(r.group.position,0xffb27a,1.1);
   boom(_rvx.copy(r.group.position).add(_rv0.set(1.5,0.4,0)),0xff4d6d,0.6);
   SFX.explode();
-  const first=!(GAME.raiderKills||0);
+  const first=!(GAME.raiderKills||0),isBoss=!!r.boss;
   GAME.raiderKills=(GAME.raiderKills||0)+1;
-  const gold=Math.round(55+Math.random()*30+UPGRADES.ship.lvl*8);
+  const gold=Math.round((isBoss?240+Math.random()*120:55+Math.random()*30)+UPGRADES.ship.lvl*(isBoss?16:8));
   earnGold(gold,true);
-  INV.rp=(INV.rp||0)+1;
-  if(Math.random()<0.55)INV.so=(INV.so||0)+1;else INV.ae=(INV.ae||0)+2;
-  if(Math.random()<0.18)INV.storm=(INV.storm||0)+1;
+  INV.rp=(INV.rp||0)+(isBoss?4:1);
+  if(isBoss){
+    INV.so=(INV.so||0)+2;INV.vd=(INV.vd||0)+1;
+    if(Math.random()<0.5)INV.storm=(INV.storm||0)+1;
+  }else{
+    if(Math.random()<0.55)INV.so=(INV.so||0)+1;else INV.ae=(INV.ae||0)+2;
+    if(Math.random()<0.18)INV.storm=(INV.storm||0)+1;
+  }
   updateResHUD();
-  factionProgress('combat',1);grantRep('guild',7);
+  factionProgress('combat',isBoss?2:1);grantRep('guild',isBoss?16:7);
   if(first)recordDiscovery('Combat','Alien Raider','Deep Space','A hostile alien raider skiff destroyed in ship-to-ship combat over the frontier.');
-  comicPop(`☠ RAIDER DOWN! +${gold} 🪙`,'#ff4d6d',50,36);
+  if(isBoss){
+    grantAch('dreadnought');
+    recordDiscovery('Combat','Alien Dreadnought','Deep Space','A capital-class alien dreadnought destroyed in open space.');
+    comicPop(`☠ DREADNOUGHT DESTROYED! +${gold} 🪙`,'#ff2d55',50,40);
+  }else comicPop(`☠ RAIDER DOWN! +${gold} 🪙`,'#ff4d6d',50,36);
   checkAchievements();checkMilestones();
   if(RAIDER.list.every(x=>x.dead)){
-    const bonus=50+RAIDER.list.length*25;
+    const bonus=(isBoss?140:50)+RAIDER.list.length*25;
     earnGold(bonus,true);INV.rp=(INV.rp||0)+2;updateResHUD();
     endRaiderWave(false,true);
     comicPop('SECTOR SECURED!','#5df2c0',50,42);
@@ -4851,13 +4882,21 @@ function updateRaiders(dt){
   const sp=ship.group.position;
   if(!RAIDER.active){
     SFX.setAlien(false,0,0);
+    if((activeSystemId==='elysian'||activeSystemId==='gargantua')&&canSpawnRaider()){
+      RAIDER.bossT-=dt;
+      if(RAIDER.bossT<=0){startRaiderWave(true);return;}
+    }
     RAIDER.nextIn-=dt;
     if(RAIDER.nextIn<=0&&canSpawnRaider())startRaiderWave();
     return;
   }
   if(RAIDER.warnT>0){
     RAIDER.warnT-=dt;
-    if(RAIDER.warnT<=0){RAIDER.warnT=0;SFX.alarm();comicPop('RAIDERS ENGAGING!','#ff4d6d',50,34);toast('⚠️ RAIDERS ENGAGING — HOLD FIRE!');}
+    if(RAIDER.warnT<=0){
+      RAIDER.warnT=0;SFX.alarm();
+      if(RAIDER.bossWave){comicPop('DREADNOUGHT ENGAGING!','#ff2d55',50,34);toast('☠ DREADNOUGHT ENGAGING — HOLD FIRE!');}
+      else{comicPop('RAIDERS ENGAGING!','#ff4d6d',50,34);toast('⚠️ RAIDERS ENGAGING — HOLD FIRE!');}
+    }
   }else{
     RAIDER.fightT-=dt;
     if(RAIDER.fightT<=0){endRaiderWave(true);return;}
@@ -4871,12 +4910,12 @@ function updateRaiders(dt){
     if(r.dead)continue;
     alive++;
     r.spawnT+=dt;r.flashT=Math.max(0,r.flashT-dt);r.ang+=r.spin*dt;
-    _rv0.copy(sp).addScaledVector(_rv1,10)
+    _rv0.copy(sp).addScaledVector(_rv1,r.fwd)
       .addScaledVector(_rv2,Math.cos(r.ang)*r.R)
-      .addScaledVector(_rv3,Math.sin(r.ang)*r.R*0.22);
+      .addScaledVector(_rv3,Math.sin(r.ang)*r.R*0.18);
     const dx=_rv0.x-r.group.position.x,dy=_rv0.y-r.group.position.y,dz=_rv0.z-r.group.position.z;
     const dd=Math.hypot(dx,dy,dz)||1;
-    const chase=dd>95?190:dd>45?135:108;
+    const chase=dd>95?(r.boss?150:190):dd>45?(r.boss?115:135):r.boss?96:108;
     const step=Math.min(dd,chase*dt);
     r.group.position.x+=dx/dd*step;r.group.position.y+=dy/dd*step;r.group.position.z+=dz/dd*step;
     _rv0.copy(sp).sub(r.group.position);
@@ -4887,11 +4926,15 @@ function updateRaiders(dt){
     r.group.rotateZ(Math.sin(t*3+r.id)*0.15);
     const sc=Math.min(1,r.spawnT/0.7);
     const pop=r.flashT>0?1+r.flashT*0.9:1;
-    r.group.scale.setScalar((0.05+0.95*sc*sc)*pop);
+    r.group.scale.setScalar((0.05+0.95*sc*sc)*pop*(r.boss?2.6:1));
     for(let gi=0;gi<r.glows.length;gi++)r.glows[gi].scale.setScalar(0.85+Math.sin(t*11+gi*2.1+r.id)*0.25);
     if(RAIDER.warnT<=0&&r.spawnT>1.1&&dist<210){
       r.fireT-=dt;
-      if(r.fireT<=0){r.fireT=2.4+Math.random()*1.3;spawnRaiderBolt(r);}
+      if(r.fireT<=0){
+        r.fireT=r.boss?2.2+Math.random()*1.0:1.4+Math.random()*0.9;
+        if(r.boss){spawnRaiderBolt(r,-0.13);spawnRaiderBolt(r,0);spawnRaiderBolt(r,0.13);}
+        else spawnRaiderBolt(r);
+      }
     }
   }
   if(alive===0){endRaiderWave(false,true);return;}
@@ -4923,9 +4966,9 @@ function updateRaiderMarkers(){
     if(off){const k=1/Math.max(Math.abs(x)/0.95,Math.abs(y)/0.88,1e-4);if(behind||k<1){x*=k;y*=k;}}
     const d=r.group.position.distanceTo(ship.group.position);
     el.style.display='';
-    el.className='mk foe'+(off?' off':'');
+    el.className='mk foe'+(r.boss?' boss':'')+(off?' off':'');
     el.style.transform=`translate(${((x*0.5+0.5)*innerWidth).toFixed(1)}px,${((-y*0.5+0.5)*innerHeight).toFixed(1)}px) translate(-50%,${off?'-50%':'-135%'})`;
-    el.lastChild.textContent=`☠ ${Math.round(d)}`;
+    el.lastChild.textContent=(r.boss?'☠ BOSS ':'☠ ')+Math.round(d);
   }
 }
 
@@ -5815,11 +5858,12 @@ function updateHUD(dt){
   linesEl.style.opacity=(m==='fly'&&input.boost&&PL.speed>60)?clamp((PL.speed-60)/200,0,0.8):0;
 
   const canLand=m==='fly'&&b&&b.landable&&PL.alt<landRange(b);
-  if(m==='fly'){const foes=RAIDER.active?RAIDER.list.filter(r=>!r.dead).length:0,npcNear=nearestNpc(150);
+  if(m==='fly'){const foes=RAIDER.active?RAIDER.list.filter(r=>!r.dead).length:0,npcNear=nearestNpc(150),
+    boss=RAIDER.active?RAIDER.list.find(r=>r.boss&&!r.dead):null;
     setBtn(bLand,'LAND',false,!canLand,canLand);setBtn(bExit,npcNear?'HAIL':'EXIT',!npcNear,false,!!npcNear);setBtn(bBoost,'BOOST',false);
     setBtn(bMine,RAIDER.active?'FIRE':'MINE',false,!RAIDER.active&&!PL.targetNode,!!RAIDER.active||!!PL.targetNode);
-    if(RAIDER.active&&RAIDER.warnT>0)setPrompt(`🚨 ALIEN RAIDERS INBOUND — ENGAGE IN ${Math.ceil(RAIDER.warnT)}s`);
-    else if(RAIDER.active)setPrompt(`${key('F')}HOLD FIRE · ${foes} RAIDER${foes===1?'':'S'} · ${Math.ceil(RAIDER.fightT)}s`);
+    if(RAIDER.active&&RAIDER.warnT>0)setPrompt(boss?`🚨 ALIEN DREADNOUGHT INBOUND — ENGAGE IN ${Math.ceil(RAIDER.warnT)}s`:`🚨 ALIEN RAIDERS INBOUND — ENGAGE IN ${Math.ceil(RAIDER.warnT)}s`);
+    else if(RAIDER.active)setPrompt(boss?`${key('F')}HOLD FIRE · ☠ DREADNOUGHT ${Math.max(0,Math.ceil(boss.hp))}/${boss.maxHp} HP · ${Math.ceil(RAIDER.fightT)}s`:`${key('F')}HOLD FIRE · ${foes} RAIDER${foes===1?'':'S'} · ${Math.ceil(RAIDER.fightT)}s`);
     else if(npcNear)setPrompt(`${key('E')}HAIL ${npcNear.species} VESSEL — ${npcNear.origin}`);
     else if(PL.targetNode)setPrompt(`${key('F')}HOLD TO MINE ${RES_META[PL.targetNode.type].label}`);
     else if(canLand)setPrompt(`${key('L')}LAND ON ${b.name}`);
@@ -6059,7 +6103,7 @@ $('importFile').addEventListener('change',e=>{
 if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)){
   addEventListener('load',()=>{navigator.serviceWorker.register('./sw.js',{updateViaCache:'none'}).then(r=>r.update()).catch(()=>{});});
 }
-window.__game={COINS,SKIN,earnGold,PL,bodies,INV,UPGRADES,MISSIONS,DISCOVERIES,ELYS,GAME,RAIDER,NPC,SFX,get ship(){return ship;},get astro(){return astro;},actLand,actExit,warpToBody,switchActiveSystem,triggerScan,handleInteract,keys,look,camera,frame,spawnStormCrystals,clearAllStormCrystals,openBase,openVaultCode,tameCreature,readTreasureMap,placeOutpostOnPlanet,startRaiderWave,endRaiderWave,damageRaider,canSpawnRaider,spawnRaiderBolt,raiderHitShip,spawnNpcConvoy,canSpawnNpc,fleeNpcs,nearestNpc,hailNpc,tutActive};
+window.__game={COINS,SKIN,earnGold,PL,bodies,INV,UPGRADES,MISSIONS,DISCOVERIES,ELYS,GAME,RAIDER,NPC,SFX,get ship(){return ship;},get astro(){return astro;},actLand,actExit,warpToBody,switchActiveSystem,triggerScan,handleInteract,keys,look,camera,frame,spawnStormCrystals,clearAllStormCrystals,openBase,openVaultCode,tameCreature,readTreasureMap,placeOutpostOnPlanet,startRaiderWave,endRaiderWave,damageRaider,canSpawnRaider,spawnRaiderBolt,raiderHitShip,spawnNpcConvoy,canSpawnNpc,fleeNpcs,nearestNpc,hailNpc,tutActive,CINE,dbg:()=>({started,modalOpen,photoMode,cine:CINE.open,tutStep,alt:PL.alt,mode:PL.mode})};
 </script>
 </body>
 </html>
