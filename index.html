@@ -56,6 +56,14 @@ html,body{margin:0;height:100%;overflow:hidden;background:var(--space);color:var
 .hudBtn.void{background:var(--void)}
 .hudBtn.paper{background:var(--paper)}
 .hudBtn.muted{background:#cfc8dc;opacity:.8}
+.hudBtn.gold{background:linear-gradient(180deg,#ffe98a,#ffb703)}
+#goldPill{font-size:13px;color:#7a4a00}
+#goldPill.bump{animation:gbump .35s}
+@keyframes gbump{0%{transform:scale(1)}40%{transform:scale(1.35)}100%{transform:scale(1)}}
+.shopPrev{height:96px;border:3px solid var(--ink);border-radius:12px;background:radial-gradient(circle at 50% 40%,#2a2350,#0a0720);display:flex;align-items:center;justify-content:center}
+.shopPrev svg{height:84px}
+.uCard.equipped{background:#fff6c9;outline:3px dashed #ffb703;outline-offset:-8px}
+.uBtn.buy{background:var(--sun)}
 
 #resTray{background:var(--paper);border:3px solid var(--ink);border-radius:11px;box-shadow:3px 4px 0 var(--ink);padding:5px 10px;display:flex;gap:9px;font-family:var(--sans);font-weight:800;font-size:11.5px;letter-spacing:0;flex-wrap:wrap;justify-content:flex-end}
 .resPill{display:flex;align-items:center;gap:4px}
@@ -231,12 +239,14 @@ html,body{margin:0;height:100%;overflow:hidden;background:var(--space);color:var
     <div id="btnRow">
       <button class="hudBtn paper" id="btnMute" title="Mute Audio">🔊</button>
       <button class="hudBtn paper" id="btnSettings" title="Sound &amp; performance (O)">⚙️</button>
+      <button class="hudBtn gold" id="btnShop" title="Coin Shop (K)">🪙 SHOP</button>
       <button class="hudBtn void" id="btnCraft" title="Craft & Outposts (B)">🔨 BUILD</button>
       <button class="hudBtn mint" id="btnUpgrade" title="Upgrade Tech Bay (U)">🛠️ TECH</button>
       <button class="hudBtn paper" id="btnJournal" title="Discovery Journal & Settings (J)">📘 LOG</button>
       <button class="hudBtn sky" id="btnMap" title="Galactic Star Map (M)">🌌 MAP · ★<span id="pcount">0</span>/<span id="ptotal">0</span></button>
     </div>
     <div id="resTray">
+      <div class="resPill" id="goldPill" title="Gold Coins">🪙 <span id="rGold">0</span></div>
       <div class="resPill" title="Ferrite (Common)"><span class="resDot" style="background:#ff922b"></span>FE: <span id="rFe">0</span></div>
       <div class="resPill" title="Aetherium (Uncommon)"><span class="resDot" style="background:#39c6ff"></span>AE: <span id="rAe">0</span></div>
       <div class="resPill" title="Solarite (Rare)"><span class="resDot" style="background:#ffd23f"></span>SO: <span id="rSo">0</span></div>
@@ -249,7 +259,7 @@ html,body{margin:0;height:100%;overflow:hidden;background:var(--space);color:var
   <div id="help" class="box">
     <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> fly/walk/rover · <kbd>MOUSE</kbd> steer · <kbd>SHIFT</kbd> boost<br>
     <kbd>L</kbd> land/launch · <kbd>E</kbd> exit/board/interact · <kbd>SPACE</kbd> jump/jetpack<br>
-    <kbd>F</kbd>/<kbd>CLICK</kbd> mine · <kbd>C</kbd> scan · <kbd>U</kbd> tech · <kbd>B</kbd> craft/build · <kbd>M</kbd> map · <kbd>J</kbd> log
+    <kbd>F</kbd>/<kbd>CLICK</kbd> mine · <kbd>C</kbd> scan · <kbd>U</kbd> tech · <kbd>B</kbd> craft/build · <kbd>M</kbd> map · <kbd>J</kbd> log · <kbd>K</kbd> 🪙 shop
   </div>
 
   <div id="stick"><div id="knob"></div></div>
@@ -318,6 +328,22 @@ html,body{margin:0;height:100%;overflow:hidden;background:var(--space);color:var
       <button class="tabBtn" id="tabGalaxySector">🌠 GALAXY SECTOR MAP</button>
     </div>
     <div class="mBody" id="mapBody"></div>
+  </div>
+</div>
+
+<!-- Coin Shop Modal -->
+<div id="shopModal" class="modal">
+  <div class="mCard">
+    <div class="mHead">
+      <h2>🪙 STAR BAZAAR · <span id="shopGold">0</span> COINS</h2>
+      <button class="hudBtn" id="closeShop" style="background:var(--pop);color:#fff">✕</button>
+    </div>
+    <div class="mTabs">
+      <button class="tabBtn active" id="tabShopShip">🚀 ROCKETS</button>
+      <button class="tabBtn" id="tabShopAstro">🧑‍🚀 SUITS</button>
+      <button class="tabBtn" id="tabShopTrade">💱 SELL ORE</button>
+    </div>
+    <div class="mBody"><div class="uGrid" id="shopGrid"></div></div>
   </div>
 </div>
 
@@ -507,7 +533,8 @@ const SFX=(()=>{
     jump(){if(fx('jump'))return;tone(200,520,0.2,'sine',0.16);},
     discover(){if(fx('discover'))return;[523,659,784,1046].forEach((f,i)=>tone(f,f,0.22,'triangle',0.16,i*0.08));},
     land(){if(fx('land'))return;thump();},
-    ui(){if(fx('ui'))return;tone(660,880,0.07,'square',0.08);}
+    ui(){if(fx('ui'))return;tone(660,880,0.07,'square',0.08);},
+    coin(){if(fx('coin'))return;tone(988,988,0.07,'square',0.07);tone(1319,1319,0.2,'square',0.07,0.06);}
   };
 })();
 
@@ -718,7 +745,13 @@ function updateOrbits(t){
 }
 
 /* ---- Player Inventory, Consumables & Upgrades (Levels 1-5) ---- */
-const INV={fe:30,ae:12,so:5,vd:0,shieldCell:1,jetCell:1,scanMod:0,outpostKit:1};
+const INV={fe:30,ae:12,so:5,vd:0,shieldCell:1,jetCell:1,scanMod:0,outpostKit:1,gold:0};
+const GOLD_RATE={fe:1,ae:2,so:4,vd:6};
+function earnGold(n,pop){
+  if(!(n>0))return;INV.gold=(INV.gold||0)+n;updateResHUD();SFX.coin();
+  const p=$('goldPill');p.classList.remove('bump');void p.offsetWidth;p.classList.add('bump');
+  if(pop)comicPop(`+${n} 🪙`,'#ffd23f',50,30);
+}
 const RES_META={
   fe:{key:'fe',label:'FERRITE',color:0xff922b,hex:'#ff922b'},
   ae:{key:'ae',label:'AETHERIUM',color:0x39c6ff,hex:'#39c6ff'},
@@ -735,6 +768,7 @@ const UPGRADES={
 };
 function updateResHUD(){
   $('rFe').textContent=INV.fe;$('rAe').textContent=INV.ae;$('rSo').textContent=INV.so;$('rVd').textContent=INV.vd;
+  $('rGold').textContent=INV.gold||0;$('shopGold').textContent=INV.gold||0;
 }
 
 /* ---- Exploration Missions & Discovery Journal ---- */
@@ -756,8 +790,8 @@ function advanceMission(type,amt=1){
       m.done=true;
       INV.fe+=m.reward.fe;INV.ae+=m.reward.ae;INV.so+=m.reward.so;INV.vd+=m.reward.vd;
       updateResHUD();
-      SFX.discover();
-      toast(`MISSION COMPLETE: ${m.title}!`);
+      SFX.discover();earnGold(100,true);
+      toast(`MISSION COMPLETE: ${m.title}! +100 🪙`);
     }
   }
   if(changed)updateMissionHUD();
@@ -773,6 +807,7 @@ function recordDiscovery(cat,name,planet,detail){
   DISCOVERIES.unshift({cat,name,planet,detail,time:new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})});
   SFX.discover();
   comicPop(`${cat.toUpperCase()} DISCOVERED!`,'#ffd23f',50,34);
+  earnGold(15,true);
   advanceMission('scan',1);
   return true;
 }
@@ -1706,28 +1741,134 @@ function buildWorld(){
 const _sd2=new V3();
 
 /* ---------- 8. SHIP, ASTRONAUT, ROVER & OUTPOSTS ---------- */
+/* ---- Coin Shop skins (rocket + astronaut looks) ---- */
+const SHIP_SKINS=[
+  {id:'classic',name:'CLASSIC HOPPER',price:0,body:0xfff4dc,acc:0xff4d6d,str:0xffd23f,glass:0x8eeaff,gEm:0x1b5a7a,f1:0xff7a1e,f2:0xfff07a,desc:'The trusty red-and-cream hopper you started with.'},
+  {id:'mint',name:'MINT COMET',price:150,body:0xf2fff9,acc:0x2ec4a0,str:0x39c6ff,glass:0xffe28a,gEm:0x7a5a00,f1:0x39c6ff,f2:0xd8fbff,desc:'Cool mint paint and a blue ion flame.'},
+  {id:'inferno',name:'INFERNO BLAZE',price:400,body:0xffb703,acc:0xd62828,str:0x2b2d42,glass:0xff9f1c,gEm:0x7a2a00,f1:0xff3d00,f2:0xffe066,fin2:true,desc:'Hot-rod flames plus twin racing tail fins.'},
+  {id:'arctic',name:'ARCTIC FOX',price:700,body:0xffffff,acc:0x39c6ff,str:0x1d3557,glass:0xbde0fe,gEm:0x1d3557,f1:0x4cc9f0,f2:0xe0fbff,pods:true,desc:'Snow-white hull with extra booster pods.'},
+  {id:'midnight',name:'MIDNIGHT RAVEN',price:1000,body:0x2b2d42,acc:0x7b2cbf,str:0x5df2c0,glass:0xff4dd8,gEm:0x7a1060,f1:0xc77dff,f2:0xffffff,fin2:true,pods:true,desc:'Stealth-dark hull, neon trim, purple plasma.'},
+  {id:'golden',name:'GOLDEN FALCON',price:2000,body:0xffd23f,acc:0xe09f1f,str:0xffffff,glass:0x5df2c0,gEm:0x0a6a50,f1:0xffffff,f2:0xffe066,fin2:true,pods:true,desc:'Solid-gold legend. Every pilot will know you made it.'}
+];
+const ASTRO_SKINS=[
+  {id:'classic',name:'CLASSIC SUIT',price:0,suit:0xffffff,legs:0xe8ecff,chest:0x7a86b8,belt:0xff4d6d,visor:0xffb23f,vEm:0x7a3a00,desc:'Standard-issue white explorer suit.'},
+  {id:'ranger',name:'JUNGLE RANGER',price:100,suit:0x9bd770,legs:0x5a8f3a,chest:0x3d5a2a,belt:0xffd23f,visor:0x5df2c0,vEm:0x0a6a50,desc:'Leafy camo for jungle-world expeditions.'},
+  {id:'tangerine',name:'TANGERINE PILOT',price:250,suit:0xff922b,legs:0xfff4dc,chest:0x39c6ff,belt:0xffffff,visor:0x39c6ff,vEm:0x0a3a6a,desc:'Classic orange flight suit with a sky-blue visor.'},
+  {id:'bubblegum',name:'BUBBLEGUM STAR',price:500,suit:0xffafcc,legs:0xcdb4db,chest:0xa2d2ff,belt:0xff4d6d,visor:0xffffff,vEm:0x6a6a8a,desc:'Pastel pink with a mirror-white visor.'},
+  {id:'shadow',name:'SHADOW NINJA',price:800,suit:0x2b2d42,legs:0x1a1a2e,chest:0xff4d6d,belt:0xff4d6d,visor:0xff2a6d,vEm:0x8a0030,desc:'Midnight suit with a glowing red visor.'},
+  {id:'royal',name:'ROYAL GOLD',price:1500,suit:0xffd23f,legs:0xfff4dc,chest:0x7b2cbf,belt:0xff4d6d,visor:0xc77dff,vEm:0x4a1a7a,crown:true,desc:'Golden suit — and a crown on the helmet!'}
+];
+const SKIN={ship:'classic',astro:'classic',ownedShip:['classic'],ownedAstro:['classic']};
+const _skinCache={};
+const shipLathe=(pts,seg=20)=>{const geo=new THREE.LatheGeometry(pts.map(p=>new THREE.Vector2(p[0],p[1])),seg);geo.rotateX(-Math.PI/2);return geo;};
+const shipWing=(pts)=>{const s=new THREE.Shape();pts.forEach((p,i)=>i?s.lineTo(p[0],p[1]):s.moveTo(p[0],p[1]));return new THREE.ExtrudeGeometry(s,{depth:0.1,bevelEnabled:false});};
+function dressShip(model,flame,id){
+  const sk=SHIP_SKINS.find(s=>s.id===id)||SHIP_SKINS[0];
+  if(model.userData.skin)model.userData.skin.forEach(m=>model.remove(m));
+  let parts=_skinCache['s:'+sk.id];
+  if(!parts){
+    const flat=new M4().makeRotationX(Math.PI/2),sc=new M4().makeScale(1,0.86,1);
+    const tail=()=>shipWing([[0.45,0.45],[1.45,1.55],[1.85,1.55],[1.6,0.4]]);
+    const P=[
+      [shipLathe([[0.001,-1.7],[0.42,-1.64],[0.74,-1.1],[0.87,-0.3],[0.85,0.4],[0.68,1.1]]),sk.body,sc],
+      [shipLathe([[0.68,1.1],[0.38,1.62],[0.001,1.92]]),sk.acc,sc],
+      [shipLathe([[0.88,-0.52],[0.9,-0.28]]),sk.str,sc],
+      [shipWing([[0.55,-0.25],[2.15,0.95],[2.15,1.5],[0.55,1.3]]),sk.acc,new M4().makeTranslation(0,-0.02,0).multiply(flat)],
+      [shipWing([[-0.55,-0.25],[-0.55,1.3],[-2.15,1.5],[-2.15,0.95]]),sk.acc,new M4().makeTranslation(0,-0.02,0).multiply(flat)],
+      [new THREE.CylinderGeometry(0.14,0.14,0.9,8),sk.str,Mx(2.15,-0.07,1.2,Math.PI/2,0,0)],
+      [new THREE.CylinderGeometry(0.14,0.14,0.9,8),sk.str,Mx(-2.15,-0.07,1.2,Math.PI/2,0,0)],
+      [new THREE.CylinderGeometry(0.5,0.36,0.5,14,1,true),0x4a4960,Mx(0,0,1.85,Math.PI/2,0,0)],
+      [new THREE.CylinderGeometry(0.36,0.36,0.05,14),0x221a2e,Mx(0,0,1.75,Math.PI/2,0,0)]
+    ];
+    if(sk.fin2){
+      P.push([tail(),sk.acc,new M4().makeTranslation(0.32,0,0).multiply(new M4().makeRotationZ(-0.5)).multiply(new M4().makeRotationY(-Math.PI/2))]);
+      P.push([tail(),sk.acc,new M4().makeTranslation(-0.22,0,0).multiply(new M4().makeRotationZ(0.5)).multiply(new M4().makeRotationY(-Math.PI/2))]);
+    }else P.push([tail(),sk.acc,new M4().makeTranslation(0.05,0,0).multiply(new M4().makeRotationY(-Math.PI/2))]);
+    if(sk.pods)for(const x of [1.25,-1.25]){
+      P.push([new THREE.CylinderGeometry(0.22,0.18,1.4,10),sk.str,Mx(x,-0.3,0.55,Math.PI/2,0,0)]);
+      P.push([new THREE.ConeGeometry(0.22,0.45,10),sk.acc,Mx(x,-0.3,-0.38,-Math.PI/2,0,0)]);
+    }
+    const hm=new THREE.Mesh(merge(P),vcToon);addOutline(hm,OL_BIG);
+    const glass=new THREE.Mesh(new THREE.SphereGeometry(0.5,16,12),toon(sk.glass,{emissive:sk.gEm,emissiveIntensity:0.7}));glass.scale.set(0.9,0.72,1.3);glass.position.set(0,0.5,-0.55);addOutline(glass,OL_BIG);
+    parts=_skinCache['s:'+sk.id]=[hm,glass];
+  }
+  parts.forEach(m=>model.add(m));model.userData.skin=parts;
+  flame.children[0].material.color.setHex(sk.f1);flame.children[1].material.color.setHex(sk.f2);
+}
+function dressAstro(A,id){
+  const sk=ASTRO_SKINS.find(s=>s.id===id)||ASTRO_SKINS[0];
+  if(A.skin)A.skin.forEach(m=>A.S.remove(m));
+  let parts=_skinCache['a:'+sk.id];
+  if(!parts){
+    const cap=(r,l)=>new THREE.CapsuleGeometry(r,l,4,10);
+    const P=[[cap(0.15,0.17),sk.suit,Mx(0,0.38,0)],[new THREE.SphereGeometry(0.18,14,10),sk.suit,Mx(0,0.68,0)],[new THREE.BoxGeometry(0.25,0.3,0.13),sk.chest,Mx(0,0.41,0.17)],
+      [new THREE.BoxGeometry(0.31,0.05,0.02),sk.belt,Mx(0,0.33,-0.15)],[new THREE.CylinderGeometry(0.01,0.01,0.2,4),0x4a4960,Mx(0.1,0.9,0.05)],[new THREE.SphereGeometry(0.035,6,5),sk.belt,Mx(0.1,1.0,0.05)]];
+    if(sk.crown){
+      P.push([new THREE.CylinderGeometry(0.135,0.14,0.06,12),0xffe066,Mx(0,0.81,0)]);
+      for(let i=0;i<5;i++){const a=i/5*TAU;P.push([new THREE.ConeGeometry(0.032,0.08,5),i%2?0xff4d6d:0xffe066,Mx(Math.cos(a)*0.12,0.87,Math.sin(a)*0.12)]);}
+    }
+    const body=new THREE.Mesh(merge(P),vcToon);addOutline(body);
+    const visor=new THREE.Mesh(new THREE.SphereGeometry(0.13,12,8),toon(sk.visor,{emissive:sk.vEm,emissiveIntensity:0.6}));visor.position.set(0,0.68,-0.085);visor.scale.set(1,0.8,0.8);
+    parts=_skinCache['a:'+sk.id]=[body,visor];
+  }
+  parts.forEach(m=>A.S.add(m));A.skin=parts;
+  A.armL.material=A.armR.material=toon(sk.suit);A.legL.material=A.legR.material=toon(sk.legs);
+}
+
+/* ---- Collectible gold coins (space trails + surface coins) ---- */
+const coinGeo=new THREE.CylinderGeometry(0.42,0.42,0.1,18);coinGeo.rotateX(Math.PI/2);
+let coinMat=null;
+const COINS=[];let coinSpawnT=3;
+const _cv=new V3(),_cf=new V3(),_cs=new V3(),_cq=new Q(),_cq2=new Q(),_cY=new V3(0,1,0),_cZero=new V3();
+function spawnCoin(body,local,scale,space){
+  if(!coinMat)coinMat=toon(0xffd23f,{emissive:0xb07800,emissiveIntensity:0.55});
+  const m=new THREE.Mesh(coinGeo,coinMat);addOutline(m,OL_BIG);m.scale.setScalar(scale);scene.add(m);
+  const base=new Q();if(!space)base.setFromUnitVectors(_cY,_cv.copy(local).normalize());
+  COINS.push({mesh:m,body,local:local.clone(),base,spin:Math.random()*TAU,space,r:scale*1.9,t:0});
+}
+function dropCoin(i){scene.remove(COINS[i].mesh);COINS.splice(i,1);}
+const _cR=new V3();
+function updateCoins(dt){
+  const m=PL.mode;
+  const refPos=m==='walk'?_cR.copy(astro.group.position).add(PL.body.center):(m==='rover'?_cR.copy(rover.localPos).add(PL.body.center):ship.group.position);
+  coinSpawnT-=dt;
+  if(coinSpawnT<=0){
+    coinSpawnT=2.5;
+    if((m==='walk'||m==='rover')&&PL.body){
+      const b=PL.body,up=m==='walk'?astro.dir:rover.dir;
+      if(COINS.filter(c=>c.body===b&&!c.space).length<7){
+        const [e1,e2]=tangentBasis(up),ang=Math.random()*TAU,arc=(7+Math.random()*16)/b.R;
+        const d=_cs.copy(up).multiplyScalar(Math.cos(arc)).addScaledVector(e1,Math.sin(arc)*Math.cos(ang)).addScaledVector(e2,Math.sin(arc)*Math.sin(ang)).normalize();
+        if(!(b.liquid&&!b.liquidSolid&&b.heightAt(d.x,d.y,d.z)<-0.28))spawnCoin(b,d.clone().multiplyScalar(b.groundR(d.x,d.y,d.z)+0.8),1,false);
+      }
+    }else if(m==='fly'&&Math.abs(PL.speed)>6&&!COINS.some(c=>c.space)){
+      const an=PL.near&&PL.alt<PL.near.R*2.5+60?PL.near:null,ctr=an?an.center:_cZero;
+      _cf.set(0,0,-1).applyQuaternion(ship.group.quaternion);_cs.set(1,0,0).applyQuaternion(ship.group.quaternion);
+      const start=_cv.copy(ship.group.position).addScaledVector(_cf,60+Math.abs(PL.speed)*0.5);
+      for(let i=0;i<6;i++){
+        const p=start.clone().addScaledVector(_cf,i*11).addScaledVector(_cs,Math.sin(i*0.7)*5);
+        if(an&&p.distanceTo(an.center)<an.R*1.2)continue;
+        spawnCoin(an,p.sub(ctr),3,true);coinSpawnT=9;
+      }
+    }
+  }
+  for(let i=COINS.length-1;i>=0;i--){
+    const c=COINS[i];c.t+=dt;
+    if((c.body&&c.body.sys!==undefined&&c.body.sys!==activeSystemId)||(c.space&&c.t>45)){dropCoin(i);continue;}
+    c.mesh.position.copy(c.body?c.body.center:_cZero).add(c.local);
+    c.spin+=dt*3;c.mesh.quaternion.copy(c.base).multiply(_cq2.setFromAxisAngle(_cY,c.spin));
+    const d=c.mesh.position.distanceTo(refPos);
+    if(d>260){dropCoin(i);continue;}
+    if(d<c.r+(m==='rover'?1.6:m==='fly'?2.5:0.6)){dropCoin(i);earnGold(5,true);comicPop('+5 🪙','#ffd23f',50,36);}
+  }
+}
+
 function buildShip(){
   const g=new THREE.Group(),model=new THREE.Group();g.add(model);
-  const lathe=(pts,seg=20)=>{const geo=new THREE.LatheGeometry(pts.map(p=>new THREE.Vector2(p[0],p[1])),seg);geo.rotateX(-Math.PI/2);return geo;};
-  const wing=(pts)=>{const s=new THREE.Shape();pts.forEach((p,i)=>i?s.lineTo(p[0],p[1]):s.moveTo(p[0],p[1]));return new THREE.ExtrudeGeometry(s,{depth:0.1,bevelEnabled:false});};
-  const flat=new M4().makeRotationX(Math.PI/2);
-  const hull=merge([
-    [lathe([[0.001,-1.7],[0.42,-1.64],[0.74,-1.1],[0.87,-0.3],[0.85,0.4],[0.68,1.1]]),0xfff4dc,new M4().makeScale(1,0.86,1)],
-    [lathe([[0.68,1.1],[0.38,1.62],[0.001,1.92]]),0xff4d6d,new M4().makeScale(1,0.86,1)],
-    [lathe([[0.88,-0.52],[0.9,-0.28]]),0xffd23f,new M4().makeScale(1,0.86,1)],
-    [wing([[0.55,-0.25],[2.15,0.95],[2.15,1.5],[0.55,1.3]]),0xff4d6d,new M4().makeTranslation(0,-0.02,0).multiply(flat)],
-    [wing([[-0.55,-0.25],[-0.55,1.3],[-2.15,1.5],[-2.15,0.95]]),0xff4d6d,new M4().makeTranslation(0,-0.02,0).multiply(flat)],
-    [wing([[0.45,0.45],[1.45,1.55],[1.85,1.55],[1.6,0.4]]),0xff4d6d,new M4().makeTranslation(0.05,0,0).multiply(new M4().makeRotationY(-Math.PI/2))],
-    [new THREE.CylinderGeometry(0.14,0.14,0.9,8),0xffd23f,Mx(2.15,-0.07,1.2,Math.PI/2,0,0)],
-    [new THREE.CylinderGeometry(0.14,0.14,0.9,8),0xffd23f,Mx(-2.15,-0.07,1.2,Math.PI/2,0,0)],
-    [new THREE.CylinderGeometry(0.5,0.36,0.5,14,1,true),0x4a4960,Mx(0,0,1.85,Math.PI/2,0,0)],
-    [new THREE.CylinderGeometry(0.36,0.36,0.05,14),0x221a2e,Mx(0,0,1.75,Math.PI/2,0,0)]
-  ]);
-  const hm=new THREE.Mesh(hull,vcToon);addOutline(hm,OL_BIG);model.add(hm);
-  const glass=new THREE.Mesh(new THREE.SphereGeometry(0.5,16,12),toon(0x8eeaff,{emissive:0x1b5a7a,emissiveIntensity:0.7}));glass.scale.set(0.9,0.72,1.3);glass.position.set(0,0.5,-0.55);addOutline(glass,OL_BIG);model.add(glass);
   const cone=(r,h)=>{const c=new THREE.ConeGeometry(r,h,10);c.translate(0,h/2,0);c.rotateX(Math.PI/2);return c;};
   const flame=new THREE.Group();flame.position.set(0,0,2.05);
   flame.add(new THREE.Mesh(cone(0.34,1.7),new THREE.MeshBasicMaterial({color:0xff7a1e})),new THREE.Mesh(cone(0.2,1.15),new THREE.MeshBasicMaterial({color:0xfff07a})));model.add(flame);
+  dressShip(model,flame,SKIN.ship);
   const gear=new THREE.Group();gear.position.y=-0.3;
   const leg=(x,z)=>[[new THREE.CylinderGeometry(0.05,0.05,0.74,6),0x8a889c,Mx(x,-0.35,z)],[new THREE.CylinderGeometry(0.18,0.2,0.07,8),0x4a4960,Mx(x,-0.7,z)]];
   const gm=new THREE.Mesh(merge([...leg(0,-0.95),...leg(0.72,0.75),...leg(-0.72,0.75)]),vcToon);addOutline(gm,OL_BIG);gear.add(gm);model.add(gear);gear.scale.y=0.01;gear.visible=false;
@@ -1736,10 +1877,6 @@ function buildShip(){
 function buildAstro(){
   const g=new THREE.Group(),S=new THREE.Group();g.add(S);S.scale.setScalar(0.9);
   const cap=(r,l)=>new THREE.CapsuleGeometry(r,l,4,10);
-  const body=new THREE.Mesh(merge([[cap(0.15,0.17),0xffffff,Mx(0,0.38,0)],[new THREE.SphereGeometry(0.18,14,10),0xffffff,Mx(0,0.68,0)],[new THREE.BoxGeometry(0.25,0.3,0.13),0x7a86b8,Mx(0,0.41,0.17)],
-    [new THREE.BoxGeometry(0.31,0.05,0.02),0xff4d6d,Mx(0,0.33,-0.15)],[new THREE.CylinderGeometry(0.01,0.01,0.2,4),0x4a4960,Mx(0.1,0.9,0.05)],[new THREE.SphereGeometry(0.035,6,5),0xff4d6d,Mx(0.1,1.0,0.05)]]),vcToon);
-  addOutline(body);S.add(body);
-  const visor=new THREE.Mesh(new THREE.SphereGeometry(0.13,12,8),toon(0xffb23f,{emissive:0x7a3a00,emissiveIntensity:0.6}));visor.position.set(0,0.68,-0.085);visor.scale.set(1,0.8,0.8);S.add(visor);
   const tool=new THREE.Mesh(merge([
     [new THREE.BoxGeometry(0.08,0.11,0.34),0xffd23f,Mx(0,0,-0.12)],
     [new THREE.CylinderGeometry(0.03,0.03,0.16,6),0x39c6ff,Mx(0,0.02,-0.32,Math.PI/2,0,0)]
@@ -1749,7 +1886,8 @@ function buildAstro(){
   const armL=limb(0.05,0.17,0xffffff,-0.21,0.5),armR=limb(0.05,0.17,0xffffff,0.21,0.5),legL=limb(0.062,0.15,0xe8ecff,-0.08,0.26),legR=limb(0.062,0.15,0xe8ecff,0.08,0.26);
   armR.add(tool);
   g.visible=false;
-  return {group:g,S,armL,armR,legL,legR,tool,dir:new V3(0,1,0),view:new V3(0,0,-1),face:new V3(0,0,-1),yOff:0,vy:0,pitch:0.35,phase:0,nearShip:false};
+  const A={S,armL,armR,legL,legR};dressAstro(A,SKIN.astro);
+  return {group:g,S,armL,armR,legL,legR,tool,skin:A.skin,dir:new V3(0,1,0),view:new V3(0,0,-1),face:new V3(0,0,-1),yOff:0,vy:0,pitch:0.35,phase:0,nearShip:false};
 }
 
 /* ---- Planetary Outpost & Rover Builders ---- */
@@ -1875,11 +2013,16 @@ function openModal(id){
 }
 function closeModals(){
   modalOpen=false;
-  ['upgradeModal','craftModal','journalModal','mapModal','settingsModal'].forEach(id=>$(id).classList.remove('open'));
+  ['upgradeModal','craftModal','journalModal','mapModal','settingsModal','shopModal'].forEach(id=>$(id).classList.remove('open'));
 }
 
 $('btnUpgrade').addEventListener('click',e=>{e.stopPropagation();SFX.init();renderUpgrades();openModal('upgradeModal');});
 $('closeUpgrade').addEventListener('click',e=>{e.stopPropagation();closeModals();});
+$('closeShop').addEventListener('click',e=>{e.stopPropagation();closeModals();});
+$('btnShop').addEventListener('click',e=>{e.stopPropagation();SFX.init();renderShop();openModal('shopModal');});
+$('tabShopShip').addEventListener('click',()=>{shopTab='ship';renderShop();});
+$('tabShopAstro').addEventListener('click',()=>{shopTab='astro';renderShop();});
+$('tabShopTrade').addEventListener('click',()=>{shopTab='trade';renderShop();});
 $('upgradeModal').addEventListener('click',e=>{if(e.target===$('upgradeModal'))closeModals();});
 
 let craftTab='craft';
@@ -1911,6 +2054,7 @@ addEventListener('keydown',e=>{
   if(e.code==='Space'||e.code.startsWith('Arrow')||e.code==='Tab')e.preventDefault();
   if(!started)return;
   if(e.code==='Escape'){closeModals();return;}
+  if(e.code==='KeyK'){if($('shopModal').classList.contains('open'))closeModals();else{SFX.init();renderShop();openModal('shopModal');}return;}
   if(e.code==='KeyU'){if($('upgradeModal').classList.contains('open'))closeModals();else{SFX.init();renderUpgrades();openModal('upgradeModal');}return;}
   if(e.code==='KeyB'){if($('craftModal').classList.contains('open'))closeModals();else{SFX.init();renderCraftModal();openModal('craftModal');}return;}
   if(e.code==='KeyJ'){if($('journalModal').classList.contains('open'))closeModals();else{SFX.init();renderJournalModal();openModal('journalModal');}return;}
@@ -1998,6 +2142,56 @@ function autoRoll(q,want,k){
 }
 
 /* ---- Render Upgrade Tech Bay (Levels 1-5) ---- */
+/* ---- Coin Shop (Star Bazaar) ---- */
+let shopTab='ship';
+const hexCss=c=>'#'+c.toString(16).padStart(6,'0');
+function shipSvg(k){const c=hexCss;return `<svg viewBox="0 0 60 100"><path d="M30 90 L22 104 L38 104Z" fill="${c(k.f1)}" transform="translate(0,-8)"/>
+<path d="M18 60 L4 82 L4 90 L18 80Z M42 60 L56 82 L56 90 L42 80Z" fill="${c(k.acc)}" stroke="#170f24" stroke-width="2.5"/>
+${k.pods?`<rect x="8" y="50" width="7" height="28" rx="3" fill="${c(k.str)}" stroke="#170f24" stroke-width="2"/><rect x="45" y="50" width="7" height="28" rx="3" fill="${c(k.str)}" stroke="#170f24" stroke-width="2"/>`:''}
+<path d="M30 6 C44 20 46 50 42 84 L18 84 C14 50 16 20 30 6Z" fill="${c(k.body)}" stroke="#170f24" stroke-width="3"/>
+<path d="M30 6 C38 13 41 20 42 26 L18 26 C19 20 22 13 30 6Z" fill="${c(k.acc)}" stroke="#170f24" stroke-width="2.5"/>
+<rect x="17" y="64" width="26" height="6" fill="${c(k.str)}" stroke="#170f24" stroke-width="2"/>
+<circle cx="30" cy="42" r="7.5" fill="${c(k.glass)}" stroke="#170f24" stroke-width="3"/>
+${k.fin2?`<path d="M24 72 L20 92 L27 84Z M36 72 L40 92 L33 84Z" fill="${c(k.acc)}" stroke="#170f24" stroke-width="2"/>`:`<path d="M30 70 L30 94" stroke="${c(k.acc)}" stroke-width="5"/>`}</svg>`;}
+function astroSvg(k){const c=hexCss;return `<svg viewBox="0 0 60 100">
+<rect x="20" y="70" width="8" height="22" rx="4" fill="${c(k.legs)}" stroke="#170f24" stroke-width="2.5"/><rect x="32" y="70" width="8" height="22" rx="4" fill="${c(k.legs)}" stroke="#170f24" stroke-width="2.5"/>
+<rect x="9" y="44" width="8" height="24" rx="4" fill="${c(k.suit)}" stroke="#170f24" stroke-width="2.5"/><rect x="43" y="44" width="8" height="24" rx="4" fill="${c(k.suit)}" stroke="#170f24" stroke-width="2.5"/>
+<rect x="16" y="40" width="28" height="36" rx="11" fill="${c(k.suit)}" stroke="#170f24" stroke-width="3"/>
+<rect x="22" y="47" width="16" height="13" rx="3" fill="${c(k.chest)}" stroke="#170f24" stroke-width="2"/><rect x="16" y="64" width="28" height="4" fill="${c(k.belt)}"/>
+<line x1="38" y1="14" x2="40" y2="4" stroke="#4a4960" stroke-width="2"/><circle cx="40" cy="4" r="3" fill="${c(k.belt)}" stroke="#170f24" stroke-width="1.5"/>
+<circle cx="30" cy="26" r="16" fill="${c(k.suit)}" stroke="#170f24" stroke-width="3"/>
+<ellipse cx="30" cy="27" rx="11" ry="8" fill="${c(k.visor)}" stroke="#170f24" stroke-width="2.5"/>
+${k.crown?`<path d="M18 12 L20 2 L25 9 L30 0 L35 9 L40 2 L42 12Z" fill="#ffe066" stroke="#170f24" stroke-width="2"/>`:''}</svg>`;}
+function renderShop(){
+  for(const [id,t] of [['tabShopShip','ship'],['tabShopAstro','astro'],['tabShopTrade','trade']])$(id).classList.toggle('active',shopTab===t);
+  updateResHUD();
+  const grid=$('shopGrid');grid.innerHTML='';const gold=INV.gold||0;
+  if(shopTab==='trade'){
+    const DEALS=[{k:'fe',n:10,g:10,l:'FERRITE'},{k:'ae',n:10,g:25,l:'AETHERIUM'},{k:'so',n:5,g:30,l:'SOLARITE'},{k:'vd',n:2,g:30,l:'VOID SHARD'}];
+    DEALS.forEach((d,i)=>{const ok=INV[d.k]>=d.n;const card=document.createElement('div');card.className='uCard';
+      card.innerHTML=`<div><div class="uTitle"><span>${d.l}</span><span class="uLvl">HAVE ${INV[d.k]}</span></div><div class="uDesc" style="margin-top:6px">Sell spare ore to the bazaar traders for gold coins.</div></div>
+      <div><div class="uCost">${d.n} ${d.k.toUpperCase()} → ${d.g} 🪙</div><button class="uBtn buy" style="margin-top:8px" data-sell="${i}" ${ok?'':'disabled'}>${ok?'SELL':'NOT ENOUGH ORE'}</button></div>`;grid.appendChild(card);});
+    grid.querySelectorAll('[data-sell]').forEach(b=>b.addEventListener('click',()=>{const d=DEALS[+b.dataset.sell];if(INV[d.k]<d.n)return;INV[d.k]-=d.n;earnGold(d.g,false);saveGame(true);renderShop();}));
+    return;
+  }
+  const isShip=shopTab==='ship',list=isShip?SHIP_SKINS:ASTRO_SKINS,owned=isShip?SKIN.ownedShip:SKIN.ownedAstro,cur=isShip?SKIN.ship:SKIN.astro;
+  for(const k of list){
+    const has=owned.includes(k.id),eq=cur===k.id,afford=gold>=k.price;
+    const card=document.createElement('div');card.className='uCard'+(eq?' equipped':'');
+    card.innerHTML=`<div><div class="shopPrev">${isShip?shipSvg(k):astroSvg(k)}</div>
+      <div class="uTitle" style="margin-top:8px"><span>${k.name}</span><span class="uLvl">${k.price?k.price+' 🪙':'FREE'}</span></div>
+      <div class="uDesc" style="margin-top:4px">${k.desc}</div></div>
+      <button class="uBtn${has?'':' buy'}" data-skin="${k.id}" ${eq||(!has&&!afford)?'disabled':''}>${eq?'★ EQUIPPED':has?'EQUIP':afford?'BUY · '+k.price+' 🪙':'NEED '+(k.price-gold)+' MORE 🪙'}</button>`;
+    grid.appendChild(card);
+  }
+  grid.querySelectorAll('[data-skin]').forEach(b=>b.addEventListener('click',()=>{
+    const id=b.dataset.skin,k=list.find(s=>s.id===id);
+    if(!owned.includes(id)){if((INV.gold||0)<k.price)return;INV.gold-=k.price;owned.push(id);toast(`PURCHASED ${k.name}!`);SFX.coin();}
+    if(isShip){SKIN.ship=id;dressShip(ship.model,ship.flame,id);}else{SKIN.astro=id;dressAstro(astro,id);}
+    SFX.upgrade();updateResHUD();saveGame(true);renderShop();
+  }));
+}
+
 function renderUpgrades(){
   const grid=$('upgradeGrid');grid.innerHTML='';
   for(const key of ['tool','suit','ship']){
@@ -2283,7 +2477,8 @@ function saveGame(silent=false){
       visited:bodies.filter(b=>b.visited).map(b=>b.name),
       discoveries:DISCOVERIES.slice(0,40),
       missions:MISSIONS.map(m=>({id:m.id,prog:m.prog,done:m.done})),
-      sys:activeSystemId
+      sys:activeSystemId,
+      skins:SKIN
     };
     localStorage.setItem('cosmic_hop_gf_save',JSON.stringify(data));
     if(!silent)toast('EXPEDITION PROGRESS SAVED!');
@@ -2295,6 +2490,15 @@ function loadGame(){
     if(!raw)return false;
     const data=JSON.parse(raw);
     if(data.inv)Object.assign(INV,data.inv);
+    if(data.skins){
+      if(Array.isArray(data.skins.ownedShip))SKIN.ownedShip=data.skins.ownedShip.filter(id=>SHIP_SKINS.some(s=>s.id===id));
+      if(Array.isArray(data.skins.ownedAstro))SKIN.ownedAstro=data.skins.ownedAstro.filter(id=>ASTRO_SKINS.some(s=>s.id===id));
+      if(!SKIN.ownedShip.includes('classic'))SKIN.ownedShip.unshift('classic');
+      if(!SKIN.ownedAstro.includes('classic'))SKIN.ownedAstro.unshift('classic');
+      SKIN.ship=SKIN.ownedShip.includes(data.skins.ship)?data.skins.ship:'classic';
+      SKIN.astro=SKIN.ownedAstro.includes(data.skins.astro)?data.skins.astro:'classic';
+      dressShip(ship.model,ship.flame,SKIN.ship);dressAstro(astro,SKIN.astro);
+    }
     if(data.upgrades){
       UPGRADES.tool.lvl=clamp(data.upgrades.tool||1,1,5);
       UPGRADES.suit.lvl=clamp(data.upgrades.suit||1,1,5);
@@ -2372,9 +2576,11 @@ function updateMining(dt){
       const meta=RES_META[bestTarget.type];
       INV[bestTarget.type]+=yieldAmt;
       if(bestTarget.type==='so')advanceMission('solarite',yieldAmt);
+      const gEarn=yieldAmt*(GOLD_RATE[bestTarget.type]||1);
+      INV.gold=(INV.gold||0)+gEarn;
       updateResHUD();
       SFX.minePop();
-      comicPop(`+${yieldAmt} ${meta.label}!`,meta.hex,50,42);
+      comicPop(`+${yieldAmt} ${meta.label}! +${gEarn}🪙`,meta.hex,50,42);
 
       if(bestTarget.kind==='node'){
         bestTarget.node.hp--;
@@ -2502,7 +2708,7 @@ function handleInteract(){
       ruin.solved=true;
       INV.ae+=25;INV.so+=15;INV.vd+=5;
       updateResHUD();
-      SFX.discover();
+      SFX.discover();earnGold(60,true);
       recordDiscovery('Ancient Puzzle',`${ruin.name} Unlocked`,PL.body.name,'Solved Precursor Monolith energy circuit and recovered exotic data.');
       advanceMission('ruin',1);
       saveGame(true);
@@ -2579,7 +2785,7 @@ function updateLanding(dt){
   ship.gear.scale.y=Math.max(0.01,sstep(0.15,0.8,L.t));ship.flameT=0.55*(1-sstep(0.85,1,L.t));
   ship.model.rotation.z*=Math.exp(-dt*4);ship.model.rotation.x*=Math.exp(-dt*4);
   if(L.t>=1){PL.mode='landed';PL.local.copy(L.d1).multiplyScalar(L.r1);PL.L=null;
-    if(!b.visited){b.visited=true;SFX.discover();updatePassport();saveGame(true);toast('NEW WORLD DISCOVERED: '+b.name+'!');}else toast('TOUCHDOWN!');}
+    if(!b.visited){b.visited=true;SFX.discover();earnGold(25,true);updatePassport();saveGame(true);toast('NEW WORLD DISCOVERED: '+b.name+'! +25 🪙');}else toast('TOUCHDOWN!');}
 }
 function takeOff(){
   if(PL.mode!=='landed')return;
@@ -2837,6 +3043,7 @@ function frame(dt){
   PL.near=findNear(g.position);PL.alt=PL.near?altitudeOver(PL.near,g.position):1e9;
 
   if(started){
+    updateCoins(dt);
     updateMining(dt);
     updateEcosystemAndHazards(dt,simT);
   }
@@ -2943,7 +3150,7 @@ async function boot(){
   });
 }
 boot().catch(err=>{console.error(err);const e=$('err');e.hidden=false;e.textContent='Could not start: '+(err&&err.message||err);playBtn.textContent='OOPS';});
-window.__game={PL,bodies,INV,UPGRADES,MISSIONS,DISCOVERIES,get ship(){return ship;},get astro(){return astro;},actLand,actExit,warpToBody,keys,look,camera,frame};
+window.__game={COINS,SKIN,earnGold,PL,bodies,INV,UPGRADES,MISSIONS,DISCOVERIES,get ship(){return ship;},get astro(){return astro;},actLand,actExit,warpToBody,keys,look,camera,frame};
 </script>
 </body>
 </html>
