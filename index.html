@@ -4685,7 +4685,7 @@ const raiderBodyGeo=merge([
 ]);
 const raiderEyeGeo=new THREE.OctahedronGeometry(0.34,0);
 const raiderGlowGeo=new THREE.OctahedronGeometry(0.5,0);
-const RAIDER={active:false,warnT:0,fightT:0,nextIn:16+Math.random()*18,list:[],bolts:[],fx:[],uid:0,audioT:0,chatterT:0,
+const RAIDER={active:false,warnT:0,fightT:0,nextIn:8+Math.random()*10,list:[],bolts:[],fx:[],uid:0,audioT:0,chatterT:0,
   boltGeo:new THREE.OctahedronGeometry(0.3,0),
   boltMat:new THREE.MeshBasicMaterial({color:0xff5ccf,transparent:true,opacity:.95,blending:THREE.AdditiveBlending,depthWrite:false})};
 const _rv0=new V3(),_rv1=new V3(),_rv2=new V3(),_rv3=new V3(),_rvx=new V3(),_rvp=new V3(),_rnp=new V3(),_rm=new M4();
@@ -4711,14 +4711,14 @@ function makeRaider(i,count){
   const right=new V3().crossVectors(fwd,AY);if(right.lengthSq()<1e-4)right.set(1,0,0);right.normalize();
   const up=new V3().crossVectors(right,fwd).normalize();
   g.position.copy(ship.group.position)
-    .addScaledVector(fwd,118+Math.random()*38)
+    .addScaledVector(fwd,100+Math.random()*35)
     .addScaledVector(right,(i-(count-1)/2)*52)
     .addScaledVector(up,(Math.random()-.5)*26);
   g.scale.setScalar(0.05);
   scene.add(g);
   const hp=5+(UPGRADES.ship.lvl>=4?2:0);
   return {id:++RAIDER.uid,group:g,glows,eye,hp,maxHp:hp,dead:false,spawnT:0,ang:Math.random()*TAU,
-    spin:(Math.random()<.5?-1:1)*(0.3+Math.random()*.28),R:52+Math.random()*34,
+    spin:(Math.random()<.5?-1:1)*(0.3+Math.random()*.28),R:24+Math.random()*20,
     fireT:1.2+Math.random()*1.6,flashT:0,mk:null};
 }
 function startRaiderWave(){
@@ -4746,7 +4746,7 @@ function endRaiderWave(retreat=true,silent=false){
   }
   for(const r of RAIDER.list){if(r.mk)r.mk.remove();if(r.group.parent)r.group.parent.remove(r.group);}
   RAIDER.list.length=0;clearRaiderBolts();
-  RAIDER.active=false;RAIDER.warnT=0;RAIDER.fightT=0;RAIDER.nextIn=45+Math.random()*35;
+  RAIDER.active=false;RAIDER.warnT=0;RAIDER.fightT=0;RAIDER.nextIn=30+Math.random()*30;
   if(!silent&&retreat)toast('🛸 THE RAIDERS JUMPED OUT — SPACE IS QUIET AGAIN');
 }
 function boom(pos,color,scale=1){
@@ -4871,9 +4871,9 @@ function updateRaiders(dt){
     if(r.dead)continue;
     alive++;
     r.spawnT+=dt;r.flashT=Math.max(0,r.flashT-dt);r.ang+=r.spin*dt;
-    _rv0.copy(sp).addScaledVector(_rv1,22)
+    _rv0.copy(sp).addScaledVector(_rv1,10)
       .addScaledVector(_rv2,Math.cos(r.ang)*r.R)
-      .addScaledVector(_rv3,Math.sin(r.ang)*r.R*0.34);
+      .addScaledVector(_rv3,Math.sin(r.ang)*r.R*0.22);
     const dx=_rv0.x-r.group.position.x,dy=_rv0.y-r.group.position.y,dz=_rv0.z-r.group.position.z;
     const dd=Math.hypot(dx,dy,dz)||1;
     const chase=dd>95?190:dd>45?135:108;
@@ -4891,7 +4891,7 @@ function updateRaiders(dt){
     for(let gi=0;gi<r.glows.length;gi++)r.glows[gi].scale.setScalar(0.85+Math.sin(t*11+gi*2.1+r.id)*0.25);
     if(RAIDER.warnT<=0&&r.spawnT>1.1&&dist<210){
       r.fireT-=dt;
-      if(r.fireT<=0){r.fireT=2.2+Math.random()*1.2;spawnRaiderBolt(r);}
+      if(r.fireT<=0){r.fireT=2.4+Math.random()*1.3;spawnRaiderBolt(r);}
     }
   }
   if(alive===0){endRaiderWave(false,true);return;}
