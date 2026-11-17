@@ -217,6 +217,17 @@ html,body{margin:0;height:100%;overflow:hidden;background:var(--space);color:var
   .hudBtn{font-size:14px;padding:5px 7px}
 }
 .hudBtn#btnFull{display:none}
+#missionCard.tut{background:#e3fbff;outline:3px dashed var(--sky);outline-offset:-6px;max-width:290px}
+#missionCard.tut #mDesc{display:block!important;font-size:12px}
+#missionCard.tut #mTitle{color:#1d6fa5}
+#tutSkip{display:inline-block;margin-top:3px;font-size:10px;color:#7a6a8a;text-decoration:underline;cursor:pointer}
+#helpModal{z-index:35}
+.guide{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:12px}
+.guide section{background:#fff;border:3px solid var(--ink);border-radius:14px;padding:10px 12px;box-shadow:3px 4px 0 var(--ink)}
+.guide h3{margin:0 0 6px;font-family:var(--display);font-size:21px;letter-spacing:.04em;color:var(--pop)}
+.guide ul{margin:0;padding-left:18px;font-size:12.5px;font-weight:600;line-height:1.5}
+.guide kbd{font-size:11px}
+#howBtn{pointer-events:auto;font-family:var(--display);font-size:clamp(17px,3.5vw,24px);letter-spacing:.05em;padding:5px 18px;border:3px solid var(--ink);border-radius:12px;background:var(--sky);color:var(--ink);box-shadow:4px 4px 0 var(--ink);cursor:pointer}
 .touch .hudBtn#btnFull.can{display:inline-flex}
 /* ---- Phones & short screens held sideways: compact full-screen landscape HUD ---- */
 @media (orientation:landscape) and (max-height:520px){
@@ -289,6 +300,7 @@ html,body{margin:0;height:100%;overflow:hidden;background:var(--space);color:var
   <div id="topRight">
     <div id="btnRow">
       <button class="hudBtn paper" id="btnMute" title="Mute Audio">🔊</button>
+      <button class="hudBtn paper" id="btnHelp" title="How to play (I)">❓</button>
       <button class="hudBtn paper" id="btnFull" title="Full screen">⛶</button>
       <button class="hudBtn paper" id="btnSettings" title="Sound &amp; performance (O)">⚙️</button>
       <button class="hudBtn gold" id="btnShop" title="Coin Shop (K)">🪙<span class="lbl"> SHOP</span></button>
@@ -385,6 +397,56 @@ html,body{margin:0;height:100%;overflow:hidden;background:var(--space);color:var
   </div>
 </div>
 
+<!-- How To Play Modal -->
+<div id="helpModal" class="modal">
+  <div class="mCard">
+    <div class="mHead">
+      <h2>❓ HOW TO PLAY</h2>
+      <button class="hudBtn" id="closeHelp" style="background:var(--pop);color:#fff">✕</button>
+    </div>
+    <div class="mBody">
+      <div class="guide">
+        <section><h3>🌌 THE GOAL</h3><ul>
+          <li>Explore 3 star systems and land on every world (★ counter on the MAP button).</li>
+          <li>Discover alien life, mine ore, finish missions, and upgrade your gear.</li>
+          <li>Earn 🪙 coins and buy new rockets &amp; astronaut suits.</li></ul></section>
+        <section><h3>🎮 KEYBOARD</h3><ul>
+          <li><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> fly / walk · <kbd>MOUSE</kbd> steer · <kbd>SHIFT</kbd> boost / run</li>
+          <li><kbd>L</kbd> land / take off · <kbd>E</kbd> exit ship, board, use</li>
+          <li><kbd>SPACE</kbd> jump (hold in air = jetpack)</li>
+          <li><kbd>F</kbd> or click: mine · <kbd>C</kbd> scan</li>
+          <li><kbd>G</kbd> eat · <kbd>H</kbd> medkit · <kbd>K</kbd> shop</li>
+          <li><kbd>U</kbd> tech · <kbd>B</kbd> build · <kbd>M</kbd> map · <kbd>J</kbd> log · <kbd>I</kbd> this help</li></ul></section>
+        <section><h3>📱 PHONE &amp; TABLET</h3><ul>
+          <li>Left side: drag the <b>joystick</b> to fly or walk.</li>
+          <li>Right side: <b>swipe</b> to look and steer.</li>
+          <li>Big buttons: <b>BOOST/RUN, LAND, EXIT, MINE, SCAN</b>.</li>
+          <li>Tap <b>🍎</b> to eat, <b>💊</b> for a medkit, <b>🪙</b> for the shop.</li>
+          <li>Turn your phone sideways for a wider view. <b>⛶</b> = full screen.</li></ul></section>
+        <section><h3>❤️ STAYING ALIVE</h3><ul>
+          <li><b>HP</b> bar = health. <b>🍗</b> bar = food. Food slowly runs out; when it's empty you lose health.</li>
+          <li>Food grows on most worlds. Walk around and look for glowing <b>🍓 berries</b> &amp; <b>🍐 star fruit</b> on the ground near you — you'll also see a "FOOD NEARBY" hint.</li>
+          <li>Lava worlds (CINDER, TARTARUS) and frozen GLACIA have no food — bring <b>🥫 rations</b> from the shop.</li>
+          <li>Crashing your ship too fast, lava, and solar storms hurt. Rest in your landed ship to heal faster.</li>
+          <li>HP 0 = knocked out: drones bring you back to your ship for a 10% coin fee.</li></ul></section>
+        <section><h3>🪙 EARNING COINS</h3><ul>
+          <li>Mining ore: 1–6 🪙 each · coin trails in space &amp; coins on the ground: 5 🪙</li>
+          <li>New discovery 15 🪙 · new world 25 🪙 · ruin puzzle 60 🪙 · mission 100 🪙</li>
+          <li>Sell spare ore in the shop. Spend coins on rockets, suits, rations &amp; medkits.</li></ul></section>
+        <section><h3>🚀 GETTING FURTHER</h3><ul>
+          <li><b>TECH</b>: upgrade your mining tool, suit and hyperdrive with ore.</li>
+          <li><b>MAP</b>: pick a planet to fly there, or warp to a new star system (needs hyperdrive upgrades).</li>
+          <li><b>BUILD</b>: craft shield/jet cells, outposts and a rover.</li>
+          <li>You can swim in water and walk across the red bridges. The game saves automatically.</li></ul></section>
+      </div>
+      <div style="display:flex;gap:10px;justify-content:center;margin-top:14px;flex-wrap:wrap">
+        <button class="uBtn" id="btnRestartTut" style="width:auto">🎓 RESTART TUTORIAL</button>
+        <button class="uBtn buy" id="btnHelpOk" style="width:auto">GOT IT — LET'S PLAY!</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- Coin Shop Modal -->
 <div id="shopModal" class="modal">
   <div class="mCard">
@@ -427,7 +489,8 @@ html,body{margin:0;height:100%;overflow:hidden;background:var(--space);color:var
     <button id="play" type="button" disabled>BUILDING GALAXY…</button>
     <button id="contBtn" type="button" hidden>CONTINUE SAVE</button>
   </div>
-  <p id="how">Land on worlds to explore caves &amp; ruins · Press C to Pulse Scan · U to Upgrade · B to Craft &amp; Build Outposts · M for Star Map</p>
+  <button id="howBtn" type="button">❓ HOW TO PLAY</button>
+  <p id="how">Fly, land, explore on foot, mine ore, collect 🪙 coins &amp; 🍓 food, stay alive — and buy cool rockets &amp; suits! A step-by-step tutorial guides you as you play.</p>
   <div id="err" hidden></div>
 </div>
 
@@ -854,6 +917,7 @@ function advanceMission(type,amt=1){
   if(changed)updateMissionHUD();
 }
 function updateMissionHUD(){
+  if(typeof tutStep!=='undefined'&&tutActive()&&started)return;
   const cur=MISSIONS.find(m=>!m.done)||MISSIONS[MISSIONS.length-1];
   $('mTitle').textContent=cur.done?`★ ALL MISSIONS COMPLETE!`:`★ MISSION: ${cur.title}`;
   $('mDesc').textContent=cur.desc;
@@ -864,7 +928,7 @@ function recordDiscovery(cat,name,planet,detail){
   DISCOVERIES.unshift({cat,name,planet,detail,time:new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})});
   SFX.discover();
   comicPop(`${cat.toUpperCase()} DISCOVERED!`,'#ffd23f',50,34);
-  earnGold(15,true);
+  earnGold(15,true);tutFlags.scan=1;
   advanceMission('scan',1);
   return true;
 }
@@ -1886,20 +1950,33 @@ function foodMesh(kind){
     fruitGeo=merge([[new THREE.SphereGeometry(0.26,10,8),0xffa94d,Mx(0,0.26,0,0,0,0,1,1.15,1)],[new THREE.ConeGeometry(0.17,0.3,8),0xffc078,Mx(0,0.6,0)],
       [new THREE.CylinderGeometry(0.025,0.025,0.16,4),0x6b4226,Mx(0,0.78,0)],[new THREE.SphereGeometry(0.1,6,4),0x5df2c0,Mx(0.1,0.8,0,0,0,0,1.4,0.4,0.8)]]);
   }
-  const m=new THREE.Mesh(kind==='berry'?berryGeo:fruitGeo,kind==='berry'?vcToon:new THREE.MeshToonMaterial({vertexColors:true,gradientMap:gradTex,emissive:0xff7a1e,emissiveIntensity:0.35}));
-  addOutline(m,OL_BIG);return m;
+  if(!foodMesh.mats)foodMesh.mats={berry:new THREE.MeshToonMaterial({vertexColors:true,gradientMap:gradTex,emissive:0xff2d55,emissiveIntensity:0.4}),fruit:new THREE.MeshToonMaterial({vertexColors:true,gradientMap:gradTex,emissive:0xff7a1e,emissiveIntensity:0.45})};
+  const m=new THREE.Mesh(kind==='berry'?berryGeo:fruitGeo,foodMesh.mats[kind==='berry'?'berry':'fruit']);
+  addOutline(m,OL_BIG);
+  if(!foodMesh.beamGeo){foodMesh.beamGeo=new THREE.CylinderGeometry(0.03,0.09,2.2,8,1,true);foodMesh.beamGeo.translate(0,1.4,0);
+    foodMesh.beamMat={berry:new THREE.MeshBasicMaterial({color:0xff5d8f,transparent:true,opacity:0.45,blending:THREE.AdditiveBlending,depthWrite:false}),fruit:new THREE.MeshBasicMaterial({color:0xffb347,transparent:true,opacity:0.45,blending:THREE.AdditiveBlending,depthWrite:false})};}
+  m.add(new THREE.Mesh(foodMesh.beamGeo,foodMesh.beamMat[kind==='berry'?'berry':'fruit']));
+  return m;
 }
 function spawnCoin(body,local,scale,space,kind='coin'){
   if(!coinMat)coinMat=toon(0xffd23f,{emissive:0xb07800,emissiveIntensity:0.55});
-  const m=kind==='coin'?new THREE.Mesh(coinGeo,coinMat):foodMesh(kind);if(kind==='coin')addOutline(m,OL_BIG);m.scale.setScalar(kind==='coin'?scale:1.6);scene.add(m);
+  const m=kind==='coin'?new THREE.Mesh(coinGeo,coinMat):foodMesh(kind);if(kind==='coin')addOutline(m,OL_BIG);m.scale.setScalar(kind==='coin'?scale:3.2);scene.add(m);
   const base=new Q();if(!space)base.setFromUnitVectors(_cY,_cv.copy(local).normalize());
   if(kind!=='coin')local=local.clone().addScaledVector(_cv,-0.75);
-  COINS.push({mesh:m,body,local:local.clone(),base,spin:Math.random()*TAU,space,r:kind==='coin'?scale*1.9:1.4,t:0,kind});
+  COINS.push({mesh:m,body,local:local.clone(),base,spin:Math.random()*TAU,space,r:kind==='coin'?scale*1.9:2.0,t:0,kind});
 }
 function dropCoin(i){scene.remove(COINS[i].mesh);COINS.splice(i,1);}
 const _cR=new V3();
+let lastCoinMode='',coinBurst=0;
 function updateCoins(dt){
   const m=PL.mode;
+  if(m!==lastCoinMode){
+    if(m==='walk'&&lastCoinMode==='landed'&&PL.body){
+      if(PL.body.fertile){coinBurst=4;coinSpawnT=0.4;if(!PL.body.foodTip){PL.body.foodTip=1;setTimeout(()=>toast('🍓 FOOD GROWS HERE — LOOK FOR GLOWING BERRIES & FRUIT!'),1600);}}
+      else if(!PL.body.foodTip){PL.body.foodTip=1;setTimeout(()=>toast('🥫 NO FOOD GROWS ON THIS WORLD — EAT RATIONS [G]'),1600);}
+    }
+    lastCoinMode=m;
+  }
   const refPos=m==='walk'?_cR.copy(astro.group.position).add(PL.body.center):(m==='rover'?_cR.copy(rover.localPos).add(PL.body.center):ship.group.position);
   coinSpawnT-=dt;
   if(coinSpawnT<=0){
@@ -1907,9 +1984,11 @@ function updateCoins(dt){
     if((m==='walk'||m==='rover')&&PL.body){
       const b=PL.body,up=m==='walk'?astro.dir:rover.dir;
       if(COINS.filter(c=>c.body===b&&!c.space).length<7){
-        const [e1,e2]=tangentBasis(up),ang=Math.random()*TAU,arc=(7+Math.random()*16)/b.R;
+        const burst=coinBurst>0;if(burst)coinBurst--;
+        const [e1,e2]=tangentBasis(up),ang=Math.random()*TAU,arc=(burst?4+Math.random()*5:7+Math.random()*16)/b.R;
         const d=_cs.copy(up).multiplyScalar(Math.cos(arc)).addScaledVector(e1,Math.sin(arc)*Math.cos(ang)).addScaledVector(e2,Math.sin(arc)*Math.sin(ang)).normalize();
-        const food=b.creatures&&b.creatures.length>0&&COINS.filter(c=>c.body===b&&c.kind!=='coin').length<4&&Math.random()<0.5;
+        const life=!!b.fertile,food=life&&(burst?coinBurst%2===1:COINS.filter(c=>c.body===b&&c.kind!=='coin').length<4&&Math.random()<0.5);
+        if(burst)coinSpawnT=0.25;
         if(!(b.liquid&&!b.liquidSolid&&b.heightAt(d.x,d.y,d.z)<-0.28))spawnCoin(b,d.clone().multiplyScalar(surfR(b,d)+0.8),1,false,food?(Math.random()<0.65?'berry':'fruit'):'coin');
       }
     }else if(m==='fly'&&Math.abs(PL.speed)>6&&!COINS.some(c=>c.space)){
@@ -1923,14 +2002,17 @@ function updateCoins(dt){
       }
     }
   }
+  PL.foodNear=0;
   for(let i=COINS.length-1;i>=0;i--){
     const c=COINS[i];c.t+=dt;
     if((c.body&&c.body.sys!==undefined&&c.body.sys!==activeSystemId)||(c.space&&c.t>45)){dropCoin(i);continue;}
     c.mesh.position.copy(c.body?c.body.center:_cZero).add(c.local);
+    if(c.kind!=='coin'){c.mesh.position.addScaledVector(_cv.copy(c.local).normalize(),0.2+Math.sin(c.t*3)*0.15);c.spin-=dt*2;}
     c.spin+=dt*3;c.mesh.quaternion.copy(c.base).multiply(_cq2.setFromAxisAngle(_cY,c.spin));
     const d=c.mesh.position.distanceTo(refPos);
+    if(c.kind!=='coin'&&d<18&&(m==='walk'||m==='rover'))PL.foodNear=1;
     if(d>260){dropCoin(i);continue;}
-    if(d<c.r+(m==='rover'?1.6:m==='fly'?2.5:0.6)){dropCoin(i);
+    if(d<c.r+(m==='rover'?1.6:m==='fly'?2.5:0.6)){dropCoin(i);tutFlags.pick=1;
       if(c.kind==='coin'){earnGold(5,true);comicPop('+5 🪙','#ffd23f',50,36);}
       else{INV[c.kind]=(INV[c.kind]||0)+1;SFX.eat();updateResHUD();comicPop(c.kind==='berry'?'+1 🍓 GLOW BERRIES':'+1 🍐 STAR FRUIT','#ff922b',50,36);
         if(!PL.foodTip){PL.foodTip=1;toast('FOOD COLLECTED! PRESS [G] OR TAP 🍎 TO EAT');}}}
@@ -2087,12 +2169,17 @@ function openModal(id){
 }
 function closeModals(){
   modalOpen=false;
-  ['upgradeModal','craftModal','journalModal','mapModal','settingsModal','shopModal'].forEach(id=>$(id).classList.remove('open'));
+  ['upgradeModal','craftModal','journalModal','mapModal','settingsModal','shopModal','helpModal'].forEach(id=>$(id).classList.remove('open'));
 }
 
 $('btnUpgrade').addEventListener('click',e=>{e.stopPropagation();SFX.init();renderUpgrades();openModal('upgradeModal');});
 $('closeUpgrade').addEventListener('click',e=>{e.stopPropagation();closeModals();});
 $('closeShop').addEventListener('click',e=>{e.stopPropagation();closeModals();});
+$('closeHelp').addEventListener('click',e=>{e.stopPropagation();closeModals();});
+$('btnHelpOk').addEventListener('click',e=>{e.stopPropagation();closeModals();});
+$('btnHelp').addEventListener('click',e=>{e.stopPropagation();SFX.init();openModal('helpModal');});
+$('howBtn').addEventListener('click',e=>{e.stopPropagation();openModal('helpModal');});
+$('btnRestartTut').addEventListener('click',e=>{e.stopPropagation();for(const k in tutFlags)delete tutFlags[k];tutStep=0;try{localStorage.setItem(TUT_KEY,'0');}catch(_){};closeModals();if(started)renderTut();toast('🎓 TUTORIAL RESTARTED!');});
 $('btnShop').addEventListener('click',e=>{e.stopPropagation();SFX.init();renderShop();openModal('shopModal');});
 $('tabShopShip').addEventListener('click',()=>{shopTab='ship';renderShop();});
 $('tabShopAstro').addEventListener('click',()=>{shopTab='astro';renderShop();});
@@ -2108,7 +2195,7 @@ $('tabOutpost').addEventListener('click',()=>{craftTab='outpost';renderCraftModa
 
 let journalTab='missions';
 $('btnJournal').addEventListener('click',e=>{e.stopPropagation();SFX.init();renderJournalModal();openModal('journalModal');});
-$('missionCard').addEventListener('click',e=>{e.stopPropagation();SFX.init();journalTab='missions';renderJournalModal();openModal('journalModal');});
+$('missionCard').addEventListener('click',e=>{e.stopPropagation();if(e.target.id==='tutSkip'){finishTut(false);return;}if(tutActive()){SFX.init();openModal('helpModal');return;}SFX.init();journalTab='missions';renderJournalModal();openModal('journalModal');});
 $('closeJournal').addEventListener('click',e=>{e.stopPropagation();closeModals();});
 $('journalModal').addEventListener('click',e=>{if(e.target===$('journalModal'))closeModals();});
 $('tabMissions').addEventListener('click',()=>{journalTab='missions';renderJournalModal();});
@@ -2130,6 +2217,7 @@ addEventListener('keydown',e=>{
   if(e.code==='Escape'){closeModals();return;}
   if(e.code==='KeyG'&&!modalOpen){eatFood();return;}
   if(e.code==='KeyH'&&!modalOpen){useMedkit();return;}
+  if(e.code==='KeyI'){if($('helpModal').classList.contains('open'))closeModals();else{SFX.init();openModal('helpModal');}return;}
   if(e.code==='KeyK'){if($('shopModal').classList.contains('open'))closeModals();else{SFX.init();renderShop();openModal('shopModal');}return;}
   if(e.code==='KeyU'){if($('upgradeModal').classList.contains('open'))closeModals();else{SFX.init();renderUpgrades();openModal('upgradeModal');}return;}
   if(e.code==='KeyB'){if($('craftModal').classList.contains('open'))closeModals();else{SFX.init();renderCraftModal();openModal('craftModal');}return;}
@@ -2239,6 +2327,7 @@ function astroSvg(k){const c=hexCss;return `<svg viewBox="0 0 60 100">
 <ellipse cx="30" cy="27" rx="11" ry="8" fill="${c(k.visor)}" stroke="#170f24" stroke-width="2.5"/>
 ${k.crown?`<path d="M18 12 L20 2 L25 9 L30 0 L35 9 L40 2 L42 12Z" fill="#ffe066" stroke="#170f24" stroke-width="2"/>`:''}</svg>`;}
 function renderShop(){
+  tutFlags.shop=1;
   for(const [id,t] of [['tabShopShip','ship'],['tabShopAstro','astro'],['tabShopTrade','trade']])$(id).classList.toggle('active',shopTab===t);
   updateResHUD();
   const grid=$('shopGrid');grid.innerHTML='';const gold=INV.gold||0;
@@ -2659,7 +2748,7 @@ function updateMining(dt){
       const meta=RES_META[bestTarget.type];
       INV[bestTarget.type]+=yieldAmt;
       if(bestTarget.type==='so')advanceMission('solarite',yieldAmt);
-      const gEarn=yieldAmt*(GOLD_RATE[bestTarget.type]||1);
+      const gEarn=yieldAmt*(GOLD_RATE[bestTarget.type]||1);tutFlags.mine=1;
       INV.gold=(INV.gold||0)+gEarn;
       updateResHUD();
       SFX.minePop();
@@ -3089,6 +3178,7 @@ function shipImpact(v,n){
   hurt(clamp((v-25)*0.4*resist,4,70),v>90?'💥 HULL BREACH! SLOW DOWN NEAR PLANETS!':'💥 CRASH! WATCH YOUR SPEED!');
 }
 function eatFood(){
+  tutFlags.eat=1;
   const f=FOODS.find(f=>(INV[f.k]||0)>0);
   if(!f){toast('NO FOOD! PICK 🍓 BERRIES & 🍐 STAR FRUIT ON LIVING WORLDS OR BUY RATIONS IN THE 🪙 SHOP');return;}
   if(PL.food>=97){toast('YOU ARE FULL!');return;}
@@ -3117,11 +3207,46 @@ function applyCamShake(dt){
 $('foodPill').addEventListener('click',e=>{e.stopPropagation();if(started)eatFood();});
 $('medPill').addEventListener('click',e=>{e.stopPropagation();if(started)useMedkit();});
 
+/* ---- Step-by-step tutorial for new players (shown in the mission card) ---- */
+const TUT_KEY='cosmic_hop_tut',tutFlags={};
+var tutStep;tutStep=0;try{const v=localStorage.getItem(TUT_KEY);if(v!==null)tutStep=+v||0;}catch(_){}
+const TUT=[
+  {t:'FLY YOUR SHIP',d:()=>touchUI?'Drag the JOYSTICK (left side) to fly. Swipe the right side to steer. Hold BOOST to go fast!':'Hold W to fly forward, move the MOUSE to steer, hold SHIFT to boost.',ok:()=>PL.mode==='fly'&&Math.abs(PL.speed)>55},
+  {t:'LAND ON A PLANET',d:()=>`Fly close to a green world like TERRA until the LAND button lights up, then ${touchUI?'tap LAND':'press L'}. Don't hit planets too fast — crashes hurt!`,ok:()=>PL.mode==='landing'||PL.mode==='landed'||PL.mode==='walk'},
+  {t:'HOP OUT',d:()=>`${touchUI?'Tap EXIT':'Press E'} to step outside as the astronaut. ${touchUI?'Tap ENTER':'Press E'} by the ship to climb back in.`,ok:()=>PL.mode==='walk'},
+  {t:'GRAB FOOD & COINS',d:()=>'Walk into the glowing 🍓 berries, 🍐 star fruit and spinning 🪙 coins near you to collect them.',ok:()=>!!tutFlags.pick},
+  {t:'MINE ORE',d:()=>`Walk up to a glowing crystal rock and ${touchUI?'hold MINE':'hold F (or the mouse button)'}. Ore pays for upgrades and gives coins.`,ok:()=>!!tutFlags.mine},
+  {t:'SCAN ALIEN LIFE',d:()=>`${touchUI?'Tap SCAN':'Press C'} near creatures and plants to discover them (+15 🪙 each).`,ok:()=>!!tutFlags.scan},
+  {t:'STAY HEALTHY',d:()=>`Watch the HP and 🍗 FOOD bars (top left). ${touchUI?'Tap the 🍎 counter':'Press G'} to eat now. ${touchUI?'Tap 💊':'Press H'} uses a medkit.`,ok:()=>!!tutFlags.eat},
+  {t:'VISIT THE SHOP',d:()=>`${touchUI?'Tap the 🪙 button':'Press K'} to spend coins on new rockets, astronaut suits and supplies.`,ok:()=>!!tutFlags.shop}
+];
+function tutActive(){return tutStep>=0&&tutStep<TUT.length;}
+function setTxt(el,v){if(el.textContent!==v)el.textContent=v;}
+function renderTut(){
+  if(!tutActive())return;const st=TUT[tutStep];$('missionCard').classList.add('tut');
+  setTxt($('mTitle'),`🎓 TUTORIAL ${tutStep+1}/${TUT.length}: ${st.t}`);setTxt($('mDesc'),st.d());
+  if(!$('tutSkip'))$('mProg').innerHTML='<span id="tutSkip">SKIP TUTORIAL ✕</span>';
+}
+function finishTut(done){
+  tutStep=TUT.length;try{localStorage.setItem(TUT_KEY,String(tutStep));}catch(_){}
+  $('missionCard').classList.remove('tut');updateMissionHUD();
+  if(done){earnGold(50,true);toast('🎓 TUTORIAL COMPLETE! +50 🪙');}else toast('TUTORIAL SKIPPED — TAP ❓ ANY TIME FOR HELP');
+}
+function tutTick(){
+  if(!started||!tutActive())return;
+  if(TUT[tutStep].ok()){
+    tutStep++;try{localStorage.setItem(TUT_KEY,String(tutStep));}catch(_){}
+    if(tutActive()){SFX.ui();comicPop('NICE! NEXT STEP','#5df2c0',50,30);}else{finishTut(true);return;}
+  }
+  renderTut();
+}
+
 const key=k=>touchUI?'':`<kbd>${k}</kbd> `;
 function setPrompt(html){if(html){if(promptEl.dataset.h!==html){promptEl.innerHTML=html;promptEl.dataset.h=html;}promptEl.classList.add('on');}else promptEl.classList.remove('on');}
 function setBtn(el,label,hidden,dim,pulse){if(el.textContent!==label)el.textContent=label;el.hidden=hidden;el.classList.toggle('dim',!!dim);el.classList.toggle('pulse',!!pulse);}
 function updateHUD(dt){
   hudT-=dt;if(hudT>0)return;hudT=0.08;
+  tutTick();
   const b=PL.near,m=PL.mode;
   if(m==='walk'||m==='rover'){locEl.textContent=PL.body.name;subEl.textContent=(m==='rover'?'ROVER':'ON FOOT')+(PL.sheltered?' · 🛡️ SHELTERED':' · '+(PL.body.blurb||''));}
   else if(m==='landed'){locEl.textContent=PL.body.name;subEl.textContent='LANDED · 🛡️ SHIP SHELTER';}
@@ -3150,6 +3275,7 @@ function updateHUD(dt){
     if(PL.nearInteract)setPrompt(`${key('E')}${PL.nearInteract.label}`);
     else if(PL.targetNode)setPrompt(`${key('F')}HOLD TO MINE ${RES_META[PL.targetNode.type].label}`);
     else if(astro.nearShip)setPrompt(`${key('E')}CLIMB ABOARD`);
+    else if(PL.foodNear)setPrompt('🍓 FOOD NEARBY — WALK INTO THE GLOWING FRUIT TO PICK IT UP');
     else setPrompt('');}
   else if(m==='rover'){
     setBtn(bLand,'HORN',false);setBtn(bExit,'EXIT',false,false,true);setBtn(bBoost,'TURBO',false);setBtn(bMine,'MINE',false,!PL.targetNode,!!PL.targetNode);
@@ -3294,7 +3420,7 @@ async function boot(){
   const steps=buildWorld();
   for(const [label,fn] of steps){playBtn.textContent=label+'…';await new Promise(r=>setTimeout(r,20));fn();}
   buildAsteroids();
-  for(const b of bodies)b.hot=/LAVA|CRIMSON/.test(b.blurb||'');
+  for(const b of bodies){b.hot=/LAVA|CRIMSON/.test(b.blurb||'');b.fertile=!!(b.creatures&&b.creatures.length)&&!b.hot&&!/FROZEN|GLACIER|ICE/.test(b.blurb||'');}
   ship=buildShip();scene.add(ship.group);astro=buildAstro();
   switchActiveSystem('solara');
   updateOrbits(0);
