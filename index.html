@@ -4272,7 +4272,10 @@ const SHIP_SKINS=[
   {id:'midnight',name:'MIDNIGHT RAVEN',price:1000,body:0x2b2d42,acc:0x7b2cbf,str:0x5df2c0,glass:0xff4dd8,gEm:0x7a1060,f1:0xc77dff,f2:0xffffff,fin2:true,pods:true,desc:'Stealth-dark hull, neon trim, purple plasma.'},
   {id:'golden',name:'GOLDEN FALCON',price:2000,body:0xffd23f,acc:0xe09f1f,str:0xffffff,glass:0x5df2c0,gEm:0x0a6a50,f1:0xffffff,f2:0xffe066,fin2:true,pods:true,desc:'Solid-gold legend. Every pilot will know you made it.'},
   {id:'goldenbloom',name:'GOLDEN BLOOM',price:0,locked:true,body:0xffe08a,acc:0xff8fce,str:0x7dffc4,glass:0xe6ff7a,gEm:0x2a6a1a,f1:0xe6ff7a,f2:0xffd1ec,fin2:true,pods:true,desc:'Eternal Explorer reward — living gold petals with bloom-green plasma.'},
-  {id:'voidlight',name:'VOIDLIGHT ENVOY',price:0,locked:true,body:0x10243f,acc:0x39c6ff,str:0x9dfcff,glass:0x5df2c0,gEm:0x0a6a7a,f1:0x39c6ff,f2:0xffffff,fin2:true,pods:true,desc:'Galactic Diplomat reward — a deep-void hull etched with living star-charts.'}
+  {id:'voidlight',name:'VOIDLIGHT ENVOY',price:0,locked:true,body:0x10243f,acc:0x39c6ff,str:0x9dfcff,glass:0x5df2c0,gEm:0x0a6a7a,f1:0x39c6ff,f2:0xffffff,fin2:true,pods:true,desc:'Galactic Diplomat reward — a deep-void hull etched with living star-charts.'},
+  {id:'nova',name:'NOVA LANCER',price:2800,body:0x0f2b4a,acc:0x39ff88,str:0xffd23f,glass:0x9dfcff,gEm:0x0a6a7a,f1:0x39ff88,f2:0xd8fff0,delta:true,desc:'Long-range interceptor with broad swept delta wings and twin wingtip cannons — built for the deep frontier.'},
+  {id:'helios',name:'HELIOS SOVEREIGN',price:4600,body:0xffe08a,acc:0xff7a2e,str:0xfff6c0,glass:0xffffff,gEm:0xffd23f,f1:0xff7a1e,f2:0xffe066,delta:true,ring:true,pods:true,desc:'Solar-crown flagship: molten-gold delta plating, twin drive hoops and extra booster pods.'},
+  {id:'omegawing',name:'OMEGA VOIDWING',price:7200,body:0x120a24,acc:0xc77dff,str:0x9dfcff,glass:0xff4dd8,gEm:0x7a1060,f1:0xc77dff,f2:0x9dfcff,delta:true,ring:true,pods:true,desc:'Void-black prototype delta hull with two glowing halo rings — the fastest silhouette in the bazaar.'}
 ];
 const ASTRO_SKINS=[
   {id:'classic',name:'CLASSIC SUIT',price:0,suit:0xffffff,legs:0xe8ecff,chest:0x7a86b8,belt:0xff4d6d,visor:0xffb23f,vEm:0x7a3a00,desc:'Standard-issue white explorer suit.'},
@@ -4280,7 +4283,9 @@ const ASTRO_SKINS=[
   {id:'tangerine',name:'TANGERINE PILOT',price:250,suit:0xff922b,legs:0xfff4dc,chest:0x39c6ff,belt:0xffffff,visor:0x39c6ff,vEm:0x0a3a6a,desc:'Classic orange flight suit with a sky-blue visor.'},
   {id:'bubblegum',name:'BUBBLEGUM STAR',price:500,suit:0xffafcc,legs:0xcdb4db,chest:0xa2d2ff,belt:0xff4d6d,visor:0xffffff,vEm:0x6a6a8a,desc:'Pastel pink with a mirror-white visor.'},
   {id:'shadow',name:'SHADOW NINJA',price:800,suit:0x2b2d42,legs:0x1a1a2e,chest:0xff4d6d,belt:0xff4d6d,visor:0xff2a6d,vEm:0x8a0030,desc:'Midnight suit with a glowing red visor.'},
-  {id:'royal',name:'ROYAL GOLD',price:1500,suit:0xffd23f,legs:0xfff4dc,chest:0x7b2cbf,belt:0xff4d6d,visor:0xc77dff,vEm:0x4a1a7a,crown:true,desc:'Golden suit — and a crown on the helmet!'}
+  {id:'royal',name:'ROYAL GOLD',price:1500,suit:0xffd23f,legs:0xfff4dc,chest:0x7b2cbf,belt:0xff4d6d,visor:0xc77dff,vEm:0x4a1a7a,crown:true,desc:'Golden suit — and a crown on the helmet!'},
+  {id:'deepvoid',name:'DEEP VOID EXPLORER',price:2200,suit:0x1a2340,legs:0x0f1730,chest:0x39c6ff,belt:0x9dfcff,visor:0x9dfcff,vEm:0x0a6a7a,pack:true,antenna:true,desc:'Long-range exploration shell with twin O2 tanks, a field pack and a deep-space relay antenna.'},
+  {id:'admiral',name:'GALACTIC ADMIRAL',price:3200,suit:0xfff4dc,legs:0xffd23f,chest:0x7b2cbf,belt:0xffd23f,visor:0xffe066,vEm:0x7a5a00,crown:true,pack:true,desc:'Command whites with gold trim, a crown crest and an admiral\'s reinforced field pack.'}
 ];
 const SKIN={ship:'classic',astro:'classic',ownedShip:['classic'],ownedAstro:['classic']};
 const _skinCache={};
@@ -4332,13 +4337,22 @@ function dressShip(model,flame,id){
       [shipLathe([[0.001,-1.7],[0.42,-1.64],[0.74,-1.1],[0.87,-0.3],[0.85,0.4],[0.68,1.1]]),sk.body,sc],
       [shipLathe([[0.68,1.1],[0.38,1.62],[0.001,1.92]]),sk.acc,sc],
       [shipLathe([[0.88,-0.52],[0.9,-0.28]]),sk.str,sc],
-      [shipWing([[0.55,-0.25],[2.15,0.95],[2.15,1.5],[0.55,1.3]]),sk.acc,new M4().makeTranslation(0,-0.02,0).multiply(flat)],
-      [shipWing([[-0.55,-0.25],[-0.55,1.3],[-2.15,1.5],[-2.15,0.95]]),sk.acc,new M4().makeTranslation(0,-0.02,0).multiply(flat)],
-      [new THREE.CylinderGeometry(0.14,0.14,0.9,8),sk.str,Mx(2.15,-0.07,1.2,Math.PI/2,0,0)],
-      [new THREE.CylinderGeometry(0.14,0.14,0.9,8),sk.str,Mx(-2.15,-0.07,1.2,Math.PI/2,0,0)],
       [new THREE.CylinderGeometry(0.5,0.36,0.5,14,1,true),0x4a4960,Mx(0,0,1.85,Math.PI/2,0,0)],
       [new THREE.CylinderGeometry(0.36,0.36,0.05,14),0x221a2e,Mx(0,0,1.75,Math.PI/2,0,0)]
     ];
+    if(sk.delta){
+      P.push([shipWing([[0.55,-0.55],[2.95,1.3],[2.95,1.7],[0.55,1.25]]),sk.acc,new M4().makeTranslation(0,-0.02,0).multiply(flat)]);
+      P.push([shipWing([[-0.55,-0.55],[-0.55,1.25],[-2.95,1.7],[-2.95,1.3]]),sk.acc,new M4().makeTranslation(0,-0.02,0).multiply(flat)]);
+      for(const x of [2.95,-2.95])P.push([new THREE.CylinderGeometry(0.12,0.12,1.3,8),sk.str,Mx(x,-0.07,1.45,Math.PI/2,0,0)]);
+    }else{
+      P.push([shipWing([[0.55,-0.25],[2.15,0.95],[2.15,1.5],[0.55,1.3]]),sk.acc,new M4().makeTranslation(0,-0.02,0).multiply(flat)]);
+      P.push([shipWing([[-0.55,-0.25],[-0.55,1.3],[-2.15,1.5],[-2.15,0.95]]),sk.acc,new M4().makeTranslation(0,-0.02,0).multiply(flat)]);
+      for(const x of [2.15,-2.15])P.push([new THREE.CylinderGeometry(0.14,0.14,0.9,8),sk.str,Mx(x,-0.07,1.2,Math.PI/2,0,0)]);
+    }
+    if(sk.ring){
+      P.push([new THREE.TorusGeometry(0.82,0.06,8,40),sk.acc,Mx(0,0,1.0)]);
+      P.push([new THREE.TorusGeometry(0.62,0.03,6,40),sk.str,Mx(0,0,1.45)]);
+    }
     if(sk.fin2){
       P.push([tail(),sk.acc,new M4().makeTranslation(0.32,0,0).multiply(new M4().makeRotationZ(-0.5)).multiply(new M4().makeRotationY(-Math.PI/2))]);
       P.push([tail(),sk.acc,new M4().makeTranslation(-0.22,0,0).multiply(new M4().makeRotationZ(0.5)).multiply(new M4().makeRotationY(-Math.PI/2))]);
@@ -4367,6 +4381,16 @@ function dressAstro(A,id){
     if(sk.crown){
       P.push([new THREE.CylinderGeometry(0.135,0.14,0.06,12),0xffe066,Mx(0,0.81,0)]);
       for(let i=0;i<5;i++){const a=i/5*TAU;P.push([new THREE.ConeGeometry(0.032,0.08,5),i%2?0xff4d6d:0xffe066,Mx(Math.cos(a)*0.12,0.87,Math.sin(a)*0.12)]);}
+    }
+    if(sk.pack){
+      P.push([new THREE.BoxGeometry(0.3,0.38,0.14),0x4a4960,Mx(0,0.4,-0.16)]);
+      P.push([new THREE.CylinderGeometry(0.05,0.05,0.32,7),sk.chest,Mx(0.09,0.42,-0.25)]);
+      P.push([new THREE.CylinderGeometry(0.05,0.05,0.32,7),sk.chest,Mx(-0.09,0.42,-0.25)]);
+      P.push([new THREE.BoxGeometry(0.34,0.055,0.09),sk.belt,Mx(0,0.29,-0.16)]);
+    }
+    if(sk.antenna){
+      P.push([new THREE.CylinderGeometry(0.007,0.007,0.44,4),0x8a889c,Mx(-0.12,0.94,-0.06)]);
+      P.push([new THREE.SphereGeometry(0.028,6,5),sk.visor,Mx(-0.12,1.17,-0.06)]);
     }
     const body=new THREE.Mesh(merge(P),vcToon);addOutline(body);addSheen(body,0xffffff,3.6,0.32);
     const visor=new THREE.Mesh(new THREE.SphereGeometry(0.13,12,8),toon(sk.visor,{emissive:sk.vEm,emissiveIntensity:0.6}));visor.position.set(0,0.68,-0.085);visor.scale.set(1,0.8,0.8);addSheen(visor,0xffffff,2.0,0.9);
@@ -4865,19 +4889,22 @@ function autoRoll(q,want,k){
 let shopTab='ship';
 const hexCss=c=>'#'+c.toString(16).padStart(6,'0');
 function shipSvg(k){const c=hexCss;return `<svg viewBox="0 0 60 100"><path d="M30 90 L22 104 L38 104Z" fill="${c(k.f1)}" transform="translate(0,-8)"/>
-<path d="M18 60 L4 82 L4 90 L18 80Z M42 60 L56 82 L56 90 L42 80Z" fill="${c(k.acc)}" stroke="#170f24" stroke-width="2.5"/>
+${k.delta?`<path d="M19 56 L1 80 L1 93 L19 82Z M41 56 L59 80 L59 93 L41 82Z" fill="${c(k.acc)}" stroke="#170f24" stroke-width="2.5"/>`:`<path d="M18 60 L4 82 L4 90 L18 80Z M42 60 L56 82 L56 90 L42 80Z" fill="${c(k.acc)}" stroke="#170f24" stroke-width="2.5"/>`}
 ${k.pods?`<rect x="8" y="50" width="7" height="28" rx="3" fill="${c(k.str)}" stroke="#170f24" stroke-width="2"/><rect x="45" y="50" width="7" height="28" rx="3" fill="${c(k.str)}" stroke="#170f24" stroke-width="2"/>`:''}
 <path d="M30 6 C44 20 46 50 42 84 L18 84 C14 50 16 20 30 6Z" fill="${c(k.body)}" stroke="#170f24" stroke-width="3"/>
 <path d="M30 6 C38 13 41 20 42 26 L18 26 C19 20 22 13 30 6Z" fill="${c(k.acc)}" stroke="#170f24" stroke-width="2.5"/>
 <rect x="17" y="64" width="26" height="6" fill="${c(k.str)}" stroke="#170f24" stroke-width="2"/>
 <circle cx="30" cy="42" r="7.5" fill="${c(k.glass)}" stroke="#170f24" stroke-width="3"/>
+${k.ring?`<ellipse cx="30" cy="58" rx="23" ry="6.5" fill="none" stroke="${c(k.acc)}" stroke-width="2.6"/><ellipse cx="30" cy="74" rx="16" ry="4.8" fill="none" stroke="${c(k.str)}" stroke-width="2.2"/>`:''}
 ${k.fin2?`<path d="M24 72 L20 92 L27 84Z M36 72 L40 92 L33 84Z" fill="${c(k.acc)}" stroke="#170f24" stroke-width="2"/>`:`<path d="M30 70 L30 94" stroke="${c(k.acc)}" stroke-width="5"/>`}</svg>`;}
 function astroSvg(k){const c=hexCss;return `<svg viewBox="0 0 60 100">
 <rect x="20" y="70" width="8" height="22" rx="4" fill="${c(k.legs)}" stroke="#170f24" stroke-width="2.5"/><rect x="32" y="70" width="8" height="22" rx="4" fill="${c(k.legs)}" stroke="#170f24" stroke-width="2.5"/>
 <rect x="9" y="44" width="8" height="24" rx="4" fill="${c(k.suit)}" stroke="#170f24" stroke-width="2.5"/><rect x="43" y="44" width="8" height="24" rx="4" fill="${c(k.suit)}" stroke="#170f24" stroke-width="2.5"/>
+${k.pack?`<rect x="21" y="40" width="18" height="33" rx="7" fill="#4a4960" stroke="#170f24" stroke-width="2"/><rect x="23" y="44" width="5" height="18" rx="2.5" fill="${c(k.chest)}"/><rect x="32" y="44" width="5" height="18" rx="2.5" fill="${c(k.chest)}"/>`:''}
 <rect x="16" y="40" width="28" height="36" rx="11" fill="${c(k.suit)}" stroke="#170f24" stroke-width="3"/>
 <rect x="22" y="47" width="16" height="13" rx="3" fill="${c(k.chest)}" stroke="#170f24" stroke-width="2"/><rect x="16" y="64" width="28" height="4" fill="${c(k.belt)}"/>
 <line x1="38" y1="14" x2="40" y2="4" stroke="#4a4960" stroke-width="2"/><circle cx="40" cy="4" r="3" fill="${c(k.belt)}" stroke="#170f24" stroke-width="1.5"/>
+${k.antenna?`<line x1="20" y1="16" x2="17" y2="1" stroke="#8a889c" stroke-width="1.6"/><circle cx="17" cy="1" r="2.4" fill="${c(k.visor)}" stroke="#170f24" stroke-width="1.2"/>`:''}
 <circle cx="30" cy="26" r="16" fill="${c(k.suit)}" stroke="#170f24" stroke-width="3"/>
 <ellipse cx="30" cy="27" rx="11" ry="8" fill="${c(k.visor)}" stroke="#170f24" stroke-width="2.5"/>
 ${k.crown?`<path d="M18 12 L20 2 L25 9 L30 0 L35 9 L40 2 L42 12Z" fill="#ffe066" stroke="#170f24" stroke-width="2"/>`:''}</svg>`;}
