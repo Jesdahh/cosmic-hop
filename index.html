@@ -739,6 +739,30 @@ body.photoMode #ui{opacity:0!important}
   .hudBtn{padding:5px 7px}
   .hudBtn .ic{width:15px;height:15px}
 }
+/* --- Resource tray: essentials fixed in front, materials in their own scroll lane --- */
+#resMain{display:flex;align-items:center;gap:9px;flex:0 0 auto}
+#resMats{display:flex;align-items:center;gap:9px;min-width:0;flex:1 1 auto;overflow-x:auto;overflow-y:hidden;scrollbar-width:none;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain;touch-action:pan-x;cursor:grab}
+#resMats::-webkit-scrollbar{display:none}
+#resMats .resPill,#resMain .resPill{flex:0 0 auto;white-space:nowrap}
+#resMats:not(:empty){border-left:1px solid rgba(120,220,255,.28);padding-left:9px}
+@keyframes gbump{0%{transform:scale(1)}40%{transform:scale(1.14)}100%{transform:scale(1)}}
+@media (max-width:900px),(orientation:landscape) and (max-height:600px){
+  #resTray{width:auto!important;max-width:min(320px,74vw)!important;overflow:hidden!important;mask-image:none!important;-webkit-mask-image:none!important;gap:7px!important}
+  #resMain,#resMats{gap:7px}
+  #resMats{mask-image:linear-gradient(90deg,#000 0,#000 78%,transparent 100%);-webkit-mask-image:linear-gradient(90deg,#000 0,#000 78%,transparent 100%)}
+}
+@media (orientation:landscape) and (max-height:600px){#resTray{max-width:min(320px,40vw)!important}}
+/* --- Mission card on phones/tablets: title + progress only, tap for details --- */
+@media (max-width:900px),(orientation:landscape) and (max-height:600px){
+  #missionCard{max-width:200px!important;transition:max-width .2s}
+  #missionCard:not(.open) #mDesc{display:none!important}
+  #missionCard:not(.open) #mTitle{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block}
+  #missionCard:not(.open) #mTitle .ic{vertical-align:-2px;margin-right:4px}
+  #missionCard.open{max-width:min(280px,70vw)!important}
+  #missionCard.open #mDesc{display:block!important}
+  #mProg::after{content:' · MORE ›';opacity:.6;font-weight:700;letter-spacing:.06em}
+  #missionCard.open #mProg::after{content:' · JOURNAL ›'}
+}
 </style>
 </head>
 <body>
@@ -1834,6 +1858,16 @@ const UPGRADES={
   ship:{name:'STARSHIP & HYPERDRIVE',lvl:1,max:5,desc:'Hyperdrive Class (Lv.2: Nyx Rift, Lv.3: Gargantua Abyss, Lv.4: Elysian Veil), increases boost speed & Black Hole gravity escape thrust.',
     costs:[null,{fe:30,ae:15,so:5,vd:0},{fe:55,ae:35,so:20,vd:5},{fe:90,ae:60,so:40,vd:15},{fe:140,ae:95,so:70,vd:35}]}
 };
+(function(){const tray=document.getElementById('resTray');if(!tray||document.getElementById('resMain'))return;
+  const main=document.createElement('div');main.id='resMain';const mats=document.createElement('div');mats.id='resMats';
+  for(const id of ['dblPill','goldPill','foodPill','medPill']){const el=document.getElementById(id);if(el)main.appendChild(el);}
+  [...tray.children].forEach(ch=>{if(ch!==main)mats.appendChild(ch);});tray.appendChild(main);tray.appendChild(mats);
+  mats.addEventListener('wheel',e=>{if(Math.abs(e.deltaY)>Math.abs(e.deltaX)){mats.scrollLeft+=e.deltaY;e.preventDefault();}},{passive:false});
+  let dragX=null,startL=0;mats.addEventListener('pointerdown',e=>{if(e.pointerType!=='mouse')return;dragX=e.clientX;startL=mats.scrollLeft;e.stopPropagation();});
+  addEventListener('pointermove',e=>{if(dragX!==null)mats.scrollLeft=startL-(e.clientX-dragX);});addEventListener('pointerup',()=>{dragX=null;});
+  mats.addEventListener('touchstart',e=>e.stopPropagation(),{passive:true});
+})();
+function fmtN(n){n=+n||0;const a=Math.abs(n);if(a<10000)return n.toLocaleString('en-US');const u=a>=1e9?[1e9,'B']:a>=1e6?[1e6,'M']:[1e3,'K'];const v=n/u[0];return (Math.abs(v)>=100?Math.floor(v):Math.floor(v*10)/10)+u[1];}
 function updateResHUD(){
   $('rFe').textContent=INV.fe;$('rAe').textContent=INV.ae;$('rSo').textContent=INV.so;$('rVd').textContent=INV.vd;
   $('rLum').textContent=INV.lum||0;$('rBp').textContent=INV.bp||0;$('rVw').textContent=INV.vw||0;$('rSeed').textContent=INV.seed||0;$('rRp').textContent=INV.rp||0;
@@ -1841,7 +1875,8 @@ function updateResHUD(){
   $('pillStorm').classList.toggle('on',!!INV.storm);$('pillMap').classList.toggle('on',!!INV.maps);
   const showX=activeSystemId==='elysian'||INV.lum||INV.bp||INV.vw||INV.seed||INV.rp;
   for(const id of ['pillLum','pillBp','pillVw','pillSeed','pillRp'])$(id).classList.toggle('on',!!showX);
-  $('rGold').textContent=INV.gold||0;$('rFood').textContent=(INV.berry||0)+(INV.fruit||0)+(INV.ration||0);$('rMed').textContent=INV.medkit||0;$('shopGold').textContent=INV.gold||0;
+  $('rGold').textContent=INV.gold||0;$('rFood').textContent=(INV.berry||0)+(INV.fruit||0)+(INV.ration||0);$('rMed').textContent=INV.medkit||0;
+  for(const [id,v] of [['rGold',INV.gold],['rFe',INV.fe],['rAe',INV.ae],['rSo',INV.so],['rVd',INV.vd],['rLum',INV.lum],['rBp',INV.bp],['rVw',INV.vw],['rSeed',INV.seed],['rRp',INV.rp],['rStorm',INV.storm],['rFood',(INV.berry||0)+(INV.fruit||0)+(INV.ration||0)],['rMed',INV.medkit]]){const el=$(id);if(el){el.textContent=fmtN(v);el.parentElement&&(el.parentElement.dataset.full=String(v||0));}}$('shopGold').textContent=INV.gold||0;
 }
 
 /* ---- Exploration Missions & Discovery Journal ---- */
@@ -4922,7 +4957,9 @@ $('tabOutpost').addEventListener('click',()=>{craftTab='outpost';renderCraftModa
 
 let journalTab='missions';
 $('btnJournal').addEventListener('click',e=>{e.stopPropagation();SFX.init();renderJournalModal();openModal('journalModal');});
-$('missionCard').addEventListener('click',e=>{e.stopPropagation();if(e.target.id==='tutSkip'){finishTut(false);return;}if(tutActive()){SFX.init();openModal('helpModal');return;}SFX.init();journalTab='missions';renderJournalModal();openModal('journalModal');});
+function mcCompact(){return matchMedia('(max-width:900px),(orientation:landscape) and (max-height:600px)').matches;}
+function mcFlash(ms){if(!mcCompact())return;const c=$('missionCard');c.classList.add('open');clearTimeout(window.__mcT);window.__mcT=setTimeout(()=>c.classList.remove('open'),ms||8000);}
+$('missionCard').addEventListener('click',e=>{e.stopPropagation();if(e.target.id==='tutSkip'){finishTut(false);return;}if(mcCompact()&&!$('missionCard').classList.contains('open')){mcFlash(8000);if(SFX.ui)SFX.ui();return;}$('missionCard').classList.remove('open');clearTimeout(window.__mcT);if(tutActive()){SFX.init();openModal('helpModal');return;}SFX.init();journalTab='missions';renderJournalModal();openModal('journalModal');});
 $('closeJournal').addEventListener('click',e=>{e.stopPropagation();closeModals();});
 $('journalModal').addEventListener('click',e=>{if(e.target===$('journalModal'))closeModals();});
 $('tabMissions').addEventListener('click',()=>{journalTab='missions';renderJournalModal();});
@@ -7741,6 +7778,7 @@ function tutActive(){return tutStep>=0&&tutStep<TUT.length;}
 function setTxt(el,v){if(el.textContent!==v)el.textContent=v;}
 function renderTut(){
   if(!tutActive())return;const st=TUT[tutStep];$('missionCard').classList.add('tut');
+  if(renderTut._s!==tutStep){renderTut._s=tutStep;if(typeof mcFlash==='function')mcFlash(7000);}
   $('mTitle').innerHTML='<svg class="ic"><use href="#i-mission"/></svg> TUTORIAL '+(tutStep+1)+'/'+TUT.length+': '+st.t;setTxt($('mDesc'),st.d());
   if(!$('tutSkip'))$('mProg').innerHTML='<span id="tutSkip">SKIP TUTORIAL ✕</span>';
 }
