@@ -8836,7 +8836,27 @@ addEventListener('keydown',e=>{
 // SHOP2-END
 /* ---- MULTIPLAYER: peer-to-peer rooms (private codes + public skies per star system) ---- */
 const MP_LIB='https://cdn.jsdelivr.net/npm/trystero@0.26.0/+esm',MP_APP='cosmic-hop.pages.dev/gf',MP_MAX=8;
-const MP={lib:null,room:null,kind:null,code:null,sys:null,peers:new Map(),sendSt:null,sendEmo:null,timer:null,joining:false};
+/* Optional TURN relay (needed for players on different networks behind strict NAT).
+   Paste a Metered Open Relay credentials URL (free: 20 GB/month) or a JSON array of
+   iceServers here, e.g. MP_TURN='https://yourapp.metered.live/api/v1/turn/credentials?apiKey=KEY'.
+   Can also be overridden at runtime: localStorage.setItem('cosmic_hop_turn', <same value>). */
+const MP_TURN='';
+const MP={lib:null,room:null,kind:null,code:null,sys:null,peers:new Map(),sendSt:null,sendEmo:null,timer:null,joining:false,ice:null,iceT:0};
+async function mpIceServers(){
+  if(MP.ice&&Date.now()-MP.iceT<1800000)return MP.ice;
+  let cfg=MP_TURN;try{cfg=localStorage.getItem('cosmic_hop_turn')||cfg;}catch(_){}
+  cfg=String(cfg||'').trim();
+  let servers=[];
+  if(cfg&&cfg[0]==='['){try{const j=JSON.parse(cfg);if(Array.isArray(j))servers=j;}catch(_){}}
+  else if(cfg){
+    try{
+      const r=await fetch(cfg,{cache:'no-store'});
+      if(r.ok){const j=await r.json();servers=Array.isArray(j)?j:(Array.isArray(j&&j.iceServers)?j.iceServers:[]);}
+    }catch(_){}
+  }
+  MP.ice=servers.filter(s=>s&&s.urls);MP.iceT=Date.now();
+  return MP.ice;
+}
 const _mpV=new V3(),_mpQ=new Q();
 function mpName(){let n='';try{n=localStorage.getItem('cosmic_hop_mp_name')||'';}catch(_){}if(!n){n='Pilot-'+Math.floor(1000+Math.random()*9000);try{localStorage.setItem('cosmic_hop_mp_name',n);}catch(_){}}return n;}
 const mpClean=n=>String(n||'').replace(/[^\p{L}\p{N} _\-.]/gu,'').trim().slice(0,14)||'Pilot';
@@ -8913,8 +8933,8 @@ async function mpJoin(kind,code){
     if(!MP.lib){$('mpStatus').textContent='Loading multiplayer…';MP.lib=await import(MP_LIB);}
     mpLeave(true);
     const roomId='lobby-'+code;
-    if(!MP.turn){MP.turn=[];try{const r=await fetch('api/turn',{method:'POST',cache:'no-store'});if(r.ok&&/json/.test(r.headers.get('content-type')||'')){const j=await r.json();if(Array.isArray(j.iceServers))MP.turn=j.iceServers;}}catch(_){}}
-    const room=MP.lib.joinRoom(MP.turn.length?{appId:MP_APP,turnConfig:MP.turn}:{appId:MP_APP},roomId);
+    const ice=await mpIceServers();
+    const room=MP.lib.joinRoom(ice.length?{appId:MP_APP,turnConfig:ice}:{appId:MP_APP},roomId);
     MP.room=room;MP.kind=kind;MP.code=code||null;MP.sys=activeSystemId;
     const st=room.makeAction('st'),emo=room.makeAction('emo'),chat=room.makeAction('chat');
     st.onMessage=mpOnState;emo.onMessage=mpOnEmo;chat.onMessage=mpOnChat;
@@ -8984,6 +9004,19 @@ function mpFlyTo(id){
   },inter?650:250);
   setTimeout(()=>wfx.classList.remove('on'),inter?1500:750);
 }
+window.__mpTurn={
+  get:()=>mpIceServers(),
+  set:v=>{try{v?localStorage.setItem('cosmic_hop_turn',v):localStorage.removeItem('cosmic_hop_turn');}catch(_){}MP.ice=null;MP.iceT=0;return 'ok';},
+  test:async()=>{
+    const ice=await mpIceServers();if(!ice.length)return {relay:0,note:'no TURN configured'};
+    const cands=[],pc=new RTCPeerConnection({iceServers:ice});
+    pc.createDataChannel('t');pc.onicecandidate=e=>{if(e.candidate&&e.candidate.candidate)cands.push(e.candidate.candidate);};
+    await pc.setLocalDescription(await pc.createOffer());
+    await new Promise(r=>setTimeout(r,9000));pc.close();
+    const relay=cands.filter(c=>c.includes(' typ relay ')).length;
+    return {relay,host:cands.filter(c=>c.includes(' typ host ')).length,srflx:cands.filter(c=>c.includes(' typ srflx ')).length};
+  }
+};
 function mpOpen(){SFX.init&&SFX.init();let saved='';try{saved=localStorage.getItem('cosmic_hop_mp_name')||'';}catch(_){}if(!MP.room)$('mpName').value=saved;mpRenderPanel();openModal('mpModal');}
 function mpStartGameIfNeeded(){
   if(started)return;
