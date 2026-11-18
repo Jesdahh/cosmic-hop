@@ -1787,7 +1787,7 @@ function recordDiscovery(cat,name,planet,detail){
 const GAME={title:'',achievements:[],milestones:[],contracts:[],contractSeed:0,outposts:[],sysVisited:['solara'],seenElysian:false,
   rep:{guild:0,veilkeepers:0,cartographers:0},factionContracts:[],factionSeed:{day:0,week:0},tamed:[],photoLog:[],catReward:{},poiState:{},treasure:[],crew:0,raiderKills:0,contacts:[],
   civRep:{},civMet:{},civTrades:{},shipSeen:{},legendSeen:[],missionOffers:[],dynMissions:[],missionHistory:[],missionCompletions:{},missionDay:0,
-  galaxySeen:[],anomalyLog:[],rescues:0,escorts:0,diplomacy:0,titles:[],equippedTitle:'',cosmetics:[],planetComplete:{},planetLooted:{},
+  galaxySeen:[],anomalyLog:[],rescues:0,escorts:0,escapes:0,diplomacy:0,titles:[],equippedTitle:'',cosmetics:[],equippedCosmetic:'',planetComplete:{},planetLooted:{},
   strangerWrecks:0,rareFinds:0};
 const SAVE_EXTRA={},GAME_EXTRA={};
 const ELYS={nodes:[],beams:[],bloom:null,core:null,petals:[],plantMats:[],restored:false,beamGroup:null};
@@ -4284,6 +4284,41 @@ const ASTRO_SKINS=[
 ];
 const SKIN={ship:'classic',astro:'classic',ownedShip:['classic'],ownedAstro:['classic']};
 const _skinCache={};
+/* ---- Unlockable ship cosmetics: plasma tints and rotating auras ---- */
+const SHIP_COSMETICS=[
+  {id:'plasma_azure',name:'AZURE PLASMA',kind:'plasma',f1:0x39c6ff,f2:0xd8fbff,hint:'complete 3 diplomatic exchanges',need:()=>GAME.diplomacy>=3},
+  {id:'plasma_bloom',name:'BLOOMFIRE PLASMA',kind:'plasma',f1:0xe6ff7a,f2:0xff8fce,hint:'complete 3 distress rescues',need:()=>GAME.rescues>=3},
+  {id:'aura_cartographer',name:'CARTOGRAPHER HALO',kind:'aura',color:0x9dfcff,hint:'chart 2 worlds to 100%',need:()=>Object.keys(GAME.planetComplete||{}).length>=2},
+  {id:'aura_legend',name:'LEGEND AURA',kind:'aura',color:0xffd23f,hint:'scan a legendary creature',need:()=>GAME.legendSeen.length>=1}
+];
+let shipAura=null;
+function currentShipSkin(){return SHIP_SKINS.find(s=>s.id===SKIN.ship)||SHIP_SKINS[0];}
+function applyShipCosmetic(id,silent=false){
+  const c=SHIP_COSMETICS.find(x=>x.id===id)||null,sk=currentShipSkin();
+  if(shipAura){ship.model.remove(shipAura);shipAura.geometry.dispose();shipAura.material.dispose();shipAura=null;}
+  if(ship.flame&&ship.flame.children.length>=2){
+    ship.flame.children[0].material.color.setHex(c&&c.kind==='plasma'?c.f1:sk.f1);
+    ship.flame.children[1].material.color.setHex(c&&c.kind==='plasma'?c.f2:sk.f2);
+  }
+  if(c&&c.kind==='aura'){
+    shipAura=new THREE.Mesh(new THREE.TorusGeometry(3.1,0.055,6,48),
+      new THREE.MeshBasicMaterial({color:c.color,transparent:true,opacity:.85,blending:THREE.AdditiveBlending,depthWrite:false}));
+    shipAura.rotation.x=Math.PI*0.36;shipAura.position.y=0.15;ship.model.add(shipAura);
+  }
+  if(!silent&&started)toast(id?`✨ COSMETIC EQUIPPED: ${c?c.name:''}`:'COSMETIC REMOVED');
+}
+function updateShipCosmetic(dt){if(shipAura)shipAura.rotation.z+=dt*0.7;}
+function checkCosmetics(){
+  let changed=false;
+  for(const c of SHIP_COSMETICS){
+    if(GAME.cosmetics.includes(c.id)||!c.need())continue;
+    GAME.cosmetics.push(c.id);changed=true;
+    if(GAME.equippedCosmetic===c.id)applyShipCosmetic(c.id,true);
+    toast(`✨ COSMETIC UNLOCKED: ${c.name} — EQUIP IT IN THE XENO CODEX`);
+    comicPop('✦ COSMETIC UNLOCKED','#ffd23f',46,34);SFX.upgrade();
+  }
+  return changed;
+}
 const shipLathe=(pts,seg=20)=>{const geo=new THREE.LatheGeometry(pts.map(p=>new THREE.Vector2(p[0],p[1])),seg);geo.rotateX(-Math.PI/2);return geo;};
 const shipWing=(pts)=>{const s=new THREE.Shape();pts.forEach((p,i)=>i?s.lineTo(p[0],p[1]):s.moveTo(p[0],p[1]));return new THREE.ExtrudeGeometry(s,{depth:0.1,bevelEnabled:false});};
 function dressShip(model,flame,id){
@@ -4318,6 +4353,8 @@ function dressShip(model,flame,id){
   }
   parts.forEach(m=>model.add(m));model.userData.skin=parts;
   flame.children[0].material.color.setHex(sk.f1);flame.children[1].material.color.setHex(sk.f2);
+  const cos=SHIP_COSMETICS.find(c=>c.id===GAME.equippedCosmetic&&c.kind==='plasma');
+  if(cos){flame.children[0].material.color.setHex(cos.f1);flame.children[1].material.color.setHex(cos.f2);}
 }
 function dressAstro(A,id){
   const sk=ASTRO_SKINS.find(s=>s.id===id)||ASTRO_SKINS[0];
@@ -5249,6 +5286,10 @@ function renderJournalModal(){
     const planetRows=charted.map(n=>`<div class="jItem"><div style="font-family:var(--display);font-size:16px">🌍 ${n}</div><span class="jBadge" style="background:var(--mint)">100% CHARTED</span></div>`).join('')
       ||`<div class="uDesc">No worlds fully charted yet. Scan and clear every point of interest on a planet.</div>`;
     const titleBtns=GAME.titles.length?GAME.titles.map(t=>`<button class="uBtn${GAME.equippedTitle===t?' buy':''}" data-title="${t}" style="width:auto">${GAME.equippedTitle===t?'★ ':''}${t}</button>`).join(''):`<div class="uDesc">Earn titles by reaching higher Explorer Ranks.</div>`;
+    const cosBtns=SHIP_COSMETICS.map(c=>{
+      const owned=GAME.cosmetics.includes(c.id),eq=owned&&GAME.equippedCosmetic===c.id;
+      return `<button class="uBtn${eq?' buy':''}" data-cosmetic="${c.id}" style="width:auto" ${owned?'':'disabled'}>${eq?'✦ ':''}${c.name}<br><small style="font-weight:700;opacity:.8">${owned?(eq?'EQUIPPED — TAP TO REMOVE':'TAP TO EQUIP'):'LOCKED · '+c.hint}</small></button>`;
+    }).join('');
     body.innerHTML=`
       <div class="uCard" style="margin-bottom:9px">
         <div class="uTitle"><span>🧭 GALACTIC EXPLORER RANK ${idx?ROMAN[idx]:'0'} — ${EXPLORER_RANKS[idx].name}</span><span class="uLvl">${score} EXP</span></div>
@@ -5266,13 +5307,20 @@ function renderJournalModal(){
       ${legends}
       <div style="font-family:var(--display);font-size:20px;color:#5a2ca0;margin:12px 0 6px">🌍 PLANET COMPLETION</div>
       ${planetRows}
-      <div class="uCard" style="margin-top:12px"><div class="uTitle"><span>🏅 EXPLORER TITLES &amp; COSMETICS</span><span class="uLvl">${GAME.titles.length} TITLES</span></div>
-        <div class="uDesc" style="margin:5px 0 7px">Permanent titles equip on your pilot record. Rank III unlocks the VOIDLIGHT ENVOY ship skin.</div>
+      <div class="uCard" style="margin-top:12px"><div class="uTitle"><span>🏅 EXPLORER TITLES &amp; COSMETICS</span><span class="uLvl">${GAME.titles.length} TITLES · ${GAME.cosmetics.length}/${SHIP_COSMETICS.length} COSMETICS</span></div>
+        <div class="uDesc" style="margin:5px 0 7px">Permanent titles equip on your pilot record. Rank III unlocks the VOIDLIGHT ENVOY ship skin. Cosmetics change your engine plasma or add a ship aura.</div>
         <div style="display:flex;gap:6px;flex-wrap:wrap">${titleBtns}</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:9px">${cosBtns}</div>
         <div class="uDesc" style="margin-top:7px">VOIDLIGHT ENVOY SKIN: <b>${SKIN.ownedShip.includes('voidlight')?'UNLOCKED':'LOCKED — REACH RANK III'}</b></div></div>`;
     body.querySelectorAll('[data-title]').forEach(btn=>btn.addEventListener('click',()=>{
       GAME.equippedTitle=btn.dataset.title;GAME.title=btn.dataset.title;
       SFX.upgrade();toast(`TITLE EQUIPPED: ${GAME.equippedTitle}`);saveGame(true);renderJournalModal();
+    }));
+    body.querySelectorAll('[data-cosmetic]').forEach(btn=>btn.addEventListener('click',()=>{
+      const id=btn.dataset.cosmetic,c=SHIP_COSMETICS.find(x=>x.id===id);
+      if(!c||!GAME.cosmetics.includes(id)){toast(`LOCKED — ${c?c.hint:'UNKNOWN COSMETIC'}`);return;}
+      GAME.equippedCosmetic=GAME.equippedCosmetic===id?'':id;
+      applyShipCosmetic(GAME.equippedCosmetic);SFX.upgrade();saveGame(true);renderJournalModal();
     }));
   }else if(journalTab==='research'){
     const rw=r=>[r.gold?`${r.gold}🪙`:null,r.rp?`${r.rp} RP`:null,['fe','ae','so','vd','lum','bp','vw','seed'].filter(k=>r[k]).map(k=>`+${r[k]} ${k.toUpperCase()}`)].flat().filter(Boolean).join(' · ');
@@ -5528,8 +5576,8 @@ function saveGame(silent=false){
         rep:GAME.rep,factionContracts:GAME.factionContracts,factionSeed:GAME.factionSeed,tamed:GAME.tamed,photoLog:GAME.photoLog,catReward:GAME.catReward,poiState:GAME.poiState,treasure:GAME.treasure,crew:GAME.crew,raiderKills:GAME.raiderKills,contacts:GAME.contacts,
         civRep:GAME.civRep,civMet:GAME.civMet,civTrades:GAME.civTrades,shipSeen:GAME.shipSeen,legendSeen:GAME.legendSeen,
         missionOffers:GAME.missionOffers,dynMissions:GAME.dynMissions,missionHistory:GAME.missionHistory,missionCompletions:GAME.missionCompletions,missionDay:GAME.missionDay,
-        galaxySeen:GAME.galaxySeen,anomalyLog:GAME.anomalyLog,rescues:GAME.rescues,escorts:GAME.escorts,diplomacy:GAME.diplomacy,
-        titles:GAME.titles,equippedTitle:GAME.equippedTitle,cosmetics:GAME.cosmetics,planetComplete:GAME.planetComplete,planetLooted:GAME.planetLooted,
+        galaxySeen:GAME.galaxySeen,anomalyLog:GAME.anomalyLog,rescues:GAME.rescues,escorts:GAME.escorts,escapes:GAME.escapes,diplomacy:GAME.diplomacy,
+        titles:GAME.titles,equippedTitle:GAME.equippedTitle,cosmetics:GAME.cosmetics,equippedCosmetic:GAME.equippedCosmetic,planetComplete:GAME.planetComplete,planetLooted:GAME.planetLooted,
         strangerWrecks:GAME.strangerWrecks,rareFinds:GAME.rareFinds},
       hazard:{stormActive:PL.stormActive,stormTimer:PL.stormTimer,stormWarned:PL.stormWarned,pollenActive:PL.pollenActive,pollenTimer:PL.pollenTimer,pollenWarned:PL.pollenWarned}
     };
@@ -5595,7 +5643,7 @@ function loadGame(){
       GAME.contacts=Array.isArray(data.game.contacts)?data.game.contacts.filter(x=>typeof x==='string').slice(0,64):[];
       const GK=['title','achievements','milestones','contracts','contractSeed','outposts','sysVisited','seenElysian','rep','factionContracts','factionSeed','tamed','photoLog','catReward','poiState','treasure','crew','raiderKills','contacts',
         'civRep','civMet','civTrades','shipSeen','legendSeen','missionOffers','dynMissions','missionHistory','missionCompletions','missionDay',
-        'galaxySeen','anomalyLog','rescues','escorts','diplomacy','titles','equippedTitle','cosmetics','planetComplete','planetLooted','strangerWrecks','rareFinds'];
+        'galaxySeen','anomalyLog','rescues','escorts','escapes','diplomacy','titles','equippedTitle','cosmetics','equippedCosmetic','planetComplete','planetLooted','strangerWrecks','rareFinds'];
       for(const k in data.game)if(!GK.includes(k))GAME_EXTRA[k]=data.game[k];
       const obj=v=>v&&typeof v==='object'&&!Array.isArray(v)?v:{};
       const num=(v,d=0)=>Number.isFinite(+v)?+v:d;
@@ -5625,11 +5673,12 @@ function loadGame(){
       GAME.missionDay=num(data.game.missionDay,0);
       GAME.galaxySeen=Array.isArray(data.game.galaxySeen)?data.game.galaxySeen.filter(x=>typeof x==='string').slice(0,64):[];
       GAME.anomalyLog=Array.isArray(data.game.anomalyLog)?data.game.anomalyLog.filter(x=>x&&typeof x==='object').slice(-40):[];
-      GAME.rescues=clamp(num(data.game.rescues),0,99999);GAME.escorts=clamp(num(data.game.escorts),0,99999);GAME.diplomacy=clamp(num(data.game.diplomacy),0,99999);
+      GAME.rescues=clamp(num(data.game.rescues),0,99999);GAME.escorts=clamp(num(data.game.escorts),0,99999);GAME.escapes=clamp(num(data.game.escapes),0,99999);GAME.diplomacy=clamp(num(data.game.diplomacy),0,99999);
       GAME.titles=Array.isArray(data.game.titles)?data.game.titles.filter(t=>typeof t==='string').slice(0,32):[];
       GAME.equippedTitle=GAME.titles.includes(data.game.equippedTitle)?data.game.equippedTitle:(GAME.title||'');
       if(GAME.equippedTitle&&!GAME.titles.includes(GAME.equippedTitle))GAME.titles.push(GAME.equippedTitle);
       GAME.cosmetics=Array.isArray(data.game.cosmetics)?data.game.cosmetics.filter(x=>typeof x==='string').slice(0,32):[];
+      GAME.equippedCosmetic=SHIP_COSMETICS.some(c=>c.id===data.game.equippedCosmetic)&&GAME.cosmetics.includes(data.game.equippedCosmetic)?data.game.equippedCosmetic:'';
       GAME.planetComplete=obj(data.game.planetComplete);
       GAME.planetLooted=obj(data.game.planetLooted);
       GAME.strangerWrecks=clamp(num(data.game.strangerWrecks),0,99999);GAME.rareFinds=clamp(num(data.game.rareFinds),0,99999);
@@ -5670,6 +5719,7 @@ function loadGame(){
       if(PL.stormActive&&startB)spawnStormCrystals(startB);
     }
     updateResHUD();updatePassport();updateMissionHUD();
+    applyShipCosmetic(GAME.equippedCosmetic,true);
     return true;
   }catch(_){return false;}
 }
@@ -5783,10 +5833,11 @@ const raiderBodyGeo=merge([
 ]);
 const raiderEyeGeo=new THREE.OctahedronGeometry(0.34,0);
 const raiderGlowGeo=new THREE.OctahedronGeometry(0.5,0);
-const RAIDER={active:false,warnT:0,fightT:0,nextIn:8+Math.random()*10,list:[],bolts:[],fx:[],uid:0,audioT:0,chatterT:0,bossT:1e9,bossWave:false,
+const RAIDER={active:false,warnT:0,fightT:0,escapeT:0,escapeWarned:false,nextIn:8+Math.random()*10,list:[],bolts:[],fx:[],uid:0,audioT:0,chatterT:0,bossT:1e9,bossWave:false,
   boltGeo:new THREE.OctahedronGeometry(0.3,0),
   boltMat:new THREE.MeshBasicMaterial({color:0xff5ccf,transparent:true,opacity:.95,blending:THREE.AdditiveBlending,depthWrite:false})};
 const _rv0=new V3(),_rv1=new V3(),_rv2=new V3(),_rv3=new V3(),_rvx=new V3(),_rvp=new V3(),_rnp=new V3(),_rm=new M4();
+const RAIDER_LEASH_DIST=430,RAIDER_LEASH_TIME=7;
 
 function ensureRaiderMarker(r){
   if(r.mk||!markersEl)return;
@@ -5828,7 +5879,7 @@ function startRaiderWave(boss=false){
   if(RAIDER.active||!started||PL.mode!=='fly')return false;
   const lvl=UPGRADES.ship.lvl,bossWave=!!boss;
   const count=bossWave?(activeSystemId==='elysian'?3:2):1+(lvl>=3?1:0)+(lvl>=5?1:0);
-  RAIDER.active=true;RAIDER.bossWave=bossWave;RAIDER.warnT=bossWave?6:5;RAIDER.fightT=bossWave?55:42;
+  RAIDER.active=true;RAIDER.bossWave=bossWave;RAIDER.warnT=bossWave?6:5;RAIDER.fightT=bossWave?55:42;RAIDER.escapeT=0;RAIDER.escapeWarned=false;
   RAIDER.list=[];RAIDER.chatterT=2.2;
   for(let i=0;i<count;i++)RAIDER.list.push(makeRaider(i,count,bossWave&&i===0));
   for(const r of RAIDER.list)ensureRaiderMarker(r);
@@ -5856,7 +5907,7 @@ function endRaiderWave(retreat=true,silent=false){
   }
   for(const r of RAIDER.list){if(r.mk)r.mk.remove();if(r.group.parent)r.group.parent.remove(r.group);}
   RAIDER.list.length=0;clearRaiderBolts();
-  RAIDER.active=false;RAIDER.warnT=0;RAIDER.fightT=0;RAIDER.nextIn=30+Math.random()*30;
+  RAIDER.active=false;RAIDER.warnT=0;RAIDER.fightT=0;RAIDER.escapeT=0;RAIDER.escapeWarned=false;RAIDER.nextIn=30+Math.random()*30;
   if(RAIDER.bossWave){
     RAIDER.bossWave=false;
     RAIDER.bossT=activeSystemId==='elysian'?55+Math.random()*30:activeSystemId==='gargantua'?105+Math.random()*45:1e9;
@@ -6033,6 +6084,24 @@ function updateRaiders(dt){
     }
   }
   if(alive===0){endRaiderWave(false,true);return;}
+  if(RAIDER.warnT<=0){
+    if(nearD>RAIDER_LEASH_DIST){
+      RAIDER.escapeT+=dt;
+      if(!RAIDER.escapeWarned&&RAIDER.escapeT>0.8){
+        RAIDER.escapeWarned=true;
+        toast(`🚀 BREAKING CONTACT — STAY BEYOND ${RAIDER_LEASH_DIST}m FOR ${RAIDER_LEASH_TIME}s TO LOSE THEM`);
+      }
+      if(RAIDER.escapeT>=RAIDER_LEASH_TIME){
+        const wasBoss=RAIDER.bossWave,bounty=wasBoss?75:25;
+        endRaiderWave(true,true);
+        GAME.escapes=(GAME.escapes||0)+1;earnGold(bounty,true);INV.rp=(INV.rp||0)+1;updateResHUD();
+        comicPop('EVASION SUCCESSFUL','#5df2c0',50,38);
+        toast(`🛸 YOU OUTRAN THE ${wasBoss?'DREADNOUGHT':'RAIDERS'} — THEY BROKE OFF THE PURSUIT · +${bounty} 🪙 +1 RP`);
+        SFX.jump();saveGame(true);checkProgression();
+        return;
+      }
+    }else RAIDER.escapeT=Math.max(0,RAIDER.escapeT-dt*1.5);
+  }
   RAIDER.audioT-=dt;
   if(RAIDER.audioT<=0&&nearD<1e8){
     RAIDER.audioT=0.12;
@@ -6154,7 +6223,7 @@ function explorerRankIdx(){
   return idx;
 }
 function checkProgression(){
-  const idx=explorerRankIdx();let changed=false;
+  const idx=explorerRankIdx();let changed=checkCosmetics();
   for(let i=1;i<=idx;i++){
     const t=EXPLORER_TITLES[i];
     if(t&&!GAME.titles.includes(t)){
@@ -6247,10 +6316,10 @@ function canSpawnNpc(){
   if(b&&PL.alt<landRange(b)+12)return false;
   return true;
 }
-function spawnNpcConvoy(){
+function spawnNpcConvoy(forceMother=false){
   if(NPC.list.length||!canSpawnNpc())return false;
   const lvl=UPGRADES.ship.lvl||1;
-  const mother=lvl>=3&&(activeSystemId==='gargantua'||activeSystemId==='elysian')&&Math.random()<0.11;
+  const mother=forceMother||(lvl>=3&&(activeSystemId==='gargantua'||activeSystemId==='elysian')&&Math.random()<0.11+0.10*progressionMeter());
   const count=mother?3:(Math.random()<0.55?2:1);
   const pool=NPC_SPECIES.slice();
   const style=mother?'mothership':count>1?'convoy':'scout';
@@ -6299,6 +6368,18 @@ function spawnDistressShip(){
   toast(`🆘 ${n.species} FREIGHTER SENDING DISTRESS — FLY CLOSE AND ${touchUI?'TAP HAIL':'PRESS E'} TO RESPOND`);
   return true;
 }
+/* ---- Living-galaxy difficulty: system tier + explorer progression weight rare sightings ---- */
+const SYS_TIER={solara:0,nyx:0.35,elysian:0.7,gargantua:1};
+function systemTier(){return SYS_TIER[activeSystemId]!==undefined?SYS_TIER[activeSystemId]:0.5;}
+function progressionMeter(){
+  const rank=explorerRankIdx()/5;
+  const civs=Object.keys(GAME.civMet||{}).filter(k=>CIV_IDS.includes(k)).length/6;
+  const worlds=Math.min(1,Object.keys(GAME.planetComplete||{}).length/6);
+  const ops=Math.min(1,(GAME.missionHistory||[]).length/8);
+  return clamp(rank*0.4+civs*0.25+worlds*0.2+ops*0.15,0,1);
+}
+function rareEncounterChance(){return clamp(0.06+progressionMeter()*0.30+systemTier()*0.12,0,0.48);}
+function encounterPace(){return clamp(1-0.3*progressionMeter()-0.08*systemTier(),0.55,1);}
 function makeNpcHostile(n,reason){
   if(!n||n.hostile)return;
   n.hostile=true;n.role='hostile';n.life=Math.max(n.life,n.age+55);n.fireT=1.2+Math.random();
@@ -6381,22 +6462,27 @@ function updateGalaxy(dt){
   if(PL.mode!=='fly'||modalOpen||photoMode||CINE.open)return;
   GALAXY.nextEvent-=dt;GALAXY.nextDistress-=dt;GALAXY.nextConvoy-=dt;GALAXY.nextAnomaly-=dt;GALAXY.nextFaction-=dt;
   if(RAIDER.active)return;
+  const meter=progressionMeter(),pace=encounterPace();
   if(GALAXY.nextAnomaly<=0&&!GALAXY.anomaly&&NPC.list.length<2){
-    if(spawnAnomaly())GALAXY.nextAnomaly=280+Math.random()*260;else GALAXY.nextAnomaly=45;
+    if(spawnAnomaly())GALAXY.nextAnomaly=(280+Math.random()*260)*(1-0.25*meter);else GALAXY.nextAnomaly=45;
   }
   if(GALAXY.nextEvent<=0){
-    GALAXY.nextEvent=110+Math.random()*100;
-    if(PL.near&&PL.near.landable&&!NPC.list.length&&Math.random()<0.5)planetaryEvent(PL.near);
+    GALAXY.nextEvent=Math.max(70,(110+Math.random()*100)*pace);
+    if(!NPC.list.length&&!GALAXY.anomaly&&Math.random()<rareEncounterChance()){
+      spawnNpcConvoy(true);
+    }else if(PL.near&&PL.near.landable&&!NPC.list.length&&Math.random()<0.5)planetaryEvent(PL.near);
   }
   if(GALAXY.nextFaction<=0){
-    GALAXY.nextFaction=240+Math.random()*200;
-    if(Math.random()<0.5){
+    GALAXY.nextFaction=Math.max(140,(240+Math.random()*200)*pace);
+    if(Math.random()<0.5-0.15*meter){
       RAIDER.nextIn=Math.min(RAIDER.nextIn,12);
       toast('☠ RAIDER WARBANDS MASSING NEAR THE LANE — EXPECT COMPANY');
-    }else{
+    }else if(spawnNpcConvoy()){
       const sp=civById('morrow');
-      spawnNpcConvoy();
       toast(`🛡 ${sp.species} ${sp.trait} REPORT RAIDER MOVEMENTS — ${activeSystemId.toUpperCase()} PATROL INBOUND`);
+    }else{
+      RAIDER.nextIn=Math.min(RAIDER.nextIn,16);
+      toast('☠ RAIDER WARBANDS MASSING NEAR THE LANE — EXPECT COMPANY');
     }
   }
 }
@@ -6468,7 +6554,7 @@ function renderAlienDialog(n){
     <div class="alienHead" style="color:${civColor(sp)}">
       <div class="alienSigil">${sp.sigil}</div>
       <div><div class="aName">${sp.species}</div>
-      <div class="aSub">${sp.trait} · ${first?'CODEX CONTACT LOGGED':'UNREGISTERED CONTACT'} · ${n.shipClass.toUpperCase()}</div>
+      <div class="aSub">${sp.trait} · ${first?'CODEX CONTACT LOGGED':'UNREGISTERED CONTACT'} · ${n.shipClass.toUpperCase()}${n.role?' · '+String(n.role).toUpperCase():''}</div>
       <div style="display:flex;gap:5px;flex-wrap:wrap;margin-top:5px"><span class="civChip">${rank}</span><span class="civChip">REP ${rep}</span><span class="civChip">HOME ${sp.home}</span></div></div>
     </div>
     <div class="dialogQuote" style="--c:${civColor(sp)}">"${n.line}"</div>
@@ -7372,7 +7458,7 @@ function updateHUD(dt){
   else if(m==='landed'){locEl.textContent=PL.body.name;subEl.textContent='LANDED · SHIP SHELTER';}
   else if(m==='descend'){locEl.textContent=PL.body.name;subEl.textContent='ATMOSPHERIC DESCENT · ALT '+Math.max(0,Math.round(PL.alt));}
   else if(RAIDER.active&&RAIDER.warnT>0){locEl.textContent='RAIDERS INBOUND';subEl.textContent='ENGAGE IN '+Math.ceil(RAIDER.warnT)+'s · EVASIVE READY';}
-  else if(RAIDER.active){locEl.textContent='COMBAT ZONE';subEl.textContent=RAIDER.list.filter(r=>!r.dead).length+' HOSTILE'+(RAIDER.list.filter(r=>!r.dead).length===1?'':'S')+' · '+Math.ceil(RAIDER.fightT)+'s BEFORE THEY JUMP';}
+  else if(RAIDER.active){locEl.textContent=RAIDER.escapeT>0?'BREAKING CONTACT':'COMBAT ZONE';subEl.textContent=RAIDER.list.filter(r=>!r.dead).length+' HOSTILE'+(RAIDER.list.filter(r=>!r.dead).length===1?'':'S')+' · '+(RAIDER.escapeT>0?`EVADE ${Math.min(99,Math.round(RAIDER.escapeT/RAIDER_LEASH_TIME*100))}%`:`${Math.ceil(RAIDER.fightT)}s BEFORE THEY JUMP`);}
   else if(b&&PL.alt<b.R*2.5+80){locEl.textContent=b.name;subEl.textContent='ALT '+Math.max(0,Math.round(PL.alt))+' · SPD '+Math.round(PL.speed);}
   else{locEl.textContent='DEEP SPACE';subEl.textContent='SPD '+Math.round(PL.speed)+(b?' · NEAREST '+b.name:'');}
   spdBar.style.width=(m==='fly'?clamp(Math.abs(PL.speed)/390,0,1)*100:0)+'%';
@@ -7512,6 +7598,7 @@ function frame(dt){
     if(postOn&&passGrade){passGrade.uniforms.uExposure.value=postBaseExp*(1+0.16*cineFx);passGrade.uniforms.uVig.value=postBaseVig*(1+0.6*cineFx);}
   }
   followSunShadow();
+  updateShipCosmetic(dt);
   render();
 }
 function resize(){
@@ -7633,6 +7720,7 @@ async function boot(){
     SFX.init();SFX.discover();
     if(resume)loadGame();
     ensureFactionContracts();
+    if(checkCosmetics())saveGame(true);
     started=true;$('start').classList.add('bye');$('ui').classList.add('live');canvas.focus();PL.speed=30;
     toast(resume?'EXPEDITION RESUMED!':'WELCOME TO GALACTIC FRONTIER!');
   };
@@ -7675,7 +7763,7 @@ $('importFile').addEventListener('change',e=>{
 if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)){
   addEventListener('load',()=>{navigator.serviceWorker.register('./sw.js',{updateViaCache:'none'}).then(r=>r.update()).catch(()=>{});});
 }
-window.__game={THREE,COINS,SKIN,earnGold,PL,bodies,INV,UPGRADES,MISSIONS,DISCOVERIES,ELYS,GAME,RAIDER,NPC,SFX,GALAXY,get sunShadow(){return sunShadow;},get renderer(){return renderer;},get scene(){return scene;},get ship(){return ship;},get astro(){return astro;},actLand,actExit,warpToBody,switchActiveSystem,triggerScan,handleInteract,keys,look,camera,frame,spawnStormCrystals,clearAllStormCrystals,openBase,openVaultCode,tameCreature,readTreasureMap,placeOutpostOnPlanet,startRaiderWave,endRaiderWave,damageRaider,canSpawnRaider,spawnRaiderBolt,raiderHitShip,spawnNpcConvoy,makeNpcHostile,canSpawnNpc,fleeNpcs,nearestNpc,hailNpc,spawnAnomaly,scanAnomaly,planetaryEvent,updateGalaxy,checkProgression,explorerScore,explorerRankIdx,spawnPOI,handlePOI,updatePlanetProgress,planetPoiTotals,ensureDynOffers,acceptDynMission,dynProgress,makeDynOffer,completeDynMission,startRescue,spawnEscortFleet,spawnDistressShip,renderJournalModal,setJournalTab:t=>{journalTab=t;},saveGame,loadGame,tutActive,CINE,setGfxMode,get gfx(){return{mode:gfxMode,tier:gfxTierName(),post:postOn,shadow:renderer.shadowMap.enabled,scale:dyn.scale,fps:fpsShow,sm:!!(sunShadow.shadow.map),calls:renderer.info.render.calls,tris:renderer.info.render.triangles,geoms:renderer.info.memory.geometries,tex:renderer.info.memory.textures};},dbg:()=>({started,modalOpen,photoMode,cine:CINE.open,tutStep,alt:PL.alt,mode:PL.mode})};
+window.__game={THREE,COINS,SKIN,earnGold,PL,bodies,INV,UPGRADES,MISSIONS,DISCOVERIES,ELYS,GAME,RAIDER,NPC,SFX,GALAXY,get sunShadow(){return sunShadow;},get renderer(){return renderer;},get scene(){return scene;},get ship(){return ship;},get astro(){return astro;},actLand,actExit,warpToBody,switchActiveSystem,triggerScan,handleInteract,keys,look,camera,frame,spawnStormCrystals,clearAllStormCrystals,openBase,openVaultCode,tameCreature,readTreasureMap,placeOutpostOnPlanet,startRaiderWave,endRaiderWave,damageRaider,canSpawnRaider,spawnRaiderBolt,raiderHitShip,spawnNpcConvoy,makeNpcHostile,canSpawnNpc,fleeNpcs,nearestNpc,hailNpc,spawnAnomaly,scanAnomaly,planetaryEvent,updateGalaxy,progressionMeter,systemTier,rareEncounterChance,encounterPace,SHIP_COSMETICS,checkCosmetics,applyShipCosmetic,checkProgression,explorerScore,explorerRankIdx,spawnPOI,handlePOI,updatePlanetProgress,planetPoiTotals,ensureDynOffers,acceptDynMission,dynProgress,makeDynOffer,completeDynMission,startRescue,spawnEscortFleet,spawnDistressShip,renderJournalModal,setJournalTab:t=>{journalTab=t;},saveGame,loadGame,tutActive,CINE,setGfxMode,get gfx(){return{mode:gfxMode,tier:gfxTierName(),post:postOn,shadow:renderer.shadowMap.enabled,scale:dyn.scale,fps:fpsShow,sm:!!(sunShadow.shadow.map),calls:renderer.info.render.calls,tris:renderer.info.render.triangles,geoms:renderer.info.memory.geometries,tex:renderer.info.memory.textures};},dbg:()=>({started,modalOpen,photoMode,cine:CINE.open,tutStep,alt:PL.alt,mode:PL.mode})};
 </script>
 </body>
 </html>
