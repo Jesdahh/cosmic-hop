@@ -254,6 +254,15 @@ html,body{margin:0;height:100%;overflow:hidden;background:var(--space);color:var
 #btnChat.on{display:inline-flex}
 .mpTag u{display:block;text-decoration:none;background:#fff;color:#170f24;border-radius:8px;padding:2px 6px;margin-bottom:3px;max-width:220px;white-space:normal;font-size:12px}
 .mpTag u:empty{display:none}
+.mpArr{display:none;width:0;height:0;border-top:7px solid transparent;border-bottom:7px solid transparent;border-left:12px solid #ffd23f;vertical-align:middle;margin-right:6px;filter:drop-shadow(0 0 3px rgba(255,210,63,.8))}
+.mpTag.edge{border-color:#ffd23f;padding:3px 9px;box-shadow:0 0 10px rgba(255,210,63,.35)}
+.mpTag.edge .mpArr{display:inline-block}
+.mpTag.edge u{display:none}
+.mpTag.edge i{display:inline;font-size:15px;margin-right:4px}
+.mpTag.edge small{display:inline;margin-left:6px;font-size:10.5px;opacity:.85}
+.mpFly{display:inline-flex;align-items:center;gap:4px;font-family:var(--display);font-size:14px;letter-spacing:.04em;padding:2px 10px;margin-left:8px;border:2px solid var(--ink);border-radius:8px;background:var(--sun);color:var(--ink);cursor:pointer;vertical-align:middle}
+.mpFly[disabled]{opacity:.5;cursor:default}
+.mpPeerRow{display:flex;align-items:center;flex-wrap:wrap;gap:4px;padding:3px 0}
 #mpStart{pointer-events:auto;font-family:var(--display);font-size:clamp(24px,5.5vw,40px);letter-spacing:.06em;padding:9px 30px;border:4px solid var(--ink);border-radius:14px;background:var(--void);color:var(--ink);box-shadow:6px 6px 0 var(--ink);cursor:pointer;transform:rotate(1deg);display:inline-flex;align-items:center;justify-content:center;gap:10px}
 .mpTag{position:absolute;left:0;top:0;pointer-events:none;white-space:nowrap;font-family:var(--sans);font-weight:800;font-size:12px;color:#fff;background:rgba(23,15,36,.78);border:2px solid #c77dff;border-radius:9px;padding:2px 7px;will-change:transform;text-align:center}
 .mpTag i{font-style:normal;font-size:20px;display:block;line-height:1.1}
@@ -1117,7 +1126,7 @@ body.photoMode #ui{opacity:0!important}
           <div class="mpRow"><button class="uBtn buy" id="mpPlay" style="width:auto">▶ FLY!</button><button class="uBtn" id="mpLeave" style="width:auto;background:#ffb3c1">LEAVE</button></div>
         </div>
       </div>
-      <div class="mpNote">Players connect directly to each other. Everyone keeps their own save, coins and progress — you see each other flying, landing and walking around when you're in the same star system. Up to 8 pilots per lobby. Emotes: keys 1–5 while playing. Chat: press Y (or tap the chat button), type, then Enter.</div>
+      <div class="mpNote">Players connect directly to each other. Everyone keeps their own save, coins and progress — you see each other flying, landing and walking around when you're in the same star system. Up to 8 pilots per lobby. Tap FLY TO next to a friend to jump right next to them. Friends off screen show as arrows at the edge. Emotes: keys 1–5 while playing. Chat: press Y (or tap the chat button), type, then Enter.</div>
     </div>
   </div>
 </div>
@@ -7863,7 +7872,7 @@ function mpState(){
 function mpMakePeer(id){
   const sh=buildShip();scene.add(sh.group);sh.group.visible=false;
   const as=buildAstro();scene.add(as.group);as.group.visible=false;
-  const tag=document.createElement('div');tag.className='mpTag';tag.style.display='none';tag.innerHTML='<u></u><i></i><span></span><small></small>';markersEl.appendChild(tag);
+  const tag=document.createElement('div');tag.className='mpTag';tag.style.display='none';tag.innerHTML='<u></u><i></i><b class="mpArr"></b><span></span><small></small>';markersEl.appendChild(tag);
   const P={id,st:null,t:0,ship:sh,astro:as,tag,sk:null,ak:null,pos:new V3(),q:new Q(),apos:new V3(),aq:new Q(),fresh:true,emo:'',emoT:0,announced:false,phase:Math.random()*6};
   MP.peers.set(id,P);return P;
 }
@@ -7916,7 +7925,7 @@ async function mpJoin(kind,code){
     if(!MP.lib){$('mpStatus').textContent='Loading multiplayer…';MP.lib=await import(MP_LIB);}
     mpLeave(true);
     const roomId='lobby-'+code;
-    if(!MP.turn){MP.turn=[];try{const r=await fetch('api/turn',{cache:'no-store'});if(r.ok&&/json/.test(r.headers.get('content-type')||'')){const j=await r.json();if(Array.isArray(j.iceServers))MP.turn=j.iceServers;}}catch(_){}}
+    if(!MP.turn){MP.turn=[];try{const r=await fetch('api/turn',{method:'POST',cache:'no-store'});if(r.ok&&/json/.test(r.headers.get('content-type')||'')){const j=await r.json();if(Array.isArray(j.iceServers))MP.turn=j.iceServers;}}catch(_){}}
     const room=MP.lib.joinRoom(MP.turn.length?{appId:MP_APP,turnConfig:MP.turn}:{appId:MP_APP},roomId);
     MP.room=room;MP.kind=kind;MP.code=code||null;MP.sys=activeSystemId;
     const st=room.makeAction('st'),emo=room.makeAction('emo'),chat=room.makeAction('chat');
@@ -7949,7 +7958,43 @@ function mpRenderPanel(){
   $('mpRoomTitle').innerHTML='<svg class="ic"><use href="#i-lock"/></svg> PRIVATE LOBBY';
   $('mpCodeBox').style.display='flex';$('mpCodeShow').textContent=MP.code||'';
   $('mpStatus').textContent=cnt?`${cnt} other pilot${cnt>1?'s':''} connected.`:'Waiting for friends… share the code above.';
-  $('mpPeers').innerHTML=[...MP.peers.values()].filter(P=>P.st).map(P=>{const st=P.st,same=st.s===activeSystemId;const nm=mpClean(st.n).replace(/[<>&]/g,'');const lc=String(st.loc||'').replace(/[^A-Z0-9 \-]/gi,'').slice(0,20);return `• <b>${nm}</b> — ${same?(lc||'nearby'):'in another star system ('+String(st.s).replace(/[^a-z]/gi,'').toUpperCase()+')'}`;}).join('<br>');
+  const html=[...MP.peers.entries()].filter(([,P])=>P.st).map(([id,P])=>{const st=P.st,same=st.s===activeSystemId;const nm=mpClean(st.n).replace(/[<>&]/g,'');const lc=String(st.loc||'').replace(/[^A-Z0-9 \-]/gi,'').slice(0,20);const sys=SYSTEMS.find(x=>x.id===st.s);const can=same||(sys&&UPGRADES.ship.lvl>=sys.reqHyper);
+    return `<div class="mpPeerRow">• <b>${nm}</b>&nbsp;— ${same?(lc||'nearby'):'in '+(sys?sys.name:'another system')}<button class="mpFly" data-fly="${String(id).replace(/[^A-Za-z0-9_-]/g,'')}" ${can&&started?'':'disabled'}><svg class="ic" style="width:14px;height:14px"><use href="#i-launch"/></svg>FLY TO</button></div>`;}).join('');
+  if($('mpPeers')._h!==html){$('mpPeers')._h=html;$('mpPeers').innerHTML=html;}
+}
+let mpFlyT=0;
+function mpFlyTo(id){
+  const P=MP.peers.get(id);if(!P||!P.st){toast('FRIEND NOT FOUND');return;}
+  const st=P.st,nm=mpClean(st.n),now=performance.now();
+  if(now-mpFlyT<4000){toast('HYPERDRIVE COOLING DOWN…');return;}
+  if(PL.mode==='landing'||PL.mode==='takeoff'){toast('WAIT UNTIL YOU ARE FLYING OR LANDED');return;}
+  const ref=bodies[st.b];if(!ref){toast('CAN\'T LOCATE '+nm);return;}
+  if(st.s!==activeSystemId){
+    const sys=SYSTEMS.find(x=>x.id===st.s);
+    if(!sys||UPGRADES.ship.lvl<sys.reqHyper){toast(`${nm} IS IN ${sys?sys.name:'ANOTHER SYSTEM'} — UPGRADE YOUR HYPERDRIVE TO FOLLOW`);return;}
+  }
+  mpFlyT=now;closeModals();
+  const inter=st.s!==activeSystemId;
+  SFX.warp();const wfx=$('warpFx');wfx.classList.add('on');
+  setTimeout(()=>{
+    const s2=P.st||st;
+    if(s2.s!==activeSystemId)switchActiveSystem(s2.s);
+    const rb=bodies[s2.b]||ref;
+    warpToBody(rb);
+    const fpos=new V3(s2.p[0],s2.p[1],s2.p[2]).add(rb.center);
+    const isPlanet=rb.kind!=='sun'&&rb.kind!=='blackhole';
+    const up=isPlanet?fpos.clone().sub(rb.center).normalize():AY.clone();
+    const side=new V3().crossVectors(up,Math.abs(up.y)<0.9?AY:new V3(1,0,0)).normalize();
+    const pos=fpos.clone().addScaledVector(up,isPlanet?22:8).addScaledVector(side,14);
+    if(isPlanet){const minR=rb.R*1.08+18;const d=pos.distanceTo(rb.center);if(d<minR)pos.sub(rb.center).setLength(minR).add(rb.center);}
+    ship.group.position.copy(pos);
+    const fwd=fpos.clone().sub(pos).normalize();
+    ship.group.quaternion.setFromRotationMatrix(setBasis(_m,_a.set(0,0,0),fwd,up));
+    PL.speed=0;PL.vel.set(0,0,0);PL.near=rb;PL.alt=altitudeOver(rb,ship.group.position);
+    P.fresh=true;
+    toast(`ARRIVED NEXT TO ${nm}!`);
+  },inter?650:250);
+  setTimeout(()=>wfx.classList.remove('on'),inter?1500:750);
 }
 function mpOpen(){SFX.init&&SFX.init();let saved='';try{saved=localStorage.getItem('cosmic_hop_mp_name')||'';}catch(_){}if(!MP.room)$('mpName').value=saved;mpRenderPanel();openModal('mpModal');}
 function mpStartGameIfNeeded(){
@@ -7985,12 +8030,26 @@ function updateMP(dt){
     const up=_a.copy(tagPos).sub(b.center).normalize();_mpV.addScaledVector(up,lift);
     const dist=camera.position.distanceTo(tagPos);
     _mpV.project(camera);
-    if(_mpV.z>1||_mpV.z<-1||dist>3000){P.tag.style.display='none';continue;}
-    const x=(_mpV.x+1)/2*w,y=(1-_mpV.y)/2*h;
-    P.tag.style.display='block';P.tag.style.transform=`translate(-50%,-100%) translate(${x.toFixed(1)}px,${y.toFixed(1)}px)`;
-    const em=P.emoT>0?P.emo:'',nm=mpClean(st.n),ds=dist>60?Math.round(dist)+'m':'';
+    /* on screen: tag floats above the friend. Off screen or behind you: it sticks to the screen edge with an arrow pointing at them */
+    let nx=_mpV.x,ny=_mpV.y;const behind=_mpV.z>1;if(behind){nx=-nx;ny=-ny;}
+    /* safe zone keeps arrows clear of the top button bar and the bottom controls */
+    const xMin=70,xMax=w-70,yMin=Math.min(h*0.42,96),yMax=Math.max(h*0.56,h-250),cx=w/2,cy=h/2;
+    let x=(nx+1)/2*w,y=(1-ny)/2*h;
+    const edge=behind||x<xMin||x>xMax||y<yMin||y>yMax;
+    if(edge){
+      let dx=x-cx,dy=y-cy;if(behind&&Math.abs(dx)<1&&Math.abs(dy)<1)dy=1;
+      const kx=dx>0?(xMax-cx)/dx:dx<0?(xMin-cx)/dx:Infinity,ky=dy>0?(yMax-cy)/dy:dy<0?(yMin-cy)/dy:Infinity,kk=Math.min(kx,ky);
+      x=cx+dx*kk;y=cy+dy*kk;
+      P.tag.children[2].style.transform=`rotate(${(Math.atan2(dy,dx)*180/Math.PI).toFixed(0)}deg)`;
+      P.tag.style.transform=`translate(-50%,-50%) translate(${x.toFixed(1)}px,${y.toFixed(1)}px)`;
+    }else{
+      P.tag.style.transform=`translate(-50%,-100%) translate(${x.toFixed(1)}px,${y.toFixed(1)}px)`;
+    }
+    if(P.tag._edge!==edge){P.tag._edge=edge;P.tag.classList.toggle('edge',edge);}
+    P.tag.style.display='block';
+    const em=P.emoT>0?P.emo:'',nm=mpClean(st.n),ds=dist>=1000?(dist/1000).toFixed(1)+'k':(dist>40||edge?Math.round(dist)+'m':'');
     const say=P.sayT>0?P.say:'';if(P.sayT>0)P.sayT-=dt;
-    if(P.tag._k!==say+em+nm+ds){P.tag._k=say+em+nm+ds;P.tag.children[0].textContent=say;P.tag.children[1].textContent=em;P.tag.children[2].textContent=nm;P.tag.children[3].textContent=ds;}
+    if(P.tag._k!==say+em+nm+ds){P.tag._k=say+em+nm+ds;P.tag.children[0].textContent=say;P.tag.children[1].textContent=em;P.tag.children[3].textContent=nm;P.tag.children[4].textContent=ds;}
   }
 }
 $('btnMP').addEventListener('click',e=>{e.stopPropagation();mpOpen();});
@@ -8010,6 +8069,8 @@ $('mpChatIn').addEventListener('keyup',e=>e.stopPropagation());
 $('mpChatBar').addEventListener('pointerdown',e=>e.stopPropagation());
 $('mpPlay').addEventListener('click',()=>{closeModals();mpStartGameIfNeeded();});
 $('mpCopy').addEventListener('click',()=>{const c=MP.code||'';try{navigator.clipboard.writeText(c).then(()=>toast('CODE COPIED: '+c),()=>toast('CODE: '+c));}catch(_){toast('CODE: '+c);}});
+$('mpPeers').addEventListener('click',e=>{const b=e.target.closest('[data-fly]');if(!b||b.disabled)return;e.stopPropagation();const id=[...MP.peers.keys()].find(k=>String(k).replace(/[^A-Za-z0-9_-]/g,'')===b.dataset.fly);if(id)mpFlyTo(id);});
+setInterval(()=>{if(MP.room&&$('mpModal').classList.contains('open'))mpRenderPanel();},1000);
 document.querySelectorAll('#mpModal .mpEmo').forEach(b=>b.addEventListener('click',()=>mpEmote(b.dataset.emo)));
 document.querySelectorAll('#mpEmoRow .mpEmo[data-emo]').forEach(b=>b.addEventListener('click',e=>{e.stopPropagation();mpEmote(b.dataset.emo);mpChatClose();}));
 $('mpChatX').addEventListener('click',e=>{e.stopPropagation();mpChatClose();});
@@ -8051,7 +8112,7 @@ $('importFile').addEventListener('change',e=>{
 if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)){
   addEventListener('load',()=>{navigator.serviceWorker.register('./sw.js',{updateViaCache:'none'}).then(r=>r.update()).catch(()=>{});});
 }
-window.__game={MP,mpJoin,mpLeave,THREE,COINS,SKIN,earnGold,PL,bodies,INV,UPGRADES,MISSIONS,DISCOVERIES,ELYS,GAME,RAIDER,NPC,SFX,GALAXY,get sunShadow(){return sunShadow;},get renderer(){return renderer;},get scene(){return scene;},get ship(){return ship;},get astro(){return astro;},actLand,actExit,warpToBody,switchActiveSystem,triggerScan,handleInteract,keys,look,camera,frame,spawnStormCrystals,clearAllStormCrystals,openBase,openVaultCode,tameCreature,readTreasureMap,placeOutpostOnPlanet,startRaiderWave,endRaiderWave,damageRaider,canSpawnRaider,spawnRaiderBolt,raiderHitShip,spawnNpcConvoy,makeNpcHostile,canSpawnNpc,fleeNpcs,nearestNpc,hailNpc,spawnAnomaly,scanAnomaly,planetaryEvent,updateGalaxy,progressionMeter,systemTier,rareEncounterChance,encounterPace,SHIP_COSMETICS,checkCosmetics,applyShipCosmetic,checkProgression,explorerScore,explorerRankIdx,spawnPOI,handlePOI,updatePlanetProgress,planetPoiTotals,ensureDynOffers,acceptDynMission,dynProgress,makeDynOffer,completeDynMission,startRescue,spawnEscortFleet,spawnDistressShip,renderJournalModal,setJournalTab:t=>{journalTab=t;},saveGame,loadGame,tutActive,CINE,setGfxMode,get gfx(){return{mode:gfxMode,tier:gfxTierName(),post:postOn,shadow:renderer.shadowMap.enabled,scale:dyn.scale,fps:fpsShow,sm:!!(sunShadow.shadow.map),calls:renderer.info.render.calls,tris:renderer.info.render.triangles,geoms:renderer.info.memory.geometries,tex:renderer.info.memory.textures};},dbg:()=>({started,modalOpen,photoMode,cine:CINE.open,tutStep,alt:PL.alt,mode:PL.mode})};
+window.__game={MP,mpJoin,mpLeave,mpFlyTo,THREE,COINS,SKIN,earnGold,PL,bodies,INV,UPGRADES,MISSIONS,DISCOVERIES,ELYS,GAME,RAIDER,NPC,SFX,GALAXY,get sunShadow(){return sunShadow;},get renderer(){return renderer;},get scene(){return scene;},get ship(){return ship;},get astro(){return astro;},actLand,actExit,warpToBody,switchActiveSystem,triggerScan,handleInteract,keys,look,camera,frame,spawnStormCrystals,clearAllStormCrystals,openBase,openVaultCode,tameCreature,readTreasureMap,placeOutpostOnPlanet,startRaiderWave,endRaiderWave,damageRaider,canSpawnRaider,spawnRaiderBolt,raiderHitShip,spawnNpcConvoy,makeNpcHostile,canSpawnNpc,fleeNpcs,nearestNpc,hailNpc,spawnAnomaly,scanAnomaly,planetaryEvent,updateGalaxy,progressionMeter,systemTier,rareEncounterChance,encounterPace,SHIP_COSMETICS,checkCosmetics,applyShipCosmetic,checkProgression,explorerScore,explorerRankIdx,spawnPOI,handlePOI,updatePlanetProgress,planetPoiTotals,ensureDynOffers,acceptDynMission,dynProgress,makeDynOffer,completeDynMission,startRescue,spawnEscortFleet,spawnDistressShip,renderJournalModal,setJournalTab:t=>{journalTab=t;},saveGame,loadGame,tutActive,CINE,setGfxMode,get gfx(){return{mode:gfxMode,tier:gfxTierName(),post:postOn,shadow:renderer.shadowMap.enabled,scale:dyn.scale,fps:fpsShow,sm:!!(sunShadow.shadow.map),calls:renderer.info.render.calls,tris:renderer.info.render.triangles,geoms:renderer.info.memory.geometries,tex:renderer.info.memory.textures};},dbg:()=>({started,modalOpen,photoMode,cine:CINE.open,tutStep,alt:PL.alt,mode:PL.mode})};
 </script>
 </body>
 </html>
