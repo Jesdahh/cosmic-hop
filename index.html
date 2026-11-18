@@ -133,6 +133,25 @@ html,body{margin:0;height:100%;overflow:hidden;background:var(--space);color:var
 .cPop{position:absolute;font-size:clamp(21px,3.8vw,32px);color:var(--mint);-webkit-text-stroke:1.8px var(--ink);text-shadow:3px 3px 0 var(--ink);transform:translate(-50%,-50%) scale(.4);animation:floatPop .95s cubic-bezier(.18,1.5,.35,1) forwards}
 @keyframes floatPop{0%{opacity:0;transform:translate(-50%,-40%) scale(.4) rotate(-8deg)}22%{opacity:1;transform:translate(-50%,-65%) scale(1.08) rotate(4deg)}80%{opacity:1;transform:translate(-50%,-88%) scale(1) rotate(-2deg)}100%{opacity:0;transform:translate(-50%,-115%) scale(.85) rotate(3deg)}}
 
+/* Scan results panel: one compact stack instead of a popup per find */
+#scanReport{position:fixed;top:76px;right:14px;width:min(268px,72vw);z-index:9;pointer-events:none;background:rgba(8,18,38,.84);border:1px solid rgba(120,230,255,.4);border-radius:12px;box-shadow:0 6px 24px rgba(0,0,0,.45),0 0 18px rgba(90,215,255,.12);backdrop-filter:blur(6px);padding:9px 10px 8px;opacity:0;transform:translateX(16px);transition:opacity .28s ease,transform .28s ease;font-family:var(--sans)}
+#scanReport.on{opacity:1;transform:none}
+#scanReport.out{opacity:0;transform:translateX(10px)}
+#scanReport .sRHead{display:flex;align-items:center;justify-content:space-between;gap:8px;padding-bottom:6px;margin-bottom:5px;border-bottom:1px solid rgba(120,230,255,.22);color:#9fdcff;font-size:9.5px;font-weight:800;letter-spacing:.16em}
+#scanReport .sRHead .ic{width:12px;height:12px;margin-right:4px;color:#5ad7ff}
+#scanReport .sRHead b{color:#eaf7ff;font-size:10px;letter-spacing:.08em}
+#scanReport .sRRow{display:flex;align-items:center;gap:7px;padding:2.5px 0;font-size:10.5px;color:#dfeeff;letter-spacing:.03em}
+#scanReport .sRRow i{width:7px;height:7px;border-radius:2px;transform:rotate(45deg);flex:0 0 auto}
+#scanReport .sRN{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:700}
+#scanReport .sRN em{font-style:normal;color:#7fb6d9;font-size:9.5px}
+#scanReport .sRT{margin-left:auto;flex:0 0 auto;font-size:8.5px;font-weight:800;letter-spacing:.1em;color:#7fb6d9}
+#scanReport .sRMore{font-size:9px;letter-spacing:.1em;color:#7fb6d9;padding-top:3px}
+#scanReport .sRFoot{display:flex;justify-content:space-between;gap:8px;margin-top:6px;padding-top:6px;border-top:1px solid rgba(120,230,255,.22);font-size:10px;font-weight:800;letter-spacing:.08em}
+#scanReport .sRG{color:#ffd23f}
+#scanReport .sRRP{color:#c77dff}
+@media (max-width:560px){#scanReport{top:60px;right:8px;width:min(216px,58vw);padding:7px 8px 6px}
+  #scanReport .sRRow{font-size:10px}#scanReport .sRT{font-size:8px}}
+
 #lines{position:absolute;inset:-20%;opacity:0;transition:opacity .25s;
   background:repeating-conic-gradient(from 0deg,rgba(255,255,255,0) 0deg 5deg,rgba(255,255,255,.5) 5.4deg 5.9deg,rgba(255,255,255,0) 6.3deg 11deg);
   -webkit-mask-image:radial-gradient(circle,transparent 38%,#000 75%);mask-image:radial-gradient(circle,transparent 38%,#000 75%);animation:spin 1.2s linear infinite}
@@ -862,6 +881,7 @@ body.photoMode #ui{opacity:0!important}
 <button id="photoExit" type="button"><svg class="ic"><use href="#i-close"/></svg> EXIT</button>
 <div id="reticle"></div>
 <div id="popLayer"></div>
+<div id="scanReport"></div>
 
 <div id="ui">
   <div id="lines"></div>
@@ -1569,11 +1589,13 @@ const SFX=(()=>{
 })();
 
 function comicPop(text,color='#5df2c0',x=50,y=42){
+  const layer=$('popLayer');
+  while(layer.children.length>=5)layer.firstChild.remove();
   const el=document.createElement('div');
   el.className='cPop';el.textContent=text;el.style.color=color;
   el.style.left=clamp(x+(Math.random()-0.5)*14,15,85)+'%';
   el.style.top=clamp(y+(Math.random()-0.5)*10,16,78)+'%';
-  $('popLayer').appendChild(el);
+  layer.appendChild(el);
   setTimeout(()=>el.remove(),950);
 }
 
@@ -1962,20 +1984,23 @@ function updateMissionHUD(){
   $('mDesc').textContent=cur.desc;
   $('mProg').textContent=`PROGRESS: ${cur.prog} / ${cur.goal}`;
 }
-function recordDiscovery(cat,name,planet,detail){
+function recordDiscovery(cat,name,planet,detail,quiet){
   if(DISCOVERIES.some(d=>d.name===name&&d.planet===planet))return false;
   const b=bodies.find(x=>x.name===planet);
   DISCOVERIES.unshift({cat,name,planet,sys:b?b.sys:'',detail,time:new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})});
-  SFX.discover();
-  comicPop(`${cat.toUpperCase()} DISCOVERED!`,'#ffd23f',50,34);
-  earnGold(15,true);
-  INV.rp=(INV.rp||0)+2;updateResHUD();updateElyHUD();
+  INV.rp=(INV.rp||0)+2;
   tutFlags.scan=1;
+  if(!quiet){
+    SFX.discover();
+    comicPop(`${cat.toUpperCase()} DISCOVERED!`,'#ffd23f',50,34);
+    earnGold(15,true);
+    updateResHUD();updateElyHUD();
+  }
   advanceMission('scan',1);
   factionProgress('scan',1);
   if(cat==='Species'&&b)checkFaunaCatalog(b);
   if(cat==='Species'&&b&&b.sys==='elysian')advanceMission('elysianScan',1);
-  checkAchievements();checkMilestones();
+  if(!quiet){checkAchievements();checkMilestones();}
   return true;
 }
 
@@ -4827,11 +4852,26 @@ const scanWave=(()=>{
   const m=new THREE.Mesh(geo,mat);m.visible=false;m.frustumCulled=false;scene.add(m);
   return {mesh:m,active:false,t:0,maxR:95};
 })();
+let scanRepT=0;
+function showScanReport(rows,gold){
+  const el=$('scanReport');if(!el)return;
+  const groups=new Map();
+  for(const r of rows){const key=r.tag+'|'+r.name,g=groups.get(key);if(g)g.n++;else groups.set(key,{...r,n:1});}
+  const list=[...groups.values()],maxRows=innerWidth<=560?3:6,shown=list.slice(0,maxRows),more=list.length-shown.length;
+  el.innerHTML=`<div class="sRHead"><span><svg class="ic"><use href="#i-radar"/></svg>SCAN</span><b>${rows.length} NEW</b></div>`
+    +shown.map(g=>`<div class="sRRow"><i style="background:${g.color};box-shadow:0 0 8px ${g.color}"></i><span class="sRN">${g.name}${g.n>1?` <em>×${g.n}</em>`:''}</span><span class="sRT">${g.tag}</span></div>`).join('')
+    +(more>0?`<div class="sRMore">+${more} MORE</div>`:'')
+    +`<div class="sRFoot"><span class="sRG">+${gold} 🪙</span><span class="sRRP">+${rows.length*2} RP</span></div>`;
+  el.classList.remove('out');el.classList.add('on');
+  clearTimeout(scanRepT);
+  scanRepT=setTimeout(()=>{el.classList.add('out');scanRepT=setTimeout(()=>el.classList.remove('on','out'),420);},4200);
+}
 function triggerScan(){
   SFX.init();SFX.scan();
   scanWave.active=true;scanWave.t=0;
   scanWave.maxR=95+(UPGRADES.tool.lvl-1)*45+(INV.scanMod*35);
   scanWave.mesh.visible=true;
+  $('scanReport').classList.remove('on');
   comicPop('TERRAIN SCANNER!','#39c6ff',50,45);
 
   if(GALAXY.anomaly&&!GALAXY.anomaly.scanned&&ship.group.position.distanceTo(GALAXY.anomaly.pos)<GALAXY.anomaly.scanR){
@@ -4842,68 +4882,66 @@ function triggerScan(){
   const b=PL.mode==='walk'||PL.mode==='rover'?PL.body:PL.near;
   if(!b)return;
   const ref=PL.mode==='walk'?_e.copy(astro.group.position).add(PL.body.center):(PL.mode==='rover'?_e.copy(rover.localPos).add(PL.body.center):ship.group.position);
-  let found=0;
+  const maxR=scanWave.maxR,cand=[];
   for(const cr of b.creatures){
     _a.copy(b.center).add(cr.mesh.position);
-    if(ref.distanceTo(_a)<scanWave.maxR && !cr.scanned){
-      cr.scanned=true;found++;
-      recordDiscovery('Species',cr.name,b.name,'Alien fauna documented via Multi-Tool Bio-Scanner.');
-      if(cr.legendary){
-        if(!GAME.legendSeen.includes(cr.name)){
-          GAME.legendSeen.push(cr.name);GAME.rareFinds++;
-          grantAch('legend');earnGold(160,true);INV.rp=(INV.rp||0)+8;
-          comicPop('LEGENDARY CREATURE!','#ffd23f',50,40);
-          toast(`✦ ${cr.name.toUpperCase()} IS NOW IN YOUR LEGENDARY BESTIARY`);
-          saveGame(true);
-        }
-        dynProgress('anomaly',1,{legend:true});
-      }
-    }
+    if(ref.distanceTo(_a)<maxR&&!cr.scanned)cand.push({it:cr,cat:'Species',name:cr.name,tag:'FAUNA',color:'#7dffc4',detail:'Alien fauna documented via Multi-Tool Bio-Scanner.'});
   }
   for(const cvItem of b.caves){
     _a.copy(b.center).add(cvItem.localPos);
-    if(ref.distanceTo(_a)<scanWave.maxR && !cvItem.scanned){
-      cvItem.scanned=true;found++;
-      recordDiscovery('Cave',cvItem.name,b.name,'Subterranean crystal cavern offering storm shelter.');
-    }
+    if(ref.distanceTo(_a)<maxR&&!cvItem.scanned)cand.push({it:cvItem,cat:'Cave',name:cvItem.name,tag:'CAVE',color:'#9dfcff',detail:'Subterranean crystal cavern offering storm shelter.'});
   }
   for(const ru of b.ruins){
     _a.copy(b.center).add(ru.localPos);
-    if(ref.distanceTo(_a)<scanWave.maxR && !ru.scanned){
-      ru.scanned=true;found++;
-      recordDiscovery('Ancient Ruin',ru.name,b.name,'Precursor energy monolith with 3 power pylons.');
-    }
+    if(ref.distanceTo(_a)<maxR&&!ru.scanned)cand.push({it:ru,cat:'Ancient Ruin',name:ru.name,tag:'RUIN',color:'#ffd23f',detail:'Precursor energy monolith with 3 power pylons.'});
   }
   for(const nd of b.nodes){
     _a.copy(b.center).add(nd.localPos);
-    if(ref.distanceTo(_a)<scanWave.maxR && !nd.scanned){
-      nd.scanned=true;found++;
-      recordDiscovery('Mineral',`${RES_META[nd.type].label} Deposit`,b.name,`High-purity ${RES_META[nd.type].label} crystal cluster.`);
-    }
+    if(ref.distanceTo(_a)<maxR&&!nd.scanned)cand.push({it:nd,cat:'Mineral',name:`${RES_META[nd.type].label} Deposit`,tag:'MINERAL',color:RES_META[nd.type].hex,detail:`High-purity ${RES_META[nd.type].label} crystal cluster.`});
   }
+  const POI_TAG={wreck:['Wreck','#ff9f5a'],probe:['Derelict Tech','#9dfcff'],vault:['Vault','#ffd23f'],npc:['Survivor','#7dffc4'],settlement:['Settlement','#c77dff'],underground:['Ruins','#b591ff'],env:['Landmark','#ffb3c7']};
   for(const poi of (b.pois||[])){
     if(poi.kind==='glyph')continue;
     _a.copy(b.center).add(poi.localPos);
-    if(ref.distanceTo(_a)<scanWave.maxR&&!poi.scanned){
-      poi.scanned=true;found++;
-      const cat=poi.kind==='wreck'?'Wreck':poi.kind==='probe'?'Derelict Tech':poi.kind==='vault'?'Vault':poi.kind==='npc'?'Survivor':poi.kind==='settlement'?'Settlement':poi.kind==='underground'?'Ruins':poi.kind==='env'?'Landmark':'Treasure';
-      recordDiscovery(cat,poi.name,b.name,'Frontier point of interest charted by Terrain Pulse Scanner.');
-      if(poi.kind==='underground')dynProgress('expedition',1,{ruin:true});
+    if(ref.distanceTo(_a)<maxR&&!poi.scanned){
+      const [cat,color]=POI_TAG[poi.kind]||['Treasure','#ffe066'];
+      cand.push({it:poi,cat,name:poi.name,tag:cat.toUpperCase(),color,detail:'Frontier point of interest charted by Terrain Pulse Scanner.'});
     }
   }
+  let netNew=0;
   if(b.netNodes)for(const nn of b.netNodes){
     _a.copy(b.center).add(nn.localPos);
-    if(ref.distanceTo(_a)<scanWave.maxR&&!nn.scanned){
-      nn.scanned=true;found++;
-      recordDiscovery('Energy Network',nn.name,b.name,'Dormant Elysian conduit node. Energize it, then light its 3 pylons.');
-      toast('ENERGY NODE FOUND — LAND AND PRESS [E] TO ENERGIZE');
+    if(ref.distanceTo(_a)<maxR&&!nn.scanned){
+      cand.push({it:nn,cat:'Energy Network',name:nn.name,tag:'NETWORK',color:'#c77dff',detail:'Dormant Elysian conduit node. Energize it, then light its 3 pylons.'});
+      netNew++;
     }
     for(const pl of nn.pylons){
       _a.copy(b.center).add(pl.localPos);
-      if(ref.distanceTo(_a)<scanWave.maxR)pl.scanned=true;
+      if(ref.distanceTo(_a)<maxR)pl.scanned=true;
     }
   }
-  if(found>0)toast(`SCAN IDENTIFIED ${found} NEW DISCOVER${found>1?'IES':'Y'}!`);
+  const quiet=cand.length>1,g0=INV.gold||0,rec=[];
+  for(const c of cand){
+    c.it.scanned=true;
+    if(recordDiscovery(c.cat,c.name,b.name,c.detail,quiet))rec.push(c);
+    if(c.cat==='Species'&&c.it.legendary){
+      if(!GAME.legendSeen.includes(c.it.name)){
+        GAME.legendSeen.push(c.it.name);GAME.rareFinds++;
+        grantAch('legend');earnGold(160,true);INV.rp=(INV.rp||0)+8;
+        comicPop('LEGENDARY CREATURE!','#ffd23f',50,40);
+        toast(`✦ ${c.it.name.toUpperCase()} IS NOW IN YOUR LEGENDARY BESTIARY`);
+        saveGame(true);
+      }
+      dynProgress('anomaly',1,{legend:true});
+    }
+    if(c.it.kind==='underground')dynProgress('expedition',1,{ruin:true});
+  }
+  if(quiet&&rec.length){
+    earnGold(rec.length*15,false);SFX.discover();
+    updateResHUD();updateElyHUD();checkAchievements();checkMilestones();
+    showScanReport(rec,(INV.gold||0)-g0);
+  }
+  if(netNew>0)toast(netNew>1?`${netNew} ENERGY NODES FOUND — LAND AND PRESS [E] TO ENERGIZE`:'ENERGY NODE FOUND — LAND AND PRESS [E] TO ENERGIZE');
   if(b&&b.landable)updatePlanetProgress(b);
 }
 
