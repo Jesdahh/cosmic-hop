@@ -763,6 +763,9 @@ body.photoMode #ui{opacity:0!important}
   #mProg::after{content:' · MORE ›';opacity:.6;font-weight:700;letter-spacing:.06em}
   #missionCard.open #mProg::after{content:' · JOURNAL ›'}
 }
+/* --- Hidden start screen must never catch taps (its buttons set pointer-events:auto) --- */
+#start.bye,#start.bye *{pointer-events:none!important}
+#start.bye{visibility:hidden;transition:opacity .5s,visibility 0s linear .5s}
 </style>
 </head>
 <body>
@@ -8105,6 +8108,7 @@ async function boot(){
   };
   window.__startPlaying=startPlaying;
   playBtn.addEventListener('click',()=>{
+    if(started)return;
     let hasSave=false;try{hasSave=!!localStorage.getItem('cosmic_hop_gf_save');}catch(_){}
     if(!hasSave){startPlaying(false);return;}
     SFX.init();
@@ -8114,7 +8118,7 @@ async function boot(){
       {label:'ERASE & START NEW',cls:'void',fn:()=>{try{localStorage.removeItem('cosmic_hop_gf_save');}catch(_){}startPlaying(false);}}
     ]);
   });
-  contBtn.addEventListener('click',()=>startPlaying(true));
+  contBtn.addEventListener('click',()=>{if(!started)startPlaying(true);});
 }
 boot().catch(err=>{console.error(err);const e=$('err');e.hidden=false;e.textContent='Could not start: '+(err&&err.message||err);playBtn.textContent='OOPS';});
 
