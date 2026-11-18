@@ -1,4 +1,4 @@
-const CACHE='cosmic-hop-gf-v3';
+const CACHE='cosmic-hop-gf-v4';
 const CORE=['./','./index.html'];
 self.addEventListener('install',e=>{
   e.waitUntil(caches.open(CACHE).then(c=>c.addAll(CORE)).then(()=>self.skipWaiting()));
