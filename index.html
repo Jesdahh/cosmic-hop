@@ -8839,7 +8839,7 @@ const MP_LIB='https://cdn.jsdelivr.net/npm/trystero@0.26.0/+esm',MP_APP='cosmic-
 /* TURN relay: lets players on different networks (strict NAT/CGNAT) connect. Metered free
    tier relays only the traffic that can't go peer-to-peer. Swap in a new key to rotate. */
 const MP_TURN='https://cosmichop.metered.live/api/v1/turn/credentials?apiKey=3bec441ac0ca95ca80c0725ad9de396a06c2';
-const MP={lib:null,room:null,kind:null,code:null,sys:null,peers:new Map(),sendSt:null,sendEmo:null,timer:null,joining:false,ice:null,iceT:0};
+const MP={lib:null,room:null,kind:null,code:null,sys:null,peers:new Map(),sendSt:null,sendEmo:null,timer:null,joining:false,ice:null,iceT:0,relay:new Map(),lastSig:'',lastSent:0,tick:0,sent:0,scanT:0};
 async function mpIceServers(){
   if(MP.ice&&Date.now()-MP.iceT<1800000)return MP.ice;
   let cfg=MP_TURN;try{cfg=localStorage.getItem('cosmic_hop_turn')||cfg;}catch(_){}
@@ -8874,6 +8874,41 @@ function mpState(){
   }
   return st;
 }
+/* Quota saver: peers whose selected ICE pair is a TURN relay get 5 Hz instead of 10 Hz,
+   and an unchanging state only needs a 2 Hz heartbeat. Direct peers are unaffected. */
+async function mpScanRelay(){
+  const room=MP.room;if(!room||typeof room.getPeers!=='function')return;
+  let peers;try{peers=room.getPeers();}catch(_){return;}
+  for(const id of Object.keys(peers)){
+    const pc=peers[id];
+    if(!pc||typeof pc.getStats!=='function')continue;
+    try{
+      const stats=await pc.getStats();let pair=null;
+      stats.forEach(r=>{if(r.type==='candidate-pair'&&r.state==='succeeded'&&r.nominated)pair=pair||r;});
+      if(!pair)stats.forEach(r=>{if(!pair&&r.type==='candidate-pair'&&r.state==='succeeded')pair=r;});
+      if(!pair)continue;
+      const lc=stats.get?stats.get(pair.localCandidateId):null;
+      MP.relay.set(id,!!(lc&&lc.candidateType==='relay'));
+    }catch(_){}
+  }
+}
+function mpSyncTick(){
+  if(!MP.room||!started||!MP.sendSt)return;
+  const now=performance.now();
+  if(now-MP.scanT>4000){MP.scanT=now;mpScanRelay();}
+  const st=mpState(),sig=JSON.stringify(st);
+  const changed=sig!==MP.lastSig;
+  if(!changed&&now-MP.lastSent<500)return;
+  MP.lastSig=sig;MP.lastSent=now;MP.tick++;
+  let ids=[];
+  try{if(MP.room.getPeers)ids=Object.keys(MP.room.getPeers());}catch(_){}
+  if(!ids.length){MP.sent++;MP.sendSt(st).catch(()=>{});return;}
+  for(const id of ids){
+    if(MP.relay.get(id)&&MP.tick%2)continue;
+    MP.sent++;
+    MP.sendSt(st,{target:id}).catch(()=>{});
+  }
+}
 function mpMakePeer(id){
   const sh=buildShip();scene.add(sh.group);sh.group.visible=false;
   const as=buildAstro();scene.add(as.group);as.group.visible=false;
@@ -8883,6 +8918,7 @@ function mpMakePeer(id){
 }
 function mpDropPeer(id){
   const P=MP.peers.get(id);if(!P)return;
+  MP.relay.delete(id);
   scene.remove(P.ship.group);scene.remove(P.astro.group);P.tag.remove();MP.peers.delete(id);
   if(P.st&&P.announced)toast(`👋 ${mpClean(P.st.n)} LEFT`);
   mpRenderPanel();
@@ -8936,12 +8972,11 @@ async function mpJoin(kind,code){
     MP.room=room;MP.kind=kind;MP.code=code||null;MP.sys=activeSystemId;
     const st=room.makeAction('st'),emo=room.makeAction('emo'),chat=room.makeAction('chat');
     st.onMessage=mpOnState;emo.onMessage=mpOnEmo;chat.onMessage=mpOnChat;
-    MP.sendSt=d=>st.send(d);MP.sendEmo=d=>emo.send(d);MP.sendChat=d=>chat.send(d);
+    MP.sendSt=(d,o)=>st.send(d,o);MP.sendEmo=d=>emo.send(d);MP.sendChat=d=>chat.send(d);
     room.onPeerJoin=id=>{if(MP.sendSt)st.send(mpState(),{target:id}).catch(()=>{});mpRenderPanel();};
     room.onPeerLeave=id=>mpDropPeer(id);
     clearInterval(MP.timer);
-    MP.timer=setInterval(()=>{if(!MP.room||!started)return;
-      MP.sendSt(mpState()).catch(()=>{});},100);
+    MP.timer=setInterval(mpSyncTick,100);
     try{localStorage.setItem('cosmic_hop_mp_name',mpClean($('mpName').value));}catch(_){}
     mpRenderPanel();
     toast(code?`LOBBY ${code} READY — SHARE THE CODE!`:'LOBBY READY');
@@ -8952,6 +8987,7 @@ function mpLeave(quiet){
   clearInterval(MP.timer);MP.timer=null;
   if(MP.room){try{MP.room.leave();}catch(_){}}
   MP.room=null;MP.sendSt=null;MP.sendEmo=null;MP.sendChat=null;mpChatClose();
+  MP.relay.clear();MP.lastSig='';MP.lastSent=0;MP.tick=0;MP.scanT=0;
   for(const id of [...MP.peers.keys()]){const P=MP.peers.get(id);P.announced=false;mpDropPeer(id);}
   if(!quiet){MP.kind=null;MP.code=null;toast('LEFT MULTIPLAYER');}
   mpRenderPanel();
@@ -9004,6 +9040,7 @@ function mpFlyTo(id){
 }
 window.__mpTurn={
   get:()=>mpIceServers(),
+  net:()=>({tick:MP.tick,sent:MP.sent,peers:MP.peers.size,relayPeers:[...MP.relay].filter(x=>x[1]).map(x=>x[0])}),
   set:v=>{try{v?localStorage.setItem('cosmic_hop_turn',v):localStorage.removeItem('cosmic_hop_turn');}catch(_){}MP.ice=null;MP.iceT=0;return 'ok';},
   test:async()=>{
     const ice=await mpIceServers();if(!ice.length)return {relay:0,note:'no TURN configured'};
