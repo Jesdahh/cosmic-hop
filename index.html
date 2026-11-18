@@ -665,7 +665,7 @@ body.photoMode #ui{opacity:0!important}
 .warpBtn.wp{background:rgba(255,210,63,.12);border-color:rgba(255,210,63,.45);color:#ffe9a8}
 .warpBtn:disabled{opacity:.4}
 .uCard.equipped{background:rgba(160,107,255,.12);outline:1px solid rgba(190,150,255,.55);outline-offset:-1px}
-.shopPrev{background:radial-gradient(circle at 50% 40%,#12294e,#050b18);border:1px solid rgba(96,200,255,.2);border-radius:12px}
+.shopPrev{background:radial-gradient(circle at 50% 42%,#25406e,#060d1c);border:1px solid rgba(96,200,255,.22);border-radius:12px}
 .jBadge{background:rgba(93,242,192,.14);border:1px solid rgba(93,242,192,.45);color:#c9ffef;font-family:var(--sans);font-size:9.5px}
 .sysHeader{color:#bfefff;border-bottom:1px solid rgba(96,200,255,.3);font-size:20px}
 .pDot{border:0;box-shadow:0 0 8px currentColor}
@@ -4569,23 +4569,154 @@ function loadHull(sk){
 }
 function hullShot(sk,proto){
   try{
-    const W=300,Hh=180,r=new THREE.WebGLRenderer({antialias:true,alpha:true,preserveDrawingBuffer:true});
-    r.setPixelRatio(1);r.setSize(W,Hh,false);r.toneMapping=THREE.NoToneMapping;
-    const sc=new THREE.Scene(),m=proto.clone(true);
-    m.rotation.y=-0.6;m.rotation.x=0.1;
-    sc.add(m);
-    sc.add(new THREE.HemisphereLight(0xcfe0ff,0x4a3a78,2.4));
-    const d=new THREE.DirectionalLight(0xfff2e2,2.6);d.position.set(4,6,-3);sc.add(d);
-    const rim=new THREE.DirectionalLight(0x39d7ff,1.6);rim.position.set(-5,1,4);sc.add(rim);
-    const cam=new THREE.PerspectiveCamera(32,W/Hh,0.1,60);
-    cam.position.set(2.9,1.65,-2.9);cam.lookAt(0,0.03,0);
-    r.render(sc,cam);
-    HULL_SHOTS[sk.id]=r.domElement.toDataURL('image/png');
-    r.dispose();if(r.forceContextLoss)r.forceContextLoss();
+    const g=new THREE.Group(),p=proto.clone(true);
+    p.rotation.set(0.1,-0.6,0);g.add(p);
+    HULL_SHOTS[sk.id]=thumbShot(g,[0.66,0.38,-0.66],1.1);
     const el=document.getElementById('hullPrev_'+sk.id);
     if(el)el.innerHTML=`<img class="hullPrev" src="${HULL_SHOTS[sk.id]}" alt="">`;
   }catch(err){console.warn('[cosmic-hop] hull preview skipped',err);}
 }
+/* ---- Star Bazaar 3D thumbnails: every catalogue item is rendered from its real in-game mesh ---- */
+const THUMB={W:340,H:170,r:null,scene:null,cam:null,cache:{},q:[],pend:new Set(),timer:0};
+const _tB=new THREE.Box3(),_tC=new THREE.Vector3(),_tD=new THREE.Vector3();
+function thumbStart(){
+  if(THUMB.r)return;
+  const r=new THREE.WebGLRenderer({antialias:true,alpha:true,preserveDrawingBuffer:true});
+  r.setPixelRatio(1);r.setSize(THUMB.W,THUMB.H,false);r.toneMapping=THREE.NoToneMapping;
+  THUMB.r=r;THUMB.cam=new THREE.PerspectiveCamera(32,THUMB.W/THUMB.H,0.05,90);
+  const sc=new THREE.Scene();
+  sc.add(new THREE.HemisphereLight(0xcfe0ff,0x4a3a78,0.62));
+  const key=new THREE.DirectionalLight(0xfff2e2,1.9);key.position.set(3.4,5,-3.6);sc.add(key);
+  const rim=new THREE.DirectionalLight(0x39d7ff,1.0);rim.position.set(-4.5,1.2,3.2);sc.add(rim);
+  const fill=new THREE.DirectionalLight(0xffd9f2,0.28);fill.position.set(-2,-3,-4);sc.add(fill);
+  const head=new THREE.DirectionalLight(0xffffff,1.0);sc.add(head);sc.add(head.target);THUMB.head=head;
+  THUMB.scene=sc;
+}
+function thumbFit(obj,dir,pad,focus){
+  const cam=THUMB.cam;
+  obj.updateWorldMatrix(true,true);
+  _tB.setFromObject(obj);_tB.getCenter(_tC);_tD.set(dir[0],dir[1],dir[2]).normalize();
+  if(focus&&focus.y!==undefined)_tC.y=focus.y;
+  cam.aspect=THUMB.W/THUMB.H;
+  cam.position.copy(_tC).add(_tD);cam.lookAt(_tC);cam.updateMatrixWorld(true);
+  const tv=Math.tan(cam.fov*Math.PI/360),th=tv*cam.aspect,m=cam.matrixWorld.elements;
+  const rx=m[0],ry=m[1],rz=m[2],ux=m[4],uy=m[5],uz=m[6];let d=0;
+  const acc=(px,py,pz)=>{
+    const need=Math.max(Math.abs(px*rx+py*ry+pz*rz)/th,Math.abs(px*ux+py*uy+pz*uz)/tv)+(px*_tD.x+py*_tD.y+pz*_tD.z);
+    if(need>d)d=need;
+  };
+  const v=new THREE.Vector3(),w=new THREE.Vector3(),sc=new THREE.Vector3();
+  obj.traverse(o=>{
+    if(o.isMesh&&o.geometry&&o.geometry.attributes&&o.geometry.attributes.position){
+      const p=o.geometry.attributes.position,step=Math.max(1,Math.ceil(p.count/900));
+      for(let i=0;i<p.count;i+=step){v.fromBufferAttribute(p,i).applyMatrix4(o.matrixWorld);acc(v.x-_tC.x,v.y-_tC.y,v.z-_tC.z);}
+    }else if(o.isSprite){
+      o.getWorldPosition(w);o.getWorldScale(sc);
+      const h=Math.max(sc.x,sc.y)*0.5;
+      acc(w.x-_tC.x-h,w.y-_tC.y-h,w.z-_tC.z);acc(w.x-_tC.x+h,w.y-_tC.y+h,w.z-_tC.z);
+    }
+  });
+  d=Math.max(0.5,d*(pad||1.04)/((focus&&focus.k)||1));
+  cam.position.copy(_tC).addScaledVector(_tD,d);cam.lookAt(_tC);
+  cam.near=Math.max(0.02,d*0.02);cam.far=d*4+40;cam.updateProjectionMatrix();cam.updateMatrixWorld(true);
+  if(THUMB.head){THUMB.head.position.copy(cam.position);THUMB.head.target.position.copy(_tC);THUMB.head.target.updateMatrixWorld(true);}
+}
+function thumbShot(obj,dir,pad,focus,ol){
+  thumbStart();THUMB.scene.add(obj);
+  const k=ol===undefined?1:ol;
+  const ob=[OL_BIG.uniforms.uBase.value,OL_BIG.uniforms.uGrow.value,OL_BIG.uniforms.uMax.value,OL_PROP.uniforms.uBase.value,OL_PROP.uniforms.uGrow.value,OL_PROP.uniforms.uMax.value];
+  try{
+    OL_BIG.uniforms.uBase.value=0.06*k;OL_BIG.uniforms.uGrow.value=0.0024*k;OL_BIG.uniforms.uMax.value=0.17*k;
+    OL_PROP.uniforms.uBase.value=0.035*k;OL_PROP.uniforms.uGrow.value=0.0016*k;OL_PROP.uniforms.uMax.value=0.11*k;
+    thumbFit(obj,dir,pad,focus);THUMB.r.render(THUMB.scene,THUMB.cam);return THUMB.r.domElement.toDataURL('image/png');
+  }
+  finally{
+    OL_BIG.uniforms.uBase.value=ob[0];OL_BIG.uniforms.uGrow.value=ob[1];OL_BIG.uniforms.uMax.value=ob[2];
+    OL_PROP.uniforms.uBase.value=ob[3];OL_PROP.uniforms.uGrow.value=ob[4];OL_PROP.uniforms.uMax.value=ob[5];
+    THUMB.scene.remove(obj);
+  }
+}
+function thumbShipObj(id){
+  const g=new THREE.Group(),model=new THREE.Group();g.add(model);
+  const cone=(r,h)=>{const c=new THREE.ConeGeometry(r,h,10);c.translate(0,h/2,0);c.rotateX(Math.PI/2);return c;};
+  const flame=new THREE.Group();flame.position.set(0,0,2.05);
+  flame.add(new THREE.Mesh(cone(0.34,1.7),new THREE.MeshBasicMaterial({color:0xff7a1e})),new THREE.Mesh(cone(0.2,1.15),new THREE.MeshBasicMaterial({color:0xfff07a})));
+  flame.scale.set(0.9,0.9,0.5);
+  model.add(flame);
+  dressShip(model,flame,id);
+  return g;
+}
+function thumbAstroObj(id){const A=buildAstro();A.group.visible=true;dressAstro(A,id);return A.group;}
+function thumbTrailObj(it){
+  const g=new THREE.Group(),sh=thumbShipObj(SHIP_SKINS[0].id);g.add(sh);
+  const T={rainbow:['dot',[0xff4d6d,0xffd23f,0x5df2c0,0x39c6ff],1],
+    stars:['star',[0xfff07a,0xffd23f,0xffe066,0xfff4dc],1],
+    hearts:['heart',[0xff4d6d,0xff9db2,0xff4d6d,0xff9db2],0],
+    flames:['flame',[0xffd23f,0xff922b,0xff7a1e,0xff4d21],1],
+    pixels:['square',[0xff4d6d,0xffd23f,0x5df2c0,0x39c6ff,0xc77dff,0xff922b],0]}[it.id];
+  if(!T)return sh;
+  for(let i=0;i<5;i++){
+    const s=new THREE.Sprite(new THREE.SpriteMaterial({map:fxTex(T[0]),color:T[1][i%T[1].length],transparent:true,depthWrite:false,blending:T[2]?THREE.AdditiveBlending:THREE.NormalBlending}));
+    s.position.set((i%2?0.11:-0.11)*(1+i*0.35),0.07*Math.sin(i*2.1),2.55+i*0.62);
+    s.scale.setScalar(1.15-i*0.09);
+    g.add(s);
+  }
+  return g;
+}
+function thumbStepsObj(it){
+  const g=new THREE.Group(),A=buildAstro();A.group.visible=true;g.add(A.group);
+  const ground=new THREE.Mesh(new THREE.CircleGeometry(0.6,28),toon(0x9c93b8));
+  ground.rotation.x=-Math.PI/2;ground.position.y=-0.01;g.add(ground);
+  const add=(tex,col,x,z,sc,add_) => {const s=new THREE.Sprite(new THREE.SpriteMaterial({map:fxTex(tex),color:col,transparent:true,depthWrite:false,blending:add_?THREE.AdditiveBlending:THREE.NormalBlending,opacity:0.95}));s.position.set(x,0.06,z);s.scale.setScalar(sc);g.add(s);};
+  if(it.id==='flowers'){const cs=[0xffafcc,0xc77dff,0xffd6e0,0xe6ff7a];for(let i=0;i<4;i++)add('flower',cs[i],(i%2?-1:1)*0.08,0.16+i*0.16,0.3);}
+  else if(it.id==='sparks'){for(let i=0;i<7;i++)add('star',0xffd23f,(i%3-1)*0.17+((i%2)?0.04:-0.04),0.1+i*0.09,0.15+(i%3)*0.05,true);}
+  else{for(let i=0;i<4;i++)add('print',0x2b2d42,(i%2?0.07:-0.07),0.12+i*0.17,0.22);}
+  return g;
+}
+function thumbMake(key){
+  const i=key.indexOf(':'),kind=key.slice(0,i),id=key.slice(i+1);
+  if(kind==='ship'){
+    const sk=SHIP_SKINS.find(s=>s.id===id);if(!sk||sk.model)return null;
+    return thumbShot(thumbShipObj(id),[0.92,0.36,-0.3],1.1);
+  }
+  if(kind==='astro'){
+    if(!ASTRO_SKINS.some(s=>s.id===id))return null;
+    return thumbShot(thumbAstroObj(id),[0.4,0.26,-0.95],1.08);
+  }
+  if(kind==='pet'){if(!PET_ITEMS.some(p=>p.id===id))return null;return thumbShot(buildPet(id),[0.5,0.36,-0.8],1.1,null,0.3);}
+  if(kind==='style'){
+    const it=STYLE_ITEMS.find(s=>s.id===id);if(!it)return null;
+    if(it.slot==='trail')return thumbShot(thumbTrailObj(it),[0.9,0.3,0.3],1.07);
+    if(it.slot==='steps')return thumbShot(thumbStepsObj(it),[0.72,0.42,0.55],1.1);
+    const A=buildAstro();A.group.visible=true;
+    if(it.slot==='hat'){applyAstroStyle(A,it.id,'');return thumbShot(A.group,[0.42,0.26,-0.9],1.04,{y:0.8,k:1.85});}
+    applyAstroStyle(A,'',it.id);return thumbShot(A.group,[0.55,0.34,0.78],1.02,{y:0.52,k:1.32});
+  }
+  return null;
+}
+function thumbApply(key,url){for(const el of document.querySelectorAll('[data-thumb="'+key+'"]'))el.innerHTML=`<img class="hullPrev" src="${url}" alt="">`;}
+function thumbKick(){if(THUMB.timer||!THUMB.q.length)return;THUMB.timer=setTimeout(thumbPump,50);}
+function thumbPump(){
+  THUMB.timer=0;
+  try{
+    const key=THUMB.q.shift();
+    if(key){const url=thumbMake(key);if(url){THUMB.cache[key]=url;thumbApply(key,url);}}
+  }catch(err){console.warn('[cosmic-hop] 3D thumb skipped',err);}
+  thumbKick();
+}
+function thumbQueue(key){
+  if(THUMB.cache[key]!==undefined||THUMB.pend.has(key))return;
+  THUMB.pend.add(key);THUMB.q.push(key);thumbKick();
+}
+setInterval(()=>{if(THUMB.q.length)thumbKick();},400);
+function thumbAttach(root){
+  root.querySelectorAll('[data-thumb]').forEach(el=>{
+    const key=el.dataset.thumb,url=THUMB.cache[key];
+    if(url)el.innerHTML=`<img class="hullPrev" src="${url}" alt="">`;
+    else thumbQueue(key);
+  });
+}
+window.__dbg={THUMB,thumbMake,thumbShipObj,thumbFit,thumbShot,thumbStart,thumbQueue,syncThumb:()=>thumbMake('ship:classic')};
 /* ---- Unlockable ship cosmetics: plasma tints and rotating auras ---- */
 const SHIP_COSMETICS=[
   {id:'plasma_azure',name:'AZURE PLASMA',kind:'plasma',f1:0x39c6ff,f2:0xd8fbff,hint:'complete 3 diplomatic exchanges',need:()=>GAME.diplomacy>=3},
@@ -5353,13 +5484,15 @@ function renderShop(){
   const isShip=shopTab==='ship',list=isShip?SHIP_SKINS:ASTRO_SKINS,owned=isShip?SKIN.ownedShip:SKIN.ownedAstro,cur=isShip?SKIN.ship:SKIN.astro;
   for(const k of list){
     const has=owned.includes(k.id),eq=cur===k.id,afford=gold>=k.price,locked=!!k.locked&&!has;
+    const tkey=(isShip&&k.model)?'':(isShip?'ship:':'astro:')+k.id;
     const card=document.createElement('div');card.className='uCard'+(eq?' equipped':'');
-    card.innerHTML=`<div><div class="shopPrev">${isShip?shipPrev(k):astroSvg(k)}</div>
+    card.innerHTML=`<div><div class="shopPrev" data-thumb="${tkey}">${isShip?shipPrev(k):astroSvg(k)}</div>
       <div class="uTitle" style="margin-top:8px"><span>${k.name}</span><span class="uLvl">${locked?'REWARD':k.price?k.price+' 🪙':'FREE'}</span></div>
       <div class="uDesc" style="margin-top:4px">${k.desc}</div></div>
       <button class="uBtn${has?'':' buy'}" data-skin="${k.id}" ${eq||(!has&&(!afford||locked))?'disabled':''}>${eq?'★ EQUIPPED':locked?'ETERNAL BLOOM REWARD':has?'EQUIP':afford?'BUY · '+k.price+' <svg class="ic"><use href="#i-coin"/></svg>':'NEED '+(k.price-gold)+' MORE <svg class="ic"><use href="#i-coin"/></svg>'}</button>`;
     grid.appendChild(card);
   }
+  thumbAttach(grid);
   grid.querySelectorAll('[data-skin]').forEach(b=>b.addEventListener('click',()=>{
     const id=b.dataset.skin,k=list.find(s=>s.id===id);
     if(k.locked&&!owned.includes(id)){toast(k.id==='goldenbloom'?'RESTORE THE ETERNAL BLOOM TO EARN THE GOLDEN BLOOM SKIN':'REACH EXPLORER RANK III TO EARN THE VOIDLIGHT ENVOY SKIN');return;}
@@ -8639,7 +8772,7 @@ function petPrev(it){const c=it.col;let s='';
 const coinIc='<svg class="ic"><use href="#i-coin"/></svg>';
 function buyFor(price,fn){if((INV.gold||0)<price){toast('NOT ENOUGH COINS');return false;}INV.gold-=price;fn();SFX.coin();SFX.upgrade();updateResHUD();saveGame(true);return true;}
 function renderShop2(grid,gold){
-  const card=(prev,name,tag,desc,btns,eq)=>{const d=document.createElement('div');d.className='uCard'+(eq?' equipped':'');d.innerHTML=`<div>${prev}<div class="uTitle" style="margin-top:8px"><span>${name}</span><span class="uLvl">${tag}</span></div><div class="uDesc" style="margin-top:4px">${desc}</div></div><div style="display:flex;gap:6px">${btns}</div>`;grid.appendChild(d);};
+  const card=(prev,name,tag,desc,btns,eq,key)=>{const d=document.createElement('div');d.className='uCard'+(eq?' equipped':'');d.innerHTML=`<div>${prev}<div class="uTitle" style="margin-top:8px"><span>${name}</span><span class="uLvl">${tag}</span></div><div class="uDesc" style="margin-top:4px">${desc}</div></div><div style="display:flex;gap:6px">${btns}</div>`;if(key){const p=d.querySelector('.shopPrev');if(p)p.dataset.thumb=key;}grid.appendChild(d);};
   const head=t=>{const h=document.createElement('div');h.style.cssText='grid-column:1/-1;font-family:var(--display);font-size:20px;letter-spacing:.06em;color:#ffd23f;margin-top:4px';h.textContent=t;grid.appendChild(h);};
   const need=p=>`NEED ${p-gold} MORE ${coinIc}`;
   if(shopTab==='gear'){
@@ -8653,11 +8786,11 @@ function renderShop2(grid,gold){
     for(const [slot,title] of [['hat','HELMETS & HATS'],['back','BACKPACKS & CAPES'],['trail','ENGINE TRAILS'],['steps','FOOTSTEP EFFECTS']]){
       head(title);
       for(const it of STYLE_ITEMS.filter(s=>s.slot===slot)){const own=SHOP2.own.includes(it.id),eq=SHOP2.eq[slot]===it.id;
-        card(stylePrev(it),it.name,own?'OWNED':it.price+' 🪙',it.desc,own?`<button class="uBtn${eq?'':' buy'}" data-style="${it.id}">${eq?'★ EQUIPPED — TAP TO REMOVE':'EQUIP'}</button>`:`<button class="uBtn buy" data-style="${it.id}" ${gold>=it.price?'':'disabled'}>${gold>=it.price?'BUY · '+it.price+' '+coinIc:need(it.price)}</button>`,eq);}
+        card(stylePrev(it),it.name,own?'OWNED':it.price+' 🪙',it.desc,own?`<button class="uBtn${eq?'':' buy'}" data-style="${it.id}">${eq?'★ EQUIPPED — TAP TO REMOVE':'EQUIP'}</button>`:`<button class="uBtn buy" data-style="${it.id}" ${gold>=it.price?'':'disabled'}>${gold>=it.price?'BUY · '+it.price+' '+coinIc:need(it.price)}</button>`,eq,'style:'+it.id);}
     }
   }else if(shopTab==='pets'){
     for(const it of PET_ITEMS){const own=SHOP2.own.includes('pet_'+it.id),eq=SHOP2.eq.pet===it.id;
-      card(petPrev(it),it.name,own?'OWNED':it.price+' 🪙',it.desc+' Follows you when you explore on foot.',own?`<button class="uBtn${eq?'':' buy'}" data-pet="${it.id}">${eq?'★ WITH YOU — TAP TO SEND HOME':'TAKE ALONG'}</button>`:`<button class="uBtn buy" data-pet="${it.id}" ${gold>=it.price?'':'disabled'}>${gold>=it.price?'ADOPT · '+it.price+' '+coinIc:need(it.price)}</button>`,eq);}
+      card(petPrev(it),it.name,own?'OWNED':it.price+' 🪙',it.desc+' Follows you when you explore on foot.',own?`<button class="uBtn${eq?'':' buy'}" data-pet="${it.id}">${eq?'★ WITH YOU — TAP TO SEND HOME':'TAKE ALONG'}</button>`:`<button class="uBtn buy" data-pet="${it.id}" ${gold>=it.price?'':'disabled'}>${gold>=it.price?'ADOPT · '+it.price+' '+coinIc:need(it.price)}</button>`,eq,'pet:'+it.id);}
   }else{
     for(const it of BOOST_ITEMS){const have=INV[it.id]||0,active=it.id==='dbl'&&dblOn();
       card(prevIcon(it.icon,it.col),it.name,'HAVE '+have,it.desc+(active?' <b style="color:#ffd23f">ACTIVE NOW!</b>':''),
@@ -8677,6 +8810,7 @@ function renderShop2(grid,gold){
     if(id==='dbl'){SHOP2.dblUntil=Date.now()+300000;comicPop('2× COINS!','#ffd23f',50,34);toast('DOUBLE COINS FOR 5 MINUTES!');SFX.discover();}
     else if(id==='beacon'){const home=bodies.find(x=>x.name==='TERRA');closeModals();if(home)triggerHyperspaceTransition(home,home.sys!==activeSystemId);toast('RETURN BEACON — WARPING HOME!');}
     updateResHUD();saveGame(true);if(id!=='beacon')renderShop();}));
+  thumbAttach(grid);
 }
 function shapeSvg(k){const c=hexCss;
   if(k.shape==='ufo')return `<svg viewBox="0 0 100 60"><ellipse cx="50" cy="26" rx="18" ry="14" fill="${c(k.glass)}" stroke="#170f24" stroke-width="3"/><ellipse cx="50" cy="34" rx="44" ry="11" fill="${c(k.body)}" stroke="#170f24" stroke-width="3"/><ellipse cx="50" cy="34" rx="44" ry="3" fill="${c(k.str)}"/>${[22,36,50,64,78].map(x=>`<circle cx="${x}" cy="40" r="3" fill="${c(k.acc)}"/>`).join('')}</svg>`;
