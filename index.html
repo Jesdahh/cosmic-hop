@@ -8836,11 +8836,9 @@ addEventListener('keydown',e=>{
 // SHOP2-END
 /* ---- MULTIPLAYER: peer-to-peer rooms (private codes + public skies per star system) ---- */
 const MP_LIB='https://cdn.jsdelivr.net/npm/trystero@0.26.0/+esm',MP_APP='cosmic-hop.pages.dev/gf',MP_MAX=8;
-/* Optional TURN relay (needed for players on different networks behind strict NAT).
-   Paste a Metered Open Relay credentials URL (free: 20 GB/month) or a JSON array of
-   iceServers here, e.g. MP_TURN='https://yourapp.metered.live/api/v1/turn/credentials?apiKey=KEY'.
-   Can also be overridden at runtime: localStorage.setItem('cosmic_hop_turn', <same value>). */
-const MP_TURN='';
+/* TURN relay: lets players on different networks (strict NAT/CGNAT) connect. Metered free
+   tier relays only the traffic that can't go peer-to-peer. Swap in a new key to rotate. */
+const MP_TURN='https://cosmichop.metered.live/api/v1/turn/credentials?apiKey=3bec441ac0ca95ca80c0725ad9de396a06c2';
 const MP={lib:null,room:null,kind:null,code:null,sys:null,peers:new Map(),sendSt:null,sendEmo:null,timer:null,joining:false,ice:null,iceT:0};
 async function mpIceServers(){
   if(MP.ice&&Date.now()-MP.iceT<1800000)return MP.ice;
