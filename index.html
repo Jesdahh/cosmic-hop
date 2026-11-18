@@ -655,6 +655,11 @@ body.photoMode #ui{opacity:0!important}
 #confirmModal .mCard{border-color:rgba(255,120,140,.35)}
 #confirmModal .mHead{background:rgba(48,12,22,.55)}
 .qBtns .hudBtn.sel{background:rgba(90,215,255,.2);border-color:rgba(120,230,255,.7);color:#c8f2ff}
+.sHead{font-family:var(--display);font-size:20px;letter-spacing:.08em;color:#ffd23f;margin:16px 0 4px;padding-top:10px;border-top:1px solid rgba(120,220,255,.18)}
+.sRow{flex-wrap:wrap}
+.sRow .sVal{min-width:44px;text-align:right;font-weight:800;color:#c8f2ff}
+.qBtns .hudBtn{font-size:13px;padding:6px 10px}
+@media (max-width:560px){.sRow label{flex:1 1 100%}.sRow input[type=range]{max-width:none}}
 
 /* --- Responsive --- */
 @media (max-width:900px){
@@ -1060,7 +1065,7 @@ body.photoMode #ui{opacity:0!important}
 <div id="settingsModal" class="modal">
   <div class="mCard" style="width:min(560px,96vw)">
     <div class="mHead">
-      <h2><svg class="ic"><use href="#i-settings"/></svg> SOUND &amp; PERFORMANCE</h2>
+      <h2><svg class="ic"><use href="#i-settings"/></svg> SETTINGS</h2>
       <button class="hudBtn" id="closeSettings" style="background:var(--pop);color:#fff" aria-label="Close"><svg class="ic"><use href="#i-close"/></svg></button>
     </div>
     <div class="mBody">
@@ -1070,6 +1075,17 @@ body.photoMode #ui{opacity:0!important}
       <div class="sRow"><label>DYNAMIC RESOLUTION</label><div class="qBtns"><button class="hudBtn" id="btnDynRes" type="button">ON</button></div></div>
       <div class="sRow"><label>FPS INDICATOR</label><div class="qBtns"><button class="hudBtn" id="btnFps" type="button">OFF</button></div></div>
       <p class="sNote">Keeps the frame rate smooth by lowering the resolution briefly when the game struggles, then restoring it. Graphics quality and saving live in the Journal.</p>
+      <div class="sHead">CONTROLS</div>
+      <div class="sRow"><label for="ctlLook">TOUCH LOOK / STEER SPEED</label><input type="range" id="ctlLook" min="30" max="250" step="5"><span class="sVal" id="ctlLookV"></span></div>
+      <div class="sRow"><label for="ctlStick">JOYSTICK SENSITIVITY</label><input type="range" id="ctlStick" min="60" max="200" step="5"><span class="sVal" id="ctlStickV"></span></div>
+      <div class="sRow"><label for="ctlMouse">MOUSE SENSITIVITY</label><input type="range" id="ctlMouse" min="30" max="250" step="5"><span class="sVal" id="ctlMouseV"></span></div>
+      <div class="sRow"><label>SMOOTH STEERING</label><div class="qBtns" data-ctl="smooth"><button class="hudBtn" type="button" data-v="0">OFF</button><button class="hudBtn" type="button" data-v="1">SOFT</button><button class="hudBtn" type="button" data-v="2">EXTRA</button></div></div>
+      <div class="sRow"><label>JOYSTICK SIZE</label><div class="qBtns" data-ctl="stickSize"><button class="hudBtn" type="button" data-v="S">S</button><button class="hudBtn" type="button" data-v="M">M</button><button class="hudBtn" type="button" data-v="L">L</button></div></div>
+      <div class="sRow"><label>BUTTON SIZE</label><div class="qBtns" data-ctl="btnSize"><button class="hudBtn" type="button" data-v="S">S</button><button class="hudBtn" type="button" data-v="M">M</button><button class="hudBtn" type="button" data-v="L">L</button></div></div>
+      <div class="sRow"><label>INVERT UP / DOWN</label><div class="qBtns" data-ctl="invert"><button class="hudBtn" type="button" data-v="0">OFF</button><button class="hudBtn" type="button" data-v="1">ON</button></div></div>
+      <div class="sRow"><label>VIBRATION</label><div class="qBtns" data-ctl="vibrate"><button class="hudBtn" type="button" data-v="1">ON</button><button class="hudBtn" type="button" data-v="0">OFF</button></div></div>
+      <div class="sRow"><label>&nbsp;</label><div class="qBtns"><button class="hudBtn" id="ctlReset" type="button">RESET CONTROLS</button></div></div>
+      <p class="sNote">Controls are saved on this device. Vibration works on Android phones (iPhones don't allow websites to vibrate).</p>
     </div>
   </div>
 </div>
@@ -4838,6 +4854,27 @@ let lookId=null,lx=0,ly=0,mouseDown=false,boostHeld=false,mineHeld=false,spaceHe
 let modalOpen=false;
 let waypointBody=null;
 const MOUSE_S=0.0023,TOUCH_S=0.0058;
+/* ---- CONTROLS settings: sensitivity, smoothing, joystick/button size, invert, vibration ---- */
+const CTRL_DEF={look:100,mouse:100,stick:100,stickSize:'M',btnSize:'M',smooth:1,invert:false,vibrate:true};
+const CTRL=Object.assign({},CTRL_DEF);
+try{const sv=JSON.parse(localStorage.getItem('cosmic_hop_controls')||'{}');for(const k in CTRL_DEF)if(k in sv&&typeof sv[k]===typeof CTRL_DEF[k])CTRL[k]=sv[k];}catch(_){}
+const CTRL_SIZE={S:0.82,M:1,L:1.2};
+function saveCtrl(){try{localStorage.setItem('cosmic_hop_controls',JSON.stringify(CTRL));}catch(_){}}
+function applyCtrlUI(){stickEl.style.scale=String(CTRL_SIZE[CTRL.stickSize]||1);const b=$('btns');if(b){b.style.transformOrigin='100% 100%';b.style.scale=String(CTRL_SIZE[CTRL.btnSize]||1);}}
+const lookP={x:0,y:0};
+function lookIn(dx,dy){if(CTRL.invert)dy=-dy;if(CTRL.smooth>0){lookP.x+=dx;lookP.y+=dy;}else{look.x+=dx;look.y+=dy;}}
+function lookSmooth(dt){if(!lookP.x&&!lookP.y)return;if(dt<=0)return;const f=1-Math.exp(-dt*(CTRL.smooth>=2?9:18));const tx=lookP.x*f,ty=lookP.y*f;look.x+=tx;look.y+=ty;lookP.x-=tx;lookP.y-=ty;if(Math.abs(lookP.x)<1e-5)lookP.x=0;if(Math.abs(lookP.y)<1e-5)lookP.y=0;}
+function buzz(ms){if(!CTRL.vibrate||!navigator.vibrate)return;if(navigator.userActivation&&!navigator.userActivation.hasBeenActive)return;try{navigator.vibrate(ms);}catch(_){}}
+function renderCtrlUI(){
+  for(const [id,k] of [['ctlLook','look'],['ctlStick','stick'],['ctlMouse','mouse']]){const el=$(id);if(!el)continue;el.value=CTRL[k];$(id+'V').textContent=CTRL[k]+'%';}
+  document.querySelectorAll('[data-ctl]').forEach(g=>{const k=g.dataset.ctl,v=typeof CTRL[k]==='boolean'?(CTRL[k]?'1':'0'):String(CTRL[k]);g.querySelectorAll('[data-v]').forEach(b=>b.classList.toggle('sel',b.dataset.v===v));});
+}
+for(const [id,k] of [['ctlLook','look'],['ctlStick','stick'],['ctlMouse','mouse']]){const el=$(id);if(el)el.addEventListener('input',()=>{CTRL[k]=+el.value;$(id+'V').textContent=CTRL[k]+'%';saveCtrl();});}
+document.querySelectorAll('[data-ctl]').forEach(g=>g.addEventListener('click',e=>{const b=e.target.closest('[data-v]');if(!b)return;e.stopPropagation();const k=g.dataset.ctl,v=b.dataset.v;
+  CTRL[k]=typeof CTRL_DEF[k]==='boolean'?v==='1':typeof CTRL_DEF[k]==='number'?+v:v;if(k==='vibrate'&&CTRL.vibrate)buzz(40);if(k==='smooth'){lookP.x=lookP.y=0;}
+  saveCtrl();applyCtrlUI();renderCtrlUI();if(typeof SFX!=='undefined'&&SFX.ui)SFX.ui();}));
+$('ctlReset').addEventListener('click',e=>{e.stopPropagation();Object.assign(CTRL,CTRL_DEF);lookP.x=lookP.y=0;saveCtrl();applyCtrlUI();renderCtrlUI();toast('CONTROLS RESET TO DEFAULT');});
+applyCtrlUI();renderCtrlUI();
 
 function openModal(id){
   modalOpen=true;$(id).classList.add('open');
@@ -4959,11 +4996,12 @@ canvas.addEventListener('pointerdown',e=>{
 addEventListener('pointermove',e=>{
   if(modalOpen)return;
   if(e.pointerId===stick.id){let dx=e.clientX-stick.cx,dy=e.clientY-stick.cy;const l=Math.hypot(dx,dy),m=56;if(l>m){dx*=m/l;dy*=m/l;}
-    stick.x=dx/m;stick.y=-dy/m;knobEl.style.transform=`translate(${dx}px,${dy}px)`;}
-  else if(e.pointerId===lookId){look.x+=(e.clientX-lx)*TOUCH_S;look.y+=(e.clientY-ly)*TOUCH_S;lx=e.clientX;ly=e.clientY;}
+    const ss=CTRL.stick/100;stick.x=clamp(dx/m*ss,-1,1);stick.y=clamp(-dy/m*ss,-1,1);knobEl.style.transform=`translate(${dx}px,${dy}px)`;}
+  else if(e.pointerId===lookId){const ts=TOUCH_S*CTRL.look/100;lookIn((e.clientX-lx)*ts,(e.clientY-ly)*ts);lx=e.clientX;ly=e.clientY;}
   else if(e.pointerType==='mouse'&&started){
-    if(document.pointerLockElement===canvas){look.x+=e.movementX*MOUSE_S;look.y+=e.movementY*MOUSE_S;}
-    else if(mouseDown){look.x+=e.movementX*MOUSE_S*1.4;look.y+=e.movementY*MOUSE_S*1.4;}}
+    const ms=MOUSE_S*CTRL.mouse/100;
+    if(document.pointerLockElement===canvas){lookIn(e.movementX*ms,e.movementY*ms);}
+    else if(mouseDown){lookIn(e.movementX*ms*1.4,e.movementY*ms*1.4);}}
 });
 function endPointer(e){
   if(e.pointerId===stick.id){stick.id=null;stick.x=stick.y=0;knobEl.style.transform='';stickEl.style.left='';stickEl.style.top='';stickEl.style.bottom='';}
@@ -6104,7 +6142,7 @@ function raiderHitShip(n){
   if(PL.mode!=='fly'||RAIDER.warnT>0)return;
   const dmg=Math.max(6,n-UPGRADES.ship.lvl*1.2);
   camShake=Math.max(camShake,0.55);
-  if(navigator.vibrate&&(!navigator.userActivation||navigator.userActivation.hasBeenActive))navigator.vibrate(20);
+  buzz(25);
   const absorbed=Math.min(PL.shield,dmg);
   PL.shield=Math.max(0,PL.shield-absorbed);
   const bleed=Math.max(2.5,dmg*0.28)+Math.max(0,dmg-absorbed)*0.45;
@@ -7508,7 +7546,7 @@ function hurt(n,msg,quiet,cause){
   if(PL.mode==='walk'||PL.mode==='rover'){if(astroBonus()==='armor')n*=0.7;}else if(shipBonus()==='armor')n*=0.75;
   PL.hp=Math.max(0,PL.hp-n);
   if(!quiet||Math.random()<0.08){const fx=$('hurtFx');fx.classList.remove('go');void fx.offsetWidth;fx.classList.add('go');}
-  if(!quiet)SFX.hurt();
+  if(!quiet){SFX.hurt();buzz(35);}
   if(msg)toast(msg);
   if(PL.hp<=0)knockOut();
 }
@@ -7545,7 +7583,7 @@ function startDeath(cause){
   try{endRaiderWave(false,true);}catch(_){}try{fleeNpcs(true);}catch(_){}
   PL.speed=0;PL.vel.set(0,0,0);ship.flameT=0;input.mine=false;
   if(mode==='rover')exitRover();
-  camShake=Math.max(camShake,1.4);SFX.hurt();
+  camShake=Math.max(camShake,1.4);SFX.hurt();buzz([90,50,160]);
   if(inFlight){
     ship.group.visible=false;
     boom(wpos,0xff7a1e,7);boom(wpos.clone().add(new V3(1.5,1,0)),0xffd23f,4.5);boom(wpos.clone().add(new V3(-1,-1,1)),0xffffff,2.5);
@@ -7647,6 +7685,7 @@ function shipImpact(v,n){
   PL.vel.addScaledVector(n,v*0.55);PL.speed*=0.25;
   PL.shield=Math.max(0,PL.shield-v*0.25);
   comicPop(v>90?'KA-BOOM!!':'CRASH!','#ff4d6d',50,38);
+  buzz(v>90?120:70);
   hurt(clamp((v-25)*0.4*resist,4,70),v>90?'💥 HULL BREACH! SLOW DOWN NEAR PLANETS!':'💥 CRASH! WATCH YOUR SPEED!',false,'CRASHED INTO '+(PL.near?PL.near.name:'A PLANET'));
 }
 function eatFood(){
@@ -7823,6 +7862,7 @@ function frame(dt){
   simT+=dt;uTime.value=simT;
   updateOrbits(simT);
   readInput();
+  lookSmooth(dt);
   SFX.update(dt,audioState());
 
   for(const ast of asteroids){
@@ -8369,6 +8409,7 @@ function updateShop2(dt){
 }
 function renderGearBar(){
   const bar=$('gearBar');if(!bar)return;const m=PL.mode;
+  {const bt=$('btns'),r=bt&&bt.getBoundingClientRect();if(r&&r.height>0){const tops=[...bt.querySelectorAll('.btn')].filter(x=>!x.hidden&&x.offsetParent).map(x=>x.getBoundingClientRect().top);const top=tops.length?Math.min(...tops):r.top;bar.style.bottom=Math.max(10,innerHeight-top+10)+'px';}}
   const ids=!started||PL.dead||modalOpen?[]:(m==='fly'?['afterburner','cloak']:m==='walk'?['grapple','hover']:[]).filter(id=>gearLvl(id));
   const key=ids.join(',');
   if(bar._k!==key){bar._k=key;bar.innerHTML=ids.map(id=>{const it=GEAR_ITEMS.find(g=>g.id===id);const short={afterburner:'BURN',cloak:'CLOAK',grapple:'HOOK',hover:'BOARD'}[id];
@@ -8731,7 +8772,7 @@ $('importFile').addEventListener('change',e=>{
 if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)){
   addEventListener('load',()=>{navigator.serviceWorker.register('./sw.js',{updateViaCache:'none'}).then(r=>r.update()).catch(()=>{});});
 }
-window.__game={SHOP2,G2,gearUse,MP,mpJoin,mpLeave,mpFlyTo,startDeath,CAPSULE,THREE,COINS,SKIN,earnGold,PL,bodies,INV,UPGRADES,MISSIONS,DISCOVERIES,ELYS,GAME,RAIDER,NPC,SFX,GALAXY,get sunShadow(){return sunShadow;},get renderer(){return renderer;},get scene(){return scene;},get ship(){return ship;},get astro(){return astro;},actLand,actExit,warpToBody,switchActiveSystem,triggerScan,handleInteract,keys,look,camera,frame,spawnStormCrystals,clearAllStormCrystals,openBase,openVaultCode,tameCreature,readTreasureMap,placeOutpostOnPlanet,startRaiderWave,endRaiderWave,damageRaider,canSpawnRaider,spawnRaiderBolt,raiderHitShip,spawnNpcConvoy,makeNpcHostile,canSpawnNpc,fleeNpcs,nearestNpc,hailNpc,spawnAnomaly,scanAnomaly,planetaryEvent,updateGalaxy,progressionMeter,systemTier,rareEncounterChance,encounterPace,SHIP_COSMETICS,checkCosmetics,applyShipCosmetic,checkProgression,explorerScore,explorerRankIdx,spawnPOI,handlePOI,updatePlanetProgress,planetPoiTotals,ensureDynOffers,acceptDynMission,dynProgress,makeDynOffer,completeDynMission,startRescue,spawnEscortFleet,spawnDistressShip,renderJournalModal,setJournalTab:t=>{journalTab=t;},saveGame,loadGame,tutActive,CINE,setGfxMode,get gfx(){return{mode:gfxMode,tier:gfxTierName(),post:postOn,shadow:renderer.shadowMap.enabled,scale:dyn.scale,fps:fpsShow,sm:!!(sunShadow.shadow.map),calls:renderer.info.render.calls,tris:renderer.info.render.triangles,geoms:renderer.info.memory.geometries,tex:renderer.info.memory.textures};},dbg:()=>({started,modalOpen,photoMode,cine:CINE.open,tutStep,alt:PL.alt,mode:PL.mode})};
+window.__game={CTRL,lookP,SHOP2,G2,gearUse,MP,mpJoin,mpLeave,mpFlyTo,startDeath,CAPSULE,THREE,COINS,SKIN,earnGold,PL,bodies,INV,UPGRADES,MISSIONS,DISCOVERIES,ELYS,GAME,RAIDER,NPC,SFX,GALAXY,get sunShadow(){return sunShadow;},get renderer(){return renderer;},get scene(){return scene;},get ship(){return ship;},get astro(){return astro;},actLand,actExit,warpToBody,switchActiveSystem,triggerScan,handleInteract,keys,look,camera,frame,spawnStormCrystals,clearAllStormCrystals,openBase,openVaultCode,tameCreature,readTreasureMap,placeOutpostOnPlanet,startRaiderWave,endRaiderWave,damageRaider,canSpawnRaider,spawnRaiderBolt,raiderHitShip,spawnNpcConvoy,makeNpcHostile,canSpawnNpc,fleeNpcs,nearestNpc,hailNpc,spawnAnomaly,scanAnomaly,planetaryEvent,updateGalaxy,progressionMeter,systemTier,rareEncounterChance,encounterPace,SHIP_COSMETICS,checkCosmetics,applyShipCosmetic,checkProgression,explorerScore,explorerRankIdx,spawnPOI,handlePOI,updatePlanetProgress,planetPoiTotals,ensureDynOffers,acceptDynMission,dynProgress,makeDynOffer,completeDynMission,startRescue,spawnEscortFleet,spawnDistressShip,renderJournalModal,setJournalTab:t=>{journalTab=t;},saveGame,loadGame,tutActive,CINE,setGfxMode,get gfx(){return{mode:gfxMode,tier:gfxTierName(),post:postOn,shadow:renderer.shadowMap.enabled,scale:dyn.scale,fps:fpsShow,sm:!!(sunShadow.shadow.map),calls:renderer.info.render.calls,tris:renderer.info.render.triangles,geoms:renderer.info.memory.geometries,tex:renderer.info.memory.textures};},dbg:()=>({started,modalOpen,photoMode,cine:CINE.open,tutStep,alt:PL.alt,mode:PL.mode})};
 </script>
 </body>
 </html>
