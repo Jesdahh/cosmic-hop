@@ -238,6 +238,22 @@ html,body{margin:0;height:100%;overflow:hidden;background:var(--space);color:var
 #tutSkip{display:inline-block;margin-top:3px;font-size:10px;color:#7a6a8a;text-decoration:underline;cursor:pointer}
 #helpModal{z-index:35}
 #mpModal{z-index:36}
+#deathModal{z-index:38;background:radial-gradient(ellipse at center,rgba(60,0,20,.72),rgba(10,0,8,.92))}
+#deathModal .mCard{width:min(560px,94vw);border-color:#ff4d6d;box-shadow:0 0 40px rgba(255,77,109,.35)}
+#deathTitle{font-family:var(--display);font-size:clamp(34px,8vw,54px);letter-spacing:.06em;color:#ff4d6d;text-align:center;margin:4px 0 2px;text-shadow:0 0 18px rgba(255,77,109,.6)}
+#deathCause{text-align:center;font-family:var(--sans);font-weight:800;font-size:14px;letter-spacing:.04em;color:#ffd2dc;margin-bottom:8px}
+#deathLoss{font-family:var(--sans);font-size:12.5px;font-weight:700;line-height:1.5;background:rgba(255,77,109,.08);border:1px solid rgba(255,77,109,.35);border-radius:10px;padding:8px 10px;margin:6px 0 10px}
+#deathCount{text-align:center;font-family:var(--display);font-size:18px;letter-spacing:.06em;margin:6px 0}
+.spawnOpt{display:flex;align-items:center;gap:10px;width:100%;text-align:left;font-family:var(--display);font-size:18px;letter-spacing:.04em;padding:9px 12px;margin:6px 0;border:2px solid var(--ink);border-radius:11px;background:var(--mint);color:var(--ink);cursor:pointer}
+.spawnOpt small{display:block;font-family:var(--sans);font-size:11px;font-weight:700;letter-spacing:0;opacity:.75}
+.spawnOpt[disabled]{opacity:.45;cursor:default;filter:grayscale(.5)}
+.spawnOpt .ic{width:22px;height:22px}
+#lowHpFx{position:fixed;inset:0;pointer-events:none;z-index:4;opacity:0;background:radial-gradient(ellipse at center,rgba(255,0,40,0) 52%,rgba(255,0,40,.5) 100%)}
+#lowHpFx.on{animation:lowPulse .9s ease-in-out infinite}
+@keyframes lowPulse{0%,100%{opacity:.2}45%{opacity:.9}}
+.capTag{position:absolute;left:0;top:0;pointer-events:none;white-space:nowrap;font-family:var(--sans);font-weight:800;font-size:12px;color:#170f24;background:#ffd23f;border:2px solid #170f24;border-radius:9px;padding:2px 8px;will-change:transform;display:none;box-shadow:0 0 12px rgba(255,210,63,.6)}
+.capTag .mpArr{border-left-color:#170f24;filter:none}
+.capTag.edge .mpArr{display:inline-block}
 #mpLog{position:absolute;left:max(12px,env(safe-area-inset-left,0px));bottom:calc(200px + env(safe-area-inset-bottom,0px));width:min(320px,62vw);display:flex;flex-direction:column;gap:3px;pointer-events:none;z-index:6}
 #mpLog div{background:rgba(8,18,38,.78);border:1px solid rgba(199,125,255,.45);border-radius:9px;padding:3px 8px;font-family:var(--sans);font-size:12.5px;font-weight:700;color:#fff;word-break:break-word;transition:opacity .8s}
 #mpLog div b{color:#c77dff;margin-right:4px}
@@ -786,6 +802,7 @@ body.photoMode #ui{opacity:0!important}
 <div id="stormFx"></div>
 <div id="pollenFx"></div>
 <div id="hurtFx"></div>
+<div id="lowHpFx"></div>
 <div id="warpFx"></div>
 <div id="entryFx"></div>
 <div id="photoFlash"></div>
@@ -1100,6 +1117,17 @@ body.photoMode #ui{opacity:0!important}
 <!-- Start Screen -->
 <div id="mpLog"></div>
 <div id="mpChatBar"><div id="mpEmoRow"><button class="mpEmo" data-emo="👋">👋</button><button class="mpEmo" data-emo="🚀">🚀</button><button class="mpEmo" data-emo="😂">😂</button><button class="mpEmo" data-emo="❤️">❤️</button><button class="mpEmo" data-emo="👍">👍</button><button class="mpEmo" id="mpChatX" style="margin-left:auto" aria-label="Close chat"><svg class="ic"><use href="#i-close"/></svg></button></div><input id="mpChatIn" maxlength="80" autocomplete="off" spellcheck="false" placeholder="Say something to your crew…"><button id="mpSend" type="button" aria-label="Send"><svg class="ic"><use href="#i-send"/></svg> SEND</button></div>
+<div id="deathModal" class="modal">
+  <div class="mCard">
+    <div class="mBody">
+      <div id="deathTitle">KNOCKED OUT!</div>
+      <div id="deathCause"></div>
+      <div id="deathLoss"></div>
+      <div id="deathCount"></div>
+      <div id="deathOpts"></div>
+    </div>
+  </div>
+</div>
 <div id="mpModal" class="modal">
   <div class="mCard" style="width:min(640px,96vw)">
     <div class="mHead">
@@ -1463,6 +1491,7 @@ const SFX=(()=>{
     eat(){if(fx('eat'))return;tone(320,200,0.08,'square',0.09);tone(300,180,0.08,'square',0.09,0.13);tone(520,780,0.18,'triangle',0.1,0.28);},
     hurt(){if(fx('hurt'))return;thump();tone(260,70,0.35,'sawtooth',0.14);},
     splash(){if(fx('splash'))return;if(!ctx||muted)return;tone(500,140,0.25,'sine',0.08);},
+    heartbeat(){if(!ctx||muted)return;tone(72,44,0.14,'sine',0.34);tone(64,40,0.12,'sine',0.27,0.18);},
     coin(){if(fx('coin'))return;tone(988,988,0.07,'square',0.07);tone(1319,1319,0.2,'square',0.07,0.06);},
     raiderShot(){if(fx('raiderShot'))return;tone(680,170,0.15,'sawtooth',0.055);tone(420,90,0.13,'square',0.035,0.03);},
     raiderHit(){if(fx('raiderHit'))return;tone(1500,340,0.09,'square',0.07);},
@@ -5677,7 +5706,7 @@ function saveGame(silent=false){
       missions:MISSIONS.map(m=>({id:m.id,prog:m.prog,done:m.done})),
       sys:activeSystemId,
       skins:SKIN,
-      vitals:{hp:Math.round(PL.hp),food:Math.round(PL.food)},
+      vitals:{hp:Math.round(PL.dead?50:PL.hp),food:Math.round(PL.food)},lastLand:PL.lastLand||null,
       elys:{nodes:ELYS.nodes.map(n=>({id:n.id,activated:n.activated,pylons:n.pylons.map(p=>p.lit)})),restored:ELYS.restored},
       game:{...GAME_EXTRA,title:GAME.title,achievements:GAME.achievements,milestones:GAME.milestones,contracts:GAME.contracts,contractSeed:GAME.contractSeed,outposts:GAME.outposts,sysVisited:GAME.sysVisited,seenElysian:GAME.seenElysian,
         rep:GAME.rep,factionContracts:GAME.factionContracts,factionSeed:GAME.factionSeed,tamed:GAME.tamed,photoLog:GAME.photoLog,catReward:GAME.catReward,poiState:GAME.poiState,treasure:GAME.treasure,crew:GAME.crew,raiderKills:GAME.raiderKills,contacts:GAME.contacts,
@@ -5700,6 +5729,7 @@ function loadGame(){
     const data=JSON.parse(raw);
     for(const k in data)if(!['inv','upgrades','visited','discoveries','missions','sys','skins','vitals','elys','game','hazard'].includes(k))SAVE_EXTRA[k]=data[k];
     if(data.inv)Object.assign(INV,data.inv);
+    if(data.lastLand)PL.lastLand=data.lastLand;
     if(data.vitals){PL.hp=clamp(+data.vitals.hp||100,20,100);PL.food=clamp(+data.vitals.food||100,0,100);}
     if(data.skins){
       if(Array.isArray(data.skins.ownedShip))SKIN.ownedShip=data.skins.ownedShip.filter(id=>SHIP_SKINS.some(s=>s.id===id));
@@ -6049,7 +6079,7 @@ function raiderHitShip(n){
   PL.shield=Math.max(0,PL.shield-absorbed);
   const bleed=Math.max(2.5,dmg*0.28)+Math.max(0,dmg-absorbed)*0.45;
   const hf=$('hurtFx');hf.classList.remove('go');void hf.offsetWidth;hf.classList.add('go');
-  hurt(bleed,null,true);SFX.hurt();
+  hurt(bleed,null,true,'SHOT DOWN BY ALIEN RAIDERS');SFX.hurt();
   if(absorbed>0)SFX.shieldHit();
   if(PL.shield<=0&&uTime.value-(PL.hullWarnT||-99)>7){PL.hullWarnT=uTime.value;toast('⚠️ SHIELDS DOWN — HULL EXPOSED! EVADE OR DESTROY THE RAIDERS');}
 }
@@ -6995,7 +7025,7 @@ function updateEcosystemAndHazards(dt,t){
     if(PL.shield<=0){
       PL.shield=55;PL.rebootGrace=2.5;
       toast('⚠️ SHIELD EMPTY — EMERGENCY REBOOT. SUIT RECOVERING…');
-      hurt(10,null,true);
+      hurt(10,null,true,'OVERWHELMED BY A SOLAR STORM');
     }
   }else{
     PL.shield=Math.min(100,PL.shield+(PL.sheltered?18:(RAIDER.active?4:9))*dt);
@@ -7114,6 +7144,7 @@ function handleInteract(){
 }
 
 function updateFly(dt){
+  if(PL.dead){ship.flameT=0;PL.speed=0;PL.vel.set(0,0,0);return;}
   const g=ship.group,b=PL.near;
   let yaw=-input.mx*1.45*dt-look.x,pitch=-look.y;
   PL.lookIdle=(look.x||look.y)?0:PL.lookIdle+dt;
@@ -7178,7 +7209,7 @@ function tryLand(){
 function finishTouchdown(b,site,r1){
   PL.mode='landed';PL.local.copy(site).multiplyScalar(r1);PL.D=null;PL.L=null;$('entryFx').classList.remove('on');
   ship.gear.visible=true;ship.gear.scale.y=1;
-  if(!b.visited){b.visited=true;SFX.discover();earnGold(25,true);updatePassport();saveGame(true);toast('NEW WORLD DISCOVERED: '+b.name+'! +25 🪙');}else toast('TOUCHDOWN!');
+  PL.lastLand=b.name;if(!b.visited){b.visited=true;SFX.discover();earnGold(25,true);updatePassport();saveGame(true);toast('NEW WORLD DISCOVERED: '+b.name+'! +25 🪙');}else toast('TOUCHDOWN!');
 }
 function updateDescend(dt){
   const D=PL.D,b=D.b;if(!D)return;
@@ -7200,7 +7231,7 @@ function updateLanding(dt){
   ship.gear.scale.y=Math.max(0.01,sstep(0.15,0.8,L.t));ship.flameT=0.55*(1-sstep(0.85,1,L.t));
   ship.model.rotation.z*=Math.exp(-dt*4);ship.model.rotation.x*=Math.exp(-dt*4);
   if(L.t>=1){PL.mode='landed';PL.local.copy(L.d1).multiplyScalar(L.r1);PL.L=null;
-    if(!b.visited){b.visited=true;SFX.discover();earnGold(25,true);updatePassport();saveGame(true);toast('NEW WORLD DISCOVERED: '+b.name+'! +25 🪙');}else toast('TOUCHDOWN!');}
+    PL.lastLand=b.name;if(!b.visited){b.visited=true;SFX.discover();earnGold(25,true);updatePassport();saveGame(true);toast('NEW WORLD DISCOVERED: '+b.name+'! +25 🪙');}else toast('TOUCHDOWN!');}
 }
 function takeOff(){
   if(PL.mode!=='landed')return;
@@ -7247,6 +7278,7 @@ function placeAstro(b){
   A.group.quaternion.setFromRotationMatrix(setBasis(_m,_a.set(0,0,0),A.face,A.dir));
 }
 function updateWalk(dt){
+  if(PL.dead){astro.S.rotation.x=Math.max(astro.S.rotation.x-dt*3.2,-1.45);return;}
   const b=PL.body,A=astro,up=_u.copy(A.dir);
   A.view.applyQuaternion(_q.setFromAxisAngle(up,-look.x));A.pitch=clamp(A.pitch+look.y,-0.3,1.3);
   _r.crossVectors(A.view,up).normalize();
@@ -7267,7 +7299,7 @@ function updateWalk(dt){
   {const hh=b.heightAt(A.dir.x,A.dir.y,A.dir.z),sw=b.liquid&&!b.liquidSolid&&hh<-0.28&&!onRoad(b,A.dir);
     if(sw&&!A.swim&&A.yOff<0.3){SFX.splash();comicPop(b.hot?'SIZZLE!':'SPLASH!',b.hot?'#ff7a1e':'#39c6ff',50,46);}
     A.swim=sw;
-    if(sw&&b.hot&&A.yOff<0.3)hurt(dt*22,uTime.value-(PL.lavaT||-9)>3?(PL.lavaT=uTime.value,'🔥 LAVA! GET OUT FAST!'):null,true);}
+    if(sw&&b.hot&&A.yOff<0.3)hurt(dt*22,uTime.value-(PL.lavaT||-9)>3?(PL.lavaT=uTime.value,'🔥 LAVA! GET OUT FAST!'):null,true,'FELL INTO LAVA');}
   if(PL.jumpQ&&A.yOff<=0.001){A.vy=A.swim?3.2:5.5;SFX.jump();}PL.jumpQ=false;
   const jetDrain=40/(1+(UPGRADES.suit.lvl-1)*0.45);
   if(spaceHeld && A.yOff>0.12 && PL.jetFuel>0){
@@ -7290,6 +7322,7 @@ function updateWalk(dt){
   A.nearShip=A.group.position.distanceTo(PL.local)<3.8;
 }
 function updateRover(dt){
+  if(PL.dead)return;
   const b=PL.body,up=_u.copy(rover.dir);
   rover.face.applyQuaternion(_q.setFromAxisAngle(up,-input.mx*1.8*dt-look.x)).normalize();
   const sp=input.my*11.5*(input.boost?1.6:1);
@@ -7433,25 +7466,140 @@ function surfR(b,d){
 /* ---- Health, hunger, food & crash impacts ---- */
 PL.hp=100;PL.food=100;PL.crashT=-9;let camShake=0;
 const FOODS=[{k:'berry',food:15,hp:0,label:'GLOW BERRIES',ic:'🍓'},{k:'fruit',food:30,hp:15,label:'STAR FRUIT',ic:'🍐'},{k:'ration',food:50,hp:5,label:'SPACE RATION',ic:'🥫'}];
-function hurt(n,msg,quiet){
+function hurt(n,msg,quiet,cause){
   if(!(n>0)||PL.mode==='landing'||PL.mode==='descend'||PL.mode==='takeoff')return;
+  if(PL.dead||uTime.value<(PL.spawnProt||0))return;
+  PL.lastCause=cause||'TOOK TOO MUCH DAMAGE';
   PL.hp=Math.max(0,PL.hp-n);
   if(!quiet||Math.random()<0.08){const fx=$('hurtFx');fx.classList.remove('go');void fx.offsetWidth;fx.classList.add('go');}
   if(!quiet)SFX.hurt();
   if(msg)toast(msg);
   if(PL.hp<=0)knockOut();
 }
-function knockOut(){
-  if(uTime.value-(PL.koT||-99)<2)return;PL.koT=uTime.value;
-  endRaiderWave(false,true);
-  fleeNpcs(true);
-  const lost=Math.floor((INV.gold||0)*0.1);INV.gold=(INV.gold||0)-lost;
-  PL.hp=60;PL.food=Math.max(PL.food,50);
-  if(PL.mode==='rover')exitRover();
-  if(PL.mode==='walk'){astro.group.visible=false;astro.swim=false;PL.mode='landed';orbit.yaw=0;orbit.pitch=0.42;}
-  updateResHUD();SFX.alarm();comicPop('KNOCKED OUT!','#ff4d6d',50,34);
-  toast(`💫 YOU BLACKED OUT! RESCUE DRONES CARRIED YOU TO THE SHIP${lost?` (−${lost} 🪙 FEE)`:''}`);
-  saveGame(true);
+function knockOut(){startDeath(PL.lastCause||'TOOK TOO MUCH DAMAGE');}
+
+/* ---- DEATH & RESPAWN: explosion / collapse, KNOCKED OUT screen, respawn choices, loot capsule ---- */
+const DEATH={mode:'',cause:'',loss:null,lostOld:false,body:null};
+const CAPSULE={data:null,mesh:null,tag:null,loaded:false};
+const RES_KEYS=['fe','ae','so','vd'];
+function deathRefBody(mode){
+  if((mode==='walk'||mode==='rover'||mode==='landed')&&PL.body)return PL.body;
+  if(PL.near&&PL.alt<PL.near.R*3+250)return PL.near;
+  return bodies.find(b=>b.sys===activeSystemId&&(b.kind==='sun'||b.kind==='blackhole'))||PL.near||bodies[0];
+}
+function startDeath(cause){
+  if(PL.dead)return;
+  PL.dead=true;PL.hp=0;
+  const mode=PL.mode,onFoot=mode==='walk'||mode==='rover',inFlight=!onFoot&&mode!=='landed';
+  DEATH.mode=mode;DEATH.cause=cause;DEATH.body=PL.body||PL.near;
+  const ref=deathRefBody(mode);
+  const wpos=mode==='walk'?astro.group.position.clone().add(PL.body.center):mode==='rover'?rover.localPos.clone().add(PL.body.center):ship.group.position.clone();
+  /* losses go into a loot capsule left where you fell */
+  const loss={gold:Math.floor((INV.gold||0)*0.15)};for(const k of RES_KEYS)loss[k]=Math.floor((INV[k]||0)*0.25);
+  for(const k in loss)INV[k]=(INV[k]||0)-loss[k];
+  DEATH.loss=loss;DEATH.lostOld=!!CAPSULE.data;
+  const total=Object.values(loss).reduce((a,b)=>a+b,0);
+  if(total>0){
+    const surf=onFoot||mode==='landed';
+    const rel=wpos.clone().sub(ref.center);
+    if(surf&&ref.kind!=='sun'&&ref.kind!=='blackhole'){const d=rel.clone().normalize();rel.copy(d).multiplyScalar(surfR(ref,d)+1.1);}
+    setCapsule({sys:activeSystemId,b:bodies.indexOf(ref),p:[rel.x,rel.y,rel.z],items:loss,surf});
+  }else setCapsule(null);
+  try{endRaiderWave(false,true);}catch(_){}try{fleeNpcs(true);}catch(_){}
+  PL.speed=0;PL.vel.set(0,0,0);ship.flameT=0;input.mine=false;
+  if(mode==='rover')exitRover();
+  camShake=Math.max(camShake,1.4);SFX.hurt();
+  if(inFlight){
+    ship.group.visible=false;
+    boom(wpos,0xff7a1e,7);boom(wpos.clone().add(new V3(1.5,1,0)),0xffd23f,4.5);boom(wpos.clone().add(new V3(-1,-1,1)),0xffffff,2.5);
+    SFX.alarm();comicPop('KA-BOOM!!','#ff4d6d',50,36);
+  }else comicPop('KNOCKED OUT!','#ff4d6d',50,36);
+  $('lowHpFx').classList.remove('on');
+  updateResHUD();saveGame(true);
+  setTimeout(showDeathScreen,1500);
+}
+function spawnOptions(){
+  const opts=[],seen=new Set();
+  const add=(o)=>{if(o.body&&seen.has(o.body.name))return;if(o.body)seen.add(o.body.name);opts.push(o);};
+  if(DEATH.mode==='walk'||DEATH.mode==='rover'||DEATH.mode==='landed')add({kind:'ship',icon:'i-launch',label:'BACK TO YOUR SHIP',sub:'Wake up inside your landed ship on '+(PL.body?PL.body.name:'this world'),body:PL.body});
+  const last=bodies.find(b=>b.name===PL.lastLand);
+  if(last)add({kind:'warp',icon:'i-planet',label:'LAST LANDING: '+last.name,sub:'Respawn in orbit above the last world you landed on',body:last});
+  const op=GAME.outposts&&GAME.outposts.length?bodies.find(b=>b.name===GAME.outposts[GAME.outposts.length-1].body):null;
+  if(op)add({kind:'warp',icon:'i-outpost',label:'YOUR OUTPOST: '+op.name,sub:'Respawn above your newest frontier base',body:op});
+  const home=bodies.find(b=>b.name==='TERRA');
+  if(home)add({kind:'warp',icon:'i-orbit',label:'HOME: TERRA',sub:'Safe return to the Solara starting world',body:home});
+  return opts;
+}
+function showDeathScreen(){
+  if(!PL.dead)return;
+  const L=DEATH.loss||{},parts=[];
+  if(L.gold)parts.push(L.gold+' coins');for(const k of RES_KEYS)if(L[k])parts.push(L[k]+' '+k.toUpperCase());
+  $('deathTitle').textContent=(DEATH.mode==='walk'||DEATH.mode==='rover'||DEATH.mode==='landed')?'KNOCKED OUT!':'SHIP DESTROYED!';
+  $('deathCause').textContent=DEATH.cause;
+  $('deathLoss').innerHTML=(parts.length?`You dropped <b>${parts.join(', ')}</b> in a <b style="color:#ffd23f">LOOT CAPSULE</b> where you fell. Go back and grab it — a yellow arrow will point the way. If you get knocked out again first, it's gone!`:'You had nothing to drop this time.')+(DEATH.lostOld?'<br><span style="color:#ff9db2">Your previous loot capsule was lost.</span>':'');
+  const box=$('deathOpts');box.innerHTML='';
+  const opts=spawnOptions();
+  opts.forEach((o,i)=>{const b=document.createElement('button');b.className='spawnOpt';b.disabled=true;b.innerHTML=`<svg class="ic"><use href="#${o.icon}"/></svg><span>${o.label}<small>${o.sub}</small></span>`;b.addEventListener('click',()=>respawn(o));box.appendChild(b);});
+  openModal('deathModal');
+  let n=3;const cd=$('deathCount');cd.textContent='RESPAWN READY IN '+n+'…';
+  const iv=setInterval(()=>{n--;if(n>0){cd.textContent='RESPAWN READY IN '+n+'…';return;}clearInterval(iv);cd.textContent='CHOOSE WHERE TO RESPAWN';box.querySelectorAll('.spawnOpt').forEach(b=>b.disabled=false);},1000);
+}
+function respawn(o){
+  if(!PL.dead)return;
+  $('deathModal').classList.remove('open');closeModals();
+  PL.dead=false;ship.group.visible=true;astro.S.rotation.x=0;astro.S.position.y=0;
+  PL.hp=50;PL.food=Math.max(PL.food,40);PL.shield=100;PL.jetFuel=100;PL.spawnProt=uTime.value+4.5;
+  if(o.kind==='ship'){astro.group.visible=false;astro.swim=false;PL.mode='landed';orbit.yaw=0;orbit.pitch=0.42;}
+  else triggerHyperspaceTransition(o.body,o.body.sys!==activeSystemId);
+  setTimeout(()=>{comicPop('RESPAWNED!','#5df2c0',50,34);toast('SPAWN SHIELD ACTIVE — 4 SECONDS OF PROTECTION');},o.kind==='ship'?100:800);
+  SFX.upgrade();saveGame(true);
+}
+/* loot capsule */
+function saveCapsule(){try{CAPSULE.data?localStorage.setItem('cosmic_hop_capsule',JSON.stringify(CAPSULE.data)):localStorage.removeItem('cosmic_hop_capsule');}catch(_){}}
+function setCapsule(d){if(CAPSULE.mesh){scene.remove(CAPSULE.mesh);CAPSULE.mesh=null;}CAPSULE.data=d;saveCapsule();}
+const _capV=new V3(),_capU=new V3();
+function capsuleMesh(){
+  const g=new THREE.Group();
+  const core=new THREE.Mesh(new THREE.OctahedronGeometry(1.1,0),toon(0xffd23f,{emissive:0xffa000,emissiveIntensity:0.8}));addOutline(core,OL_BIG);g.add(core);
+  const ring=new THREE.Mesh(new THREE.TorusGeometry(1.7,0.12,6,28),new THREE.MeshBasicMaterial({color:0xfff07a,transparent:true,opacity:0.85}));ring.rotation.x=Math.PI/2;g.add(ring);
+  const beam=new THREE.Mesh(new THREE.CylinderGeometry(0.15,0.5,14,10,1,true),new THREE.MeshBasicMaterial({color:0xffd23f,transparent:true,opacity:0.35,blending:THREE.AdditiveBlending,depthWrite:false}));beam.position.y=7;g.add(beam);
+  g.userData={core,ring};return g;
+}
+function placeScreenTag(el,pos){
+  const w=innerWidth,h=innerHeight;_capV.copy(pos).project(camera);
+  let nx=_capV.x,ny=_capV.y;const behind=_capV.z>1;if(behind){nx=-nx;ny=-ny;}
+  const xMin=70,xMax=w-70,yMin=Math.min(h*0.42,96),yMax=Math.max(h*0.56,h-250),cx=w/2,cy=h/2;
+  let x=(nx+1)/2*w,y=(1-ny)/2*h;const edge=behind||x<xMin||x>xMax||y<yMin||y>yMax;
+  if(edge){let dx=x-cx,dy=y-cy;if(Math.abs(dx)<1&&Math.abs(dy)<1)dy=1;const kx=dx>0?(xMax-cx)/dx:dx<0?(xMin-cx)/dx:Infinity,ky=dy>0?(yMax-cy)/dy:dy<0?(yMin-cy)/dy:Infinity,k=Math.min(kx,ky);x=cx+dx*k;y=cy+dy*k;
+    el.querySelector('.mpArr').style.transform=`rotate(${(Math.atan2(dy,dx)*180/Math.PI).toFixed(0)}deg)`;el.style.transform=`translate(-50%,-50%) translate(${x.toFixed(1)}px,${y.toFixed(1)}px)`;}
+  else el.style.transform=`translate(-50%,-100%) translate(${x.toFixed(1)}px,${y.toFixed(1)}px)`;
+  el.classList.toggle('edge',edge);el.style.display='block';
+}
+function updateCapsule(dt){
+  if(!CAPSULE.loaded&&started){CAPSULE.loaded=true;
+    if(!CAPSULE.data){try{const c=JSON.parse(localStorage.getItem('cosmic_hop_capsule')||'null');if(c&&localStorage.getItem('cosmic_hop_gf_save'))CAPSULE.data=c;else localStorage.removeItem('cosmic_hop_capsule');}catch(_){}}}
+  if(!CAPSULE.tag){CAPSULE.tag=document.createElement('div');CAPSULE.tag.className='capTag';CAPSULE.tag.innerHTML='<b class="mpArr"></b><span></span>';markersEl.appendChild(CAPSULE.tag);}
+  const d=CAPSULE.data,b=d&&bodies[d.b];
+  if(!d||!b||d.sys!==activeSystemId||!started){if(CAPSULE.mesh)CAPSULE.mesh.visible=false;CAPSULE.tag.style.display='none';return;}
+  if(!CAPSULE.mesh){CAPSULE.mesh=capsuleMesh();scene.add(CAPSULE.mesh);}
+  const m=CAPSULE.mesh;m.visible=true;
+  m.position.set(d.p[0],d.p[1],d.p[2]).add(b.center);
+  const up=(b.kind==='sun'||b.kind==='blackhole')?_capU.copy(AY):_capU.set(d.p[0],d.p[1],d.p[2]).normalize();
+  m.quaternion.setFromUnitVectors(AY,up);
+  m.userData.core.rotation.y+=dt*2;m.userData.ring.rotation.z+=dt*1.2;
+  m.position.addScaledVector(up,Math.sin(uTime.value*2.4)*0.25);
+  const mode=PL.mode,me=mode==='walk'?astro.group.position.clone().add(PL.body.center):mode==='rover'?rover.localPos.clone().add(PL.body.center):ship.group.position;
+  const dist=me.distanceTo(m.position);
+  if(!PL.dead&&uTime.value>(PL.spawnProt||0)&&dist<(mode==='walk'?3.2:mode==='rover'?4.5:12)){
+    const it=d.items||{},got=[];
+    if(it.gold){INV.gold=(INV.gold||0)+it.gold;got.push(it.gold+' coins');}
+    for(const k of RES_KEYS)if(it[k]){INV[k]=(INV[k]||0)+it[k];got.push(it[k]+' '+k.toUpperCase());}
+    setCapsule(null);CAPSULE.tag.style.display='none';updateResHUD();SFX.discover();SFX.coin();
+    comicPop('LOOT RECOVERED!','#ffd23f',50,34);toast('LOOT CAPSULE RECOVERED: '+(got.join(', ')||'nothing'));saveGame(true);return;
+  }
+  const lbl='LOOT CAPSULE '+(dist>=1000?(dist/1000).toFixed(1)+'k':Math.round(dist)+'m');
+  const sp=CAPSULE.tag.querySelector('span');if(sp.textContent!==lbl)sp.textContent=lbl;
+  _capV.copy(m.position).addScaledVector(up,2.4);placeScreenTag(CAPSULE.tag,_capV.clone());
 }
 function shipImpact(v,n){
   if(v<12||uTime.value-PL.crashT<0.8)return;
@@ -7462,7 +7610,7 @@ function shipImpact(v,n){
   PL.vel.addScaledVector(n,v*0.55);PL.speed*=0.25;
   PL.shield=Math.max(0,PL.shield-v*0.25);
   comicPop(v>90?'KA-BOOM!!':'CRASH!','#ff4d6d',50,38);
-  hurt(clamp((v-25)*0.4*resist,4,70),v>90?'💥 HULL BREACH! SLOW DOWN NEAR PLANETS!':'💥 CRASH! WATCH YOUR SPEED!');
+  hurt(clamp((v-25)*0.4*resist,4,70),v>90?'💥 HULL BREACH! SLOW DOWN NEAR PLANETS!':'💥 CRASH! WATCH YOUR SPEED!',false,'CRASHED INTO '+(PL.near?PL.near.name:'A PLANET'));
 }
 function eatFood(){
   tutFlags.eat=1;
@@ -7478,12 +7626,16 @@ function useMedkit(){
   INV.medkit--;PL.hp=Math.min(100,PL.hp+50);SFX.upgrade();comicPop('💊 +50 HP','#ff4d6d',50,40);updateResHUD();
 }
 function updateVitals(dt){
-  if(modalOpen)return;
+  if(modalOpen||PL.dead)return;
   const onFoot=PL.mode==='walk'||PL.mode==='rover';
   const hazResist=1-(UPGRADES.suit.lvl-1)*0.2;
   PL.food=Math.max(0,PL.food-dt*(onFoot?0.3:0.12)*(PL.hazardExposed?1+0.35*hazResist:1));
-  if(PL.food<=0)hurt(dt*1.5,null,true);
+  if(PL.food<=0)hurt(dt*1.5,null,true,'STARVED — RAN OUT OF FOOD');
   else if(PL.food>40&&PL.hp<100)PL.hp=Math.min(100,PL.hp+dt*(PL.mode==='landed'?3:0.7)*(1-(PL.hazardExposed?0.7*hazResist:0)));
+  const low=PL.hp<25&&!PL.dead;
+  if($('lowHpFx').classList.contains('on')!==low)$('lowHpFx').classList.toggle('on',low);
+  if(low){PL.hbT=(PL.hbT||0)-dt;if(PL.hbT<=0){PL.hbT=0.95;SFX.heartbeat();}
+    if(uTime.value-(PL.critT||-99)>18){PL.critT=uTime.value;toast(INV.medkit>0?(touchUI?'⚠️ CRITICAL HEALTH — TAP THE MEDKIT NOW!':'⚠️ CRITICAL HEALTH — PRESS [H] FOR A MEDKIT!'):'⚠️ CRITICAL HEALTH — EAT FOOD OR REST IN YOUR LANDED SHIP!');}}
   if(PL.food<20&&uTime.value-(PL.hungerT||-99)>25){PL.hungerT=uTime.value;toast(PL.food<=0?'🍗 STARVING! LOSING HEALTH — EAT SOMETHING [G]':'🍗 GETTING HUNGRY — EAT FOOD [G]');}
 }
 const _sk=new V3();
@@ -7616,8 +7768,9 @@ function updateHUD(dt){
   }else chipEl.classList.remove('on');
   updateCompanionHUD();
 }
-function actLand(){if(PL.mode==='fly')tryLand();else if(PL.mode==='landed')takeOff();else if(PL.mode==='walk')PL.jumpQ=true;}
+function actLand(){if(PL.dead)return;if(PL.mode==='fly')tryLand();else if(PL.mode==='landed')takeOff();else if(PL.mode==='walk')PL.jumpQ=true;}
 function actExit(){
+  if(PL.dead)return;
   if(PL.mode==='fly')hailNpc();
   else if(PL.mode==='landed')exitShip();
   else if(PL.mode==='rover')exitRover();
@@ -7679,6 +7832,7 @@ function frame(dt){
   ship.flame.visible=ship.flameS>0.03;ship.flame.scale.set(0.8+ship.flameS*0.3,0.8+ship.flameS*0.3,ship.flameS*(0.85+Math.random()*0.3));
   updateCamera(dt,false);applyCamShake(dt);
   updateMP(dt);
+  if(started)updateCapsule(dt);
   look.x=look.y=0;
 
   let tint=0;
@@ -7862,7 +8016,7 @@ const r3=v=>[Math.round(v.x*100)/100,Math.round(v.y*100)/100,Math.round(v.z*100)
 const r4=q=>[+q.x.toFixed(4),+q.y.toFixed(4),+q.z.toFixed(4),+q.w.toFixed(4)];
 function mpState(){
   const b=mpRefBody(),bi=bodies.indexOf(b);
-  const st={n:mpClean($('mpName').value||mpName()),s:activeSystemId,m:PL.mode,b:bi,p:r3(_mpV.copy(ship.group.position).sub(b.center)),q:r4(ship.group.quaternion),f:+(ship.flameS||0).toFixed(2),sk:SKIN.ship,ak:SKIN.astro,loc:(PL.mode==='fly'?(PL.near?PL.near.name:'DEEP SPACE'):(PL.body?PL.body.name:''))};
+  const st={n:mpClean($('mpName').value||mpName()),s:activeSystemId,m:PL.mode,b:bi,p:r3(_mpV.copy(ship.group.position).sub(b.center)),q:r4(ship.group.quaternion),f:+(ship.flameS||0).toFixed(2),sk:SKIN.ship,ak:SKIN.astro,loc:(PL.mode==='fly'?(PL.near?PL.near.name:'DEEP SPACE'):(PL.body?PL.body.name:'')),d:PL.dead?1:0};
   if((PL.mode==='walk'||PL.mode==='rover')&&PL.body){
     const ap=PL.mode==='rover'?rover.localPos:astro.group.position;
     st.a=r3(ap);st.aq=r4(PL.mode==='rover'?_mpQ.setFromRotationMatrix(setBasis(_m,_a.set(0,0,0),rover.face,rover.dir)):astro.group.quaternion);st.ab=bodies.indexOf(PL.body);
@@ -7886,7 +8040,7 @@ function mpOnState(st,meta){
   const id=meta&&meta.peerId;if(!id||!st||typeof st!=='object')return;
   let P=MP.peers.get(id);
   if(!P){if(MP.peers.size>=MP_MAX-1)return;P=mpMakePeer(id);}
-  const first=!P.st;P.st=st;P.t=performance.now();
+  const first=!P.st;if(P.st&&!P.st.d&&st.d&&st.s===activeSystemId)toast(`${mpClean(st.n)} WAS KNOCKED OUT!`);P.st=st;P.t=performance.now();
   if(first&&st.s===activeSystemId){P.announced=true;toast(`${mpClean(st.n)} JOINED THE LOBBY!`);SFX.ui();}
   else if(first)P.announced=true;
   if(st.sk!==P.sk&&SHIP_SKINS.some(k=>k.id===st.sk)){P.sk=st.sk;dressShip(P.ship.model,P.ship.flame,st.sk);const k=SHIP_SKINS.find(k=>k.id===st.sk);P.ship.flame.children[0].material=P.ship.flame.children[0].material.clone();P.ship.flame.children[1].material=P.ship.flame.children[1].material.clone();P.ship.flame.children[0].material.color.setHex(k.f1);P.ship.flame.children[1].material.color.setHex(k.f2);}
@@ -8012,7 +8166,7 @@ function updateMP(dt){
     const b=bodies[st.b]||bodies[0];
     _mpV.set(st.p[0],st.p[1],st.p[2]).add(b.center);_mpQ.set(st.q[0],st.q[1],st.q[2],st.q[3]);
     if(P.fresh||P.pos.distanceTo(_mpV)>250){P.pos.copy(_mpV);P.q.copy(_mpQ);}else{P.pos.lerp(_mpV,k);P.q.slerp(_mpQ,k);}
-    P.ship.group.position.copy(P.pos);P.ship.group.quaternion.copy(P.q);P.ship.group.visible=true;
+    P.ship.group.position.copy(P.pos);P.ship.group.quaternion.copy(P.q);P.ship.group.visible=!(st.d&&st.m!=='landed'&&st.m!=='walk'&&st.m!=='rover');
     const fl=st.m==='fly'||st.m==='takeoff'||st.m==='landing'?Math.max(0.15,st.f||0):0;
     P.ship.flame.visible=fl>0.03;P.ship.flame.scale.set(0.8+fl*0.3,0.8+fl*0.3,fl*(0.85+Math.random()*0.3));
     P.ship.gear.visible=st.m!=='fly';P.ship.gear.scale.y=st.m!=='fly'?1:0.01;
@@ -8112,7 +8266,7 @@ $('importFile').addEventListener('change',e=>{
 if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)){
   addEventListener('load',()=>{navigator.serviceWorker.register('./sw.js',{updateViaCache:'none'}).then(r=>r.update()).catch(()=>{});});
 }
-window.__game={MP,mpJoin,mpLeave,mpFlyTo,THREE,COINS,SKIN,earnGold,PL,bodies,INV,UPGRADES,MISSIONS,DISCOVERIES,ELYS,GAME,RAIDER,NPC,SFX,GALAXY,get sunShadow(){return sunShadow;},get renderer(){return renderer;},get scene(){return scene;},get ship(){return ship;},get astro(){return astro;},actLand,actExit,warpToBody,switchActiveSystem,triggerScan,handleInteract,keys,look,camera,frame,spawnStormCrystals,clearAllStormCrystals,openBase,openVaultCode,tameCreature,readTreasureMap,placeOutpostOnPlanet,startRaiderWave,endRaiderWave,damageRaider,canSpawnRaider,spawnRaiderBolt,raiderHitShip,spawnNpcConvoy,makeNpcHostile,canSpawnNpc,fleeNpcs,nearestNpc,hailNpc,spawnAnomaly,scanAnomaly,planetaryEvent,updateGalaxy,progressionMeter,systemTier,rareEncounterChance,encounterPace,SHIP_COSMETICS,checkCosmetics,applyShipCosmetic,checkProgression,explorerScore,explorerRankIdx,spawnPOI,handlePOI,updatePlanetProgress,planetPoiTotals,ensureDynOffers,acceptDynMission,dynProgress,makeDynOffer,completeDynMission,startRescue,spawnEscortFleet,spawnDistressShip,renderJournalModal,setJournalTab:t=>{journalTab=t;},saveGame,loadGame,tutActive,CINE,setGfxMode,get gfx(){return{mode:gfxMode,tier:gfxTierName(),post:postOn,shadow:renderer.shadowMap.enabled,scale:dyn.scale,fps:fpsShow,sm:!!(sunShadow.shadow.map),calls:renderer.info.render.calls,tris:renderer.info.render.triangles,geoms:renderer.info.memory.geometries,tex:renderer.info.memory.textures};},dbg:()=>({started,modalOpen,photoMode,cine:CINE.open,tutStep,alt:PL.alt,mode:PL.mode})};
+window.__game={MP,mpJoin,mpLeave,mpFlyTo,startDeath,CAPSULE,THREE,COINS,SKIN,earnGold,PL,bodies,INV,UPGRADES,MISSIONS,DISCOVERIES,ELYS,GAME,RAIDER,NPC,SFX,GALAXY,get sunShadow(){return sunShadow;},get renderer(){return renderer;},get scene(){return scene;},get ship(){return ship;},get astro(){return astro;},actLand,actExit,warpToBody,switchActiveSystem,triggerScan,handleInteract,keys,look,camera,frame,spawnStormCrystals,clearAllStormCrystals,openBase,openVaultCode,tameCreature,readTreasureMap,placeOutpostOnPlanet,startRaiderWave,endRaiderWave,damageRaider,canSpawnRaider,spawnRaiderBolt,raiderHitShip,spawnNpcConvoy,makeNpcHostile,canSpawnNpc,fleeNpcs,nearestNpc,hailNpc,spawnAnomaly,scanAnomaly,planetaryEvent,updateGalaxy,progressionMeter,systemTier,rareEncounterChance,encounterPace,SHIP_COSMETICS,checkCosmetics,applyShipCosmetic,checkProgression,explorerScore,explorerRankIdx,spawnPOI,handlePOI,updatePlanetProgress,planetPoiTotals,ensureDynOffers,acceptDynMission,dynProgress,makeDynOffer,completeDynMission,startRescue,spawnEscortFleet,spawnDistressShip,renderJournalModal,setJournalTab:t=>{journalTab=t;},saveGame,loadGame,tutActive,CINE,setGfxMode,get gfx(){return{mode:gfxMode,tier:gfxTierName(),post:postOn,shadow:renderer.shadowMap.enabled,scale:dyn.scale,fps:fpsShow,sm:!!(sunShadow.shadow.map),calls:renderer.info.render.calls,tris:renderer.info.render.triangles,geoms:renderer.info.memory.geometries,tex:renderer.info.memory.textures};},dbg:()=>({started,modalOpen,photoMode,cine:CINE.open,tutStep,alt:PL.alt,mode:PL.mode})};
 </script>
 </body>
 </html>
