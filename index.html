@@ -77,7 +77,11 @@ html,body{margin:0;height:100%;overflow:hidden;background:var(--space);color:var
 #foodBar{background:linear-gradient(90deg,#ff922b,#ffd23f)}
 .barRow.low .meter{animation:lowA .6s infinite alternate}
 @keyframes lowA{to{border-color:#ff4d6d;box-shadow:0 0 6px #ff4d6d}}
-.tapPill{cursor:pointer;padding:1px 5px;border-radius:7px;background:#fff;border:2px solid var(--ink)}
+.tapPill{cursor:pointer;padding:1px 7px;border-radius:8px;background:linear-gradient(160deg,rgba(60,30,10,.9),rgba(30,14,6,.85));border:1px solid rgba(255,177,92,.85);color:#ffe1b8;text-shadow:0 1px 0 rgba(0,0,0,.45);box-shadow:inset 0 0 10px rgba(255,150,60,.18)}
+.tapPill .ic{width:13px;height:13px;color:#ffc078;stroke-width:2.35;filter:drop-shadow(0 0 3px rgba(255,170,80,.75))}
+#foodPill{order:-2}
+#medPill{order:-1;background:linear-gradient(160deg,rgba(56,16,28,.9),rgba(26,8,14,.85));border-color:rgba(255,143,163,.85);color:#ffdce6;box-shadow:inset 0 0 10px rgba(255,120,150,.18)}
+#medPill .ic{color:#ff9db2;stroke-width:2.35;filter:drop-shadow(0 0 3px rgba(255,130,165,.8))}
 .tapPill:active{transform:translateY(1px)}
 #stormFx{position:fixed;inset:0;pointer-events:none;z-index:3;opacity:0;transition:opacity .35s;
   background:radial-gradient(circle at 50% 50%,transparent 48%,rgba(255,120,20,.25) 82%,rgba(255,40,70,.55) 100%)}
@@ -471,8 +475,8 @@ body.photoMode #ui{opacity:0!important}
 .resPill .ic{width:13px;height:13px;color:#7fdcff}
 #goldPill{color:#ffe9a8;cursor:pointer}
 #goldPill .ic{color:#ffd76a}
-#foodPill .ic{color:#ffb15c}
-#medPill .ic{color:#ff8fa3}
+#foodPill .ic{color:#ffc078}
+#medPill .ic{color:#ff9db2}
 .resDot{width:7px;height:7px;border-radius:2px;transform:rotate(45deg);border:1px solid rgba(255,255,255,.4);box-shadow:0 0 6px currentColor}
 #goldPill.bump{animation:gbump .35s}
 
@@ -631,6 +635,42 @@ body.photoMode #ui{opacity:0!important}
 }
 @media (orientation:portrait) and (max-width:700px){
   #prompt{bottom:calc(196px + env(safe-area-inset-bottom,0px));max-width:78vw}
+}
+/* --- Galactic Evolution: diplomacy & codex --- */
+.alienHead{display:flex;align-items:center;gap:12px;padding:10px 12px;border:1.5px solid rgba(90,215,255,.35);border-radius:14px;background:linear-gradient(145deg,rgba(14,36,64,.92),rgba(8,16,34,.94));margin-bottom:10px}
+.alienSigil{width:54px;height:54px;border-radius:50%;display:grid;place-items:center;font-family:var(--display);font-size:19px;flex:0 0 auto;border:2px solid currentColor;box-shadow:0 0 18px -4px currentColor}
+.alienHead .aName{font-family:var(--display);font-size:21px;line-height:1.05}
+.alienHead .aSub{font-size:10.5px;font-weight:800;letter-spacing:.5px;opacity:.8;margin-top:2px}
+.dialogQuote{font-size:13px;font-weight:700;line-height:1.45;padding:10px 12px;border-left:3px solid var(--c, #5df2c0);background:rgba(255,255,255,.045);border-radius:0 10px 10px 0;margin:8px 0 12px;font-style:italic}
+.choiceBtn{width:100%;text-align:left;justify-content:flex-start;gap:9px;line-height:1.3;margin-top:7px;padding:11px 13px}
+.civChip{display:inline-flex;align-items:center;gap:5px;padding:2px 8px;border-radius:99px;border:1px solid rgba(255,255,255,.22);font-size:9.5px;font-weight:900;letter-spacing:.4px}
+.rankTrack{height:9px;border-radius:99px;background:rgba(255,255,255,.12);overflow:hidden;margin:7px 0 4px}
+.rankTrack i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,#39c6ff,#5df2c0,#e6ff7a)}
+.civCard{border-left:3px solid var(--c,#5df2c0)}
+.dynTag{font-size:9px;font-weight:900;letter-spacing:.5px;padding:2px 7px;border-radius:99px;background:rgba(93,242,192,.18);color:#9dffd7}
+@media (max-width:640px){.alienHead{padding:8px 9px}.alienSigil{width:44px;height:44px;font-size:16px}.alienHead .aName{font-size:18px}.choiceBtn{font-size:11px;padding:10px}}
+/* --- Short landscape phones: keep the resource strip in its own lane (never over the status panel) --- */
+@media (orientation:landscape) and (max-height:600px){
+  #topRight{max-width:calc(100vw - 236px);gap:4px}
+  #resTray{width:100%;max-width:100%;min-width:0;flex-wrap:nowrap;overflow-x:auto;overflow-y:hidden;justify-content:flex-start;
+    align-items:center;font-size:9px;gap:7px;padding:3px 7px;border-radius:9px;scrollbar-width:none;-webkit-overflow-scrolling:touch;
+    mask-image:linear-gradient(90deg,#000 0,#000 94%,transparent 100%);-webkit-mask-image:linear-gradient(90deg,#000 0,#000 94%,transparent 100%)}
+  #resTray::-webkit-scrollbar{display:none}
+  #resTray .resPill{flex:0 0 auto;white-space:nowrap;gap:4px}
+  #resTray .ic{width:12px;height:12px}
+  #resTray .resDot{width:7px;height:7px}
+  .tapPill{padding:0 5px}
+  #panel{max-width:186px;padding:5px 9px 7px}
+  #loc{font-size:15px}
+  #sub{font-size:8.5px;letter-spacing:.05em}
+  #sysTag{font-size:8.5px;letter-spacing:.16em}
+  .barRow{margin-top:3px}
+  #missionCard{max-width:190px;padding:4px 8px}
+  #mTitle{font-size:11.5px}
+  #mProg{font-size:9px}
+  #btnRow{gap:4px}
+  .hudBtn{padding:5px 7px}
+  .hudBtn .ic{width:15px;height:15px}
 }
 </style>
 </head>
@@ -829,6 +869,7 @@ body.photoMode #ui{opacity:0!important}
       <button class="tabBtn" id="tabDisc"><svg class="ic"><use href="#i-scan"/></svg> DISCOVERIES</button>
       <button class="tabBtn" id="tabFactions"><svg class="ic"><use href="#i-faction"/></svg> FACTIONS</button>
       <button class="tabBtn" id="tabFauna"><svg class="ic"><use href="#i-fauna"/></svg> FAUNA</button>
+      <button class="tabBtn" id="tabCodex"><svg class="ic"><use href="#i-comms"/></svg> XENO CODEX</button>
       <button class="tabBtn" id="tabResearch"><svg class="ic"><use href="#i-research"/></svg> RESEARCH ARCHIVE</button>
       <button class="tabBtn" id="tabSave"><svg class="ic"><use href="#i-save"/></svg> SAVE &amp; GRAPHICS</button>
     </div>
@@ -908,6 +949,17 @@ body.photoMode #ui{opacity:0!important}
         <button class="uBtn buy" id="btnHelpOk" style="width:auto"><svg class="ic"><use href="#i-check"/></svg> GOT IT — LET'S PLAY!</button>
       </div>
     </div>
+  </div>
+</div>
+
+<!-- Alien First Contact & Diplomacy Modal -->
+<div id="alienModal" class="modal">
+  <div class="mCard" style="width:min(640px,96vw)">
+    <div class="mHead">
+      <h2><svg class="ic"><use href="#i-comms"/></svg> XENO-DIPLOMACY CHANNEL</h2>
+      <button class="hudBtn" id="closeAlien" style="background:var(--pop);color:#fff" aria-label="Close"><svg class="ic"><use href="#i-close"/></svg></button>
+    </div>
+    <div class="mBody" id="alienBody"></div>
   </div>
 </div>
 
@@ -1488,6 +1540,14 @@ function advanceMission(type,amt=1){
 }
 function updateMissionHUD(){
   if(typeof tutStep!=='undefined'&&tutActive()&&started)return;
+  const dyn=(GAME.dynMissions||[]).find(m=>m.status==='active');
+  if(dyn){
+    const line=dynMissionLine(dyn);
+    $('mTitle').innerHTML=`<svg class="ic"><use href="#i-mission"/></svg> OP: ${dyn.title}`;
+    $('mDesc').textContent=dyn.desc;
+    $('mProg').textContent=`STAGE ${line.stage+1}/${line.def.stages?line.def.stages.length:2} · ${line.def.stages?line.def.stages[line.stage]:'IN PROGRESS'} · ${line.progTxt}`;
+    return;
+  }
   const cur=MISSIONS.find(m=>!m.done);
   if(!cur){
     $('mTitle').innerHTML='<svg class="ic"><use href="#i-check"/></svg> ALL MISSIONS COMPLETE!';
@@ -1518,7 +1578,11 @@ function recordDiscovery(cat,name,planet,detail){
 
 /* ---- ELYSIAN VEIL: living-system state, HUD, titles & restoration ---- */
 const GAME={title:'',achievements:[],milestones:[],contracts:[],contractSeed:0,outposts:[],sysVisited:['solara'],seenElysian:false,
-  rep:{guild:0,veilkeepers:0,cartographers:0},factionContracts:[],factionSeed:{day:0,week:0},tamed:[],photoLog:[],catReward:{},poiState:{},treasure:[],crew:0,raiderKills:0,contacts:[]};
+  rep:{guild:0,veilkeepers:0,cartographers:0},factionContracts:[],factionSeed:{day:0,week:0},tamed:[],photoLog:[],catReward:{},poiState:{},treasure:[],crew:0,raiderKills:0,contacts:[],
+  civRep:{},civMet:{},civTrades:{},shipSeen:{},legendSeen:[],missionOffers:[],dynMissions:[],missionHistory:[],missionCompletions:{},missionDay:0,
+  galaxySeen:[],anomalyLog:[],rescues:0,escorts:0,diplomacy:0,titles:[],equippedTitle:'',cosmetics:[],planetComplete:{},planetLooted:{},
+  strangerWrecks:0,rareFinds:0};
+const SAVE_EXTRA={},GAME_EXTRA={};
 const ELYS={nodes:[],beams:[],bloom:null,core:null,petals:[],plantMats:[],restored:false,beamGroup:null};
 const CINE={open:false,t:0};
 const ELYS_NODE_COST={fe:15,ae:5,lum:3};
@@ -1532,7 +1596,18 @@ const ACH_LIST=[
   {id:'eternal',name:'ETERNAL EXPLORER',desc:'Restore the Eternal Bloom.'},
   {id:'raider',name:'VOID HUNTER',desc:'Destroy an alien raider in ship-to-ship combat.'},
   {id:'envoy',name:'XENO-ENVOY',desc:'Hail an unknown species starship.'},
-  {id:'dreadnought',name:'DREADSLAYER',desc:'Destroy an alien dreadnought in systems 3 or 4.'}
+  {id:'dreadnought',name:'DREADSLAYER',desc:'Destroy an alien dreadnought in systems 3 or 4.'},
+  {id:'civ6',name:'GALACTIC CHORUS',desc:'Make first contact with all six alien civilizations.'},
+  {id:'mothership',name:'TITAN PARLEY',desc:'Hail an alien mothership and survive the audience.'},
+  {id:'legend',name:'LEGEND HUNTER',desc:'Scan a legendary creature on a planetary surface.'},
+  {id:'mission_rescue',name:'GUARDIAN ANGEL',desc:'Complete a Distress Rescue operation.'},
+  {id:'mission_negotiation',name:'SILVER TONGUE',desc:'Complete an Alien Negotiation.'},
+  {id:'mission_escort',name:'CONVOY SHIELD',desc:'Complete a Fleet Escort.'},
+  {id:'mission_bounty',name:'HUNTER\'S MARK',desc:'Complete a Bounty Hunt.'},
+  {id:'mission_expedition',name:'RUIN RUNNER',desc:'Complete an Ancient Expedition.'},
+  {id:'mission_lost',name:'NO ONE LEFT BEHIND',desc:'Complete a Lost Explorer rescue.'},
+  {id:'mission_anomaly',name:'ANOMALY CHASER',desc:'Complete an Anomaly Investigation.'},
+  {id:'rank5',name:'LEGEND OF THE VEIL',desc:'Reach Galactic Explorer Rank V.'}
 ];
 const MILESTONES=[
   {id:'ms_d10',name:'FIELD NOTES',desc:'Log 10 discoveries.',req:()=>DISCOVERIES.length>=10,reward:{gold:80,rp:2}},
@@ -1669,6 +1744,182 @@ function claimFactionContract(ct){
   const f=factionById(ct.faction);
   toast(`${f.icon} CONTRACT CLAIMED — +${ct.reward.gold} 🪙 +${ct.reward.rp} RP +${ct.reward.rep} REP`);
   return true;
+}
+
+/* ---- DYNAMIC MISSIONS: seven repeatable, multi-stage operations ---- */
+const DYN_DEFS={
+  rescue:{title:'DISTRESS RESCUE',icon:'#i-heart',color:'#ff6b8a',goal:30,unit:'s',
+    desc:'A civilian freighter is broadcasting a distress call. Reach it and escort the crew to safety.',
+    stages:['Reach the distressed freighter','Stay within 220m for 30 seconds']},
+  negotiation:{title:'ALIEN NEGOTIATION',icon:'#i-comms',color:'#5df2c0',goal:1,unit:'',
+    desc:'Open a channel with a target civilisation and settle the conversation without bloodshed.',
+    stages:['Hail the target envoy','Choose a peaceful resolution']},
+  escort:{title:'FLEET ESCORT',icon:'#i-shield',color:'#39c6ff',goal:40,unit:'s',
+    desc:'A courier fleet needs a gun at its wing through the trade lane.',
+    stages:['Rendezvous with the courier fleet','Stay within 220m for 40 seconds']},
+  bounty:{title:'BOUNTY HUNT',icon:'#i-target',color:'#ff4d6d',goal:2,unit:'',
+    desc:'A frontier bounty is posted on raider hulls. Clear the spacelane.',
+    stages:['Destroy 2 alien raiders','Collect the bounty']},
+  expedition:{title:'ANCIENT EXPEDITION',icon:'#i-gem',color:'#ffd23f',goal:2,unit:'',
+    desc:'Precursor signals are bleeding through the crust. Chart the ancient sites.',
+    stages:['Survey 2 ancient sites','Decode the relic data']},
+  lost:{title:'LOST EXPLORER',icon:'#i-fauna',color:'#ff922b',goal:1,unit:'',
+    desc:'A survey team stopped transmitting on a planet below. Find their last signal.',
+    stages:['Reach the target world','Rescue the stranded explorer']},
+  anomaly:{title:'ANOMALY INVESTIGATION',icon:'#i-radar',color:'#c77dff',goal:1,unit:'',
+    desc:'Sensors are screaming about a spatial anomaly. Get close enough to scan it.',
+    stages:['Locate the anomaly','Scan it before it collapses']}
+};
+const DYN_ORDER=['rescue','negotiation','escort','bounty','expedition','lost','anomaly'];
+function dynReward(seed){
+  const s=mulberry32(seed||1),mult=1+(UPGRADES.ship.lvl||1)*0.12;
+  return {gold:Math.round((120+s()*110)*mult),rp:3+((s()*4)|0),rep:6+((s()*6)|0),
+    res:{fe:8+((s()*10)|0),ae:5+((s()*8)|0),so:2+((s()*4)|0)}};
+}
+function dynTargetBody(seed){
+  const list=bodies.filter(b=>b.landable&&b.kind!=='bloom');
+  if(!list.length)return null;
+  return list[seed%list.length];
+}
+function makeDynOffer(type,seed){
+  const def=DYN_DEFS[type],rnd=mulberry32(seed),r=dynReward(seed);
+  const o={id:'dm'+todayKey()+'_'+type+'_'+(seed%997),type,title:def.title,desc:def.desc,goal:def.goal,unit:def.unit,
+    reward:r,day:todayKey(),targetCiv:CIV_IDS[(rnd()*CIV_IDS.length)|0],targetBody:'',pending:false};
+  if(type==='lost'){const b=dynTargetBody((rnd()*9999)|0);o.targetBody=b?b.name:'';o.desc=`A survey team stopped transmitting on ${b?b.name:'a frontier world'}. Find their last signal.`;}
+  if(type==='negotiation'){const c=civById(o.targetCiv);o.desc=`${c.species} envoys are waiting for a formal channel. Open a dialogue and keep it peaceful.`;}
+  return o;
+}
+function ensureDynOffers(force=false){
+  if(!GAME.missionOffers)GAME.missionOffers=[];
+  if(!Array.isArray(GAME.dynMissions))GAME.dynMissions=[];
+  const day=todayKey();
+  if(!force&&GAME.missionDay===day&&GAME.missionOffers.length)return;
+  const keep=force?[]:GAME.missionOffers.slice(0,1);
+  GAME.missionDay=day;
+  const rnd=mulberry32(day*7919+17),types=DYN_ORDER.slice();
+  for(let i=0;i<3;i++){
+    const idx=(rnd()*types.length)|0,type=types.splice(idx,1)[0];
+    GAME.missionOffers.push(makeDynOffer(type,day*131+i*37+((rnd()*97)|0)));
+  }
+  if(keep.length)GAME.missionOffers=keep.concat(GAME.missionOffers);
+  GAME.missionOffers=GAME.missionOffers.slice(0,4);
+  saveGame(true);
+}
+function acceptDynMission(id){
+  ensureDynOffers();
+  const o=GAME.missionOffers.find(x=>x.id===id);if(!o)return false;
+  if(GAME.dynMissions.length>=3){toast('MISSION SLOTS FULL — FINISH AN ACTIVE OPERATION FIRST');return false;}
+  const m=JSON.parse(JSON.stringify(o));
+  m.status='active';m.prog=0;m.stage=0;m.accepted=Date.now();m.shipId=0;
+  GAME.dynMissions.push(m);
+  GAME.missionOffers=GAME.missionOffers.filter(x=>x.id!==id);
+  if(m.type==='rescue'){
+    if(!spawnDistressShip())m.pending=true;
+    toast('🆘 DISTRESS RESCUE ACCEPTED — LAUNCH AND REACH THE FREIGHTER');
+  }else if(m.type==='escort'){
+    if(!spawnEscortFleet())m.pending=true;
+    else toast('🛸 ESCORT FLEET RENDEZVOUS SET — FLY WITHIN 220m');
+  }else if(m.type==='anomaly'){
+    if(typeof spawnAnomaly==='function')spawnAnomaly(true);
+    toast('🌌 ANOMALY COORDINATES RECEIVED — FLY CLOSE AND PRESS E TO SCAN');
+  }else if(m.type==='lost'){
+    const b=bodies.find(x=>x.name===m.targetBody);
+    if(b&&b.detail&&!b.pois.some(p=>p.kind==='npc'&&!p.rescued)){
+      spawnPOI(b,'npc',940+((Math.random()*50)|0),mulberry32((Date.now()&0xffff)+7));
+    }
+    toast(`🔎 ${m.targetBody||'TARGET WORLD'}: LAND AND FIND THE SURVEY TEAM`);
+  }else if(m.type==='bounty')toast('☠ BOUNTY POSTED — DESTROY 2 RAIDERS IN THE SPACELANES');
+  else if(m.type==='expedition')toast('🏛 ANCIENT EXPEDITION ACCEPTED — SOLVE 2 ANCIENT SITES');
+  else toast(`🤝 NEGOTIATION ACCEPTED — HAIL THE ${civById(m.targetCiv).species}`);
+  updateMissionHUD();saveGame(true);renderJournalModal();
+  return true;
+}
+function startRescue(n){
+  let m=GAME.dynMissions.find(x=>x.type==='rescue'&&x.status==='active'&&x.prog<x.goal);
+  if(!m){
+    m=makeDynOffer('rescue',Date.now()%99991);m.id='dr'+Date.now().toString(36);m.status='active';m.prog=0;m.stage=0;m.accepted=Date.now();
+    GAME.dynMissions.push(m);
+  }
+  m.shipId=n?n.id:0;m.pending=false;m.goal=m.goal||30;m.desc='A civilian freighter is broadcasting a distress call. Escort the crew to safety.';
+  updateMissionHUD();saveGame(true);
+  return m;
+}
+function dynProgress(type,amt=1,ctx){
+  let changed=false;
+  for(const m of GAME.dynMissions.slice()){
+    if(m.status!=='active'||m.type!==type||m.prog>=m.goal)continue;
+    if(type==='negotiation'&&m.targetCiv&&ctx&&ctx.civId&&ctx.civId!==m.targetCiv)continue;
+    if(type==='lost'&&m.targetBody&&ctx&&ctx.body&&ctx.body!==m.targetBody)continue;
+    m.prog=Math.min(m.goal,m.prog+(amt||1));
+    changed=true;
+    if(m.prog>=m.goal)completeDynMission(m);
+  }
+  if(changed){updateMissionHUD();}
+}
+function completeDynMission(m){
+  if(!m||m.status==='done')return;
+  m.status='done';m.done=Date.now();
+  const idx=GAME.dynMissions.indexOf(m);if(idx>=0)GAME.dynMissions.splice(idx,1);
+  GAME.missionCompletions[m.type]=(GAME.missionCompletions[m.type]||0)+1;
+  GAME.missionHistory.unshift({type:m.type,title:m.title,done:m.done,reward:m.reward});
+  GAME.missionHistory=GAME.missionHistory.slice(0,24);
+  const r=m.reward||dynReward(1);
+  earnGold(r.gold,true);INV.rp=(INV.rp||0)+r.rp;
+  for(const k of ['fe','ae','so','vd','lum','bp','vw','seed'])if(r.res&&r.res[k])INV[k]=(INV[k]||0)+r.res[k];
+  const f=['guild','cartographers','veilkeepers'][DYN_ORDER.indexOf(m.type)%3];
+  grantRep(f,r.rep||6);
+  if(m.type==='negotiation'&&m.targetCiv)grantCivRep(m.targetCiv,8);
+  if(m.type==='rescue'&&m.shipId){
+    const n=NPC.list.find(x=>x.id===m.shipId);
+    if(n){n.follow=false;n.escort=false;n.life=Math.min(n.life,n.age+14);}
+    GAME.rescues=(GAME.rescues||0)+1;
+  }
+  if(m.type==='escort')GAME.escorts=(GAME.escorts||0)+1;
+  grantAch('mission_'+m.type);
+  recordDiscovery('Mission',`${m.title} Complete`,'Galactic Frontier',`Completed a ${m.title.toLowerCase()} operation for the frontier.`);
+  comicPop(`${m.title} COMPLETE!`,'#5df2c0',50,38);
+  toast(`✅ ${m.title} COMPLETE — +${r.gold} 🪙 +${r.rp} RP +${r.rep||6} REP`);
+  SFX.discover();updateResHUD();checkAchievements();checkMilestones();checkProgression();saveGame(true);
+}
+function secsLeft(m){return Math.max(0,Math.ceil(m.goal-m.prog));}
+function updateDynMissions(dt){
+  if(!GAME.dynMissions||!GAME.dynMissions.length)return;
+  const near=NPC.list.filter(n=>!n.hostile&&(n.escort||n.follow));
+  for(const m of GAME.dynMissions.slice()){
+    if(m.status!=='active')continue;
+    if(m.pending&&(m.type==='rescue'||m.type==='escort')){
+      if(m.type==='rescue'?spawnDistressShip():spawnEscortFleet()){m.pending=false;toast(m.type==='rescue'?'🆘 DISTRESS FREIGHTER BACK ON SENSORS':'🛸 COURIER FLEET HAS ARRIVED');}
+    }
+    if(m.type==='escort'||m.type==='rescue'){
+      const nearOne=near.find(n=>n.group.position.distanceTo(ship.group.position)<240);
+      if(nearOne&&PL.mode==='fly'){
+        m.prog=Math.min(m.goal,m.prog+dt);
+        if(m.prog>=m.goal)completeDynMission(m);
+      }
+    }
+  }
+}
+function dynMissionLine(m){
+  const def=DYN_DEFS[m.type]||{},pct=clamp(m.prog/(m.goal||1),0,1)*100;
+  const stage=m.prog>=(m.goal||1)*0.5?1:0;
+  const progTxt=m.unit==='s'?`${Math.floor(m.prog)}/${m.goal}s`:`${Math.floor(m.prog)}/${m.goal}`;
+  return {def,pct,stage,progTxt};
+}
+function renderDynMissionCard(m){
+  const {def,stage,progTxt,pct}=dynMissionLine(m);
+  return `<span class="jBadge" style="background:${def.color||'#5df2c0'};color:#0b1020">${stage===0?'STAGE 1':'STAGE 2'}</span>
+    <div style="min-width:0"><div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap"><div style="font-family:var(--display);font-size:19px">${m.title}</div><span class="dynTag">${progTxt}</span></div>
+    <div style="font-size:11.5px;font-weight:700;margin-top:2px">${m.desc}</div>
+    <div style="font-size:10.5px;font-weight:800;opacity:.72;margin-top:3px">STAGE ${stage+1}: ${def.stages?def.stages[stage]:'In progress'}${m.targetBody?` · ${m.targetBody}`:''}${m.type==='negotiation'?` · ${civById(m.targetCiv).species}`:''}</div>
+    <div class="rankTrack"><i style="width:${pct.toFixed(1)}%;background:${def.color||'#5df2c0'}"></i></div>
+    <div style="font-size:10px;font-weight:800;opacity:.7">REWARD ${m.reward.gold} 🪙 · ${m.reward.rp} RP · +${m.reward.rep||6} REP</div></div>`;
+}
+function renderDynOfferCard(m){
+  const def=DYN_DEFS[m.type]||{};
+  return `<div class="uCard"><div><div class="uTitle"><span>${m.title}</span><span class="uLvl">${def.stages?def.stages.length:1} STAGE</span></div>
+    <div class="uDesc" style="margin-top:5px">${m.desc}</div>
+    <div class="uCost">REWARD: ${m.reward.gold} 🪙 · ${m.reward.rp} RP · +${m.reward.rep||6} REP</div></div>
+    <button class="uBtn buy" data-dyn="${m.id}" ${GAME.dynMissions.length>=3?'disabled':''}>${GAME.dynMissions.length>=3?'SLOTS FULL':'ACCEPT MISSION'}</button></div>`;
 }
 
 /* ---- ECOLOGY: COMPANIONS, PLANET CATALOGUES & PHOTO MODE ---- */
@@ -2134,6 +2385,31 @@ function spawnResourceNodes(b,rnd,types,count){
 }
 
 /* ---- Procedural Alien Wildlife, Caves & Ancient Ruins ---- */
+const PLANET_LORE={
+  CINDER:{settlement:'ASHFALL FOUNDRY',underground:'MAGMA CISTERN',env:'SULFUR VENT FIELD',legend:'CINDER MOLTEN LEVIATHAN'},
+  DUNE:{settlement:'SUNKEN CARAVAN POST',underground:'MESA TOMB',env:'GLASS DUNE MIRAGE',legend:'DUNE GLASS SERPENT'},
+  TERRA:{settlement:'COLONY OUTPOST 7',underground:'OLD TRANSIT TUNNEL',env:'ANCIENT FOREST RING',legend:'TERRA CLOUDWHALE'},
+  AZURA:{settlement:'TIDELINE RESORT RUIN',underground:'DROWNED TEMPLE',env:'CORAL SINGING SHALLOWS',legend:'AZURA REEF TITAN'},
+  FUNGARA:{settlement:'SPORE HARVEST CAMP',underground:'MYCELIAL CATHEDRAL',env:'GLOWCAP BLOOM FIELD',legend:'FUNGARA ELDER SPORE'},
+  GLACIA:{settlement:'FROZEN DRILL STATION',underground:'ICE TOMB',env:'AURORA ICE ARCH',legend:'GLACIA RIME WALKER'},
+  LUNA:{settlement:'LUNA SURVEY SHACK',underground:'LAVA TUBE ECHO',env:'CRATER GLASS FIELD',legend:'LUNA PALE WIDOW'},
+  EMBER:{settlement:'SULFUR MINING HUT',underground:'ASH SHAFT',env:'MOLTEN GEYSER BASIN',legend:'EMBER CINDER HOUND'},
+  FROST:{settlement:'CRYO RELAY STATION',underground:'FROZEN RELAY VAULT',env:'BLUE ICE MAZE',legend:'FROST GLASS PHANTOM'},
+  MOSS:{settlement:'VERDANT HERDER CAMP',underground:'ROOTWAY BURROW',env:'MOSS LIGHT WELL',legend:'MOSS ANTLER BEAST'},
+  PEARL:{settlement:'PEARL DIVERS HUT',underground:'SHELL CATACOMB',env:'IRIDESCENT SALT FLAT',legend:'PEARL SHELL SOVEREIGN'},
+  VESPERA:{settlement:'OBSIDIAN WAYSTATION',underground:'CRYSTAL VEIN CRYPT',env:'BIOLUME SPIRE GARDEN',legend:'VESPERA LUMEN WRAITH'},
+  XYLOS:{settlement:'AMBER HARVESTER CAMP',underground:'SPORE HIVE GALLERY',env:'TOXIC AMBER FALLS',legend:'XYLOS AMBER MAW'},
+  CHRONOS:{settlement:'RING-WORLD RELIQUARY',underground:'SHATTERED ARCHIVE',env:'GRAVITY SCAR',legend:'CHRONOS TIME MOTH'},
+  'EREBUS-9':{settlement:'VOID-MATTER OUTPOST',underground:'SINGULARITY VAULT',env:'DARK-MATTER FOUNTAIN',legend:'EREBUS NULL SERPENT'},
+  TARTARUS:{settlement:'CRIMSON FORGE CAMP',underground:'INFERNO CRUCIBLE',env:'OBSIDIAN FALLS',legend:'TARTARUS BLOOD COLOSSUS'},
+  AURELIA:{settlement:'SKY-ISLE SHRINE',underground:'FLOATING CRYPT',env:'LOW-GRAVITY BLOOMFIELD',legend:'AURELIA SKY WHALE'},
+  PELAGIA:{settlement:'DROWNED COLONY',underground:'ABYSSAL PEARL VAULT',env:'LUMINA KELP FOREST',legend:'PELAGIA TIDAL LEVIATHAN'},
+  PRISMARA:{settlement:'PRISM SURVEY CAMP',underground:'CRYSTAL ARCHIVE',env:'MAGNETIC SPIRE FIELD',legend:'PRISMARA SHARD DRAGON'},
+  MYCELORA:{settlement:'ROOT-BRIDGE HAMLET',underground:'UNDERROOT CRYPT',env:'GIANT CAP GARDEN',legend:'MYCELORA ROOT MOTHER'},
+  PETAL:{settlement:'PETAL HERMITAGE',underground:'BLOOM BURROW',env:'LUMINA PETAL SEA',legend:'PETAL GOSSAMER STAG'},
+  ECHO:{settlement:'ECHO RELAY RUIN',underground:'NETWORK ECHO VAULT',env:'RESONANCE HOLLOW',legend:'ECHO PHASE WISP'}
+};
+function loreFor(b){return PLANET_LORE[b.name]||{settlement:`${b.name} ABANDONED CAMP`,underground:`${b.name} UNDER-RUIN`,env:`${b.name} ANOMALY FIELD`,legend:`${b.name} APEX PREDATOR`};}
 function spawnPlanetaryEcosystem(b,rnd,cfg){
   const parent=b.detail||b.group;
 
@@ -2158,6 +2434,29 @@ function spawnPlanetaryEcosystem(b,rnd,cfg){
     b.creatures.push({mesh:m,dir:d.clone(),yaw:rnd()*TAU,phase:rnd()*TAU,hover:i%2===0?0.55:0.04,name:spName,scanned:false,tamed:false,photoed:false});
     i++;
   }
+  // Rare apex creature: one legendary species may stalk each world. Hard to find, valuable to scan.
+  if(rnd()<0.62){
+    const legend=loreFor(b).legend;
+    const legGeo=merge([
+      [new THREE.SphereGeometry(0.6,12,9),wCol,Mx(0,0.6,0,0,0,0,1.15,0.75,1.9)],
+      [new THREE.SphereGeometry(0.36,10,7),0xffffff,Mx(0,1.02,-1.25,0,0,0,1.05,0.85,1.05)],
+      [new THREE.ConeGeometry(0.17,1.15,5),0xffd23f,Mx(-0.38,1.18,-0.65,-0.35,0,0.15)],
+      [new THREE.ConeGeometry(0.17,1.15,5),0xffd23f,Mx(0.38,1.18,-0.65,-0.35,0,-0.15)],
+      [new THREE.ConeGeometry(0.11,0.5,6),0xffffff,Mx(-0.22,1.24,-1.72,-Math.PI/2,0,0)],
+      [new THREE.ConeGeometry(0.11,0.5,6),0xffffff,Mx(0.22,1.24,-1.72,-Math.PI/2,0,0)],
+      [new THREE.ConeGeometry(0.5,2.7,5),wCol,Mx(0,0.4,2.2,Math.PI/2,0,0)]
+    ]);
+    for(let t=0;t<40;t++){
+      const d=randUnit(rnd),h=b.heightAt(d.x,d.y,d.z);
+      if(b.liquid&&!b.liquidSolid&&h<0.45)continue;
+      const m=new THREE.Mesh(legGeo,new THREE.MeshToonMaterial({vertexColors:true,gradientMap:gradTex,emissive:wCol,emissiveIntensity:0.5}));
+      addOutline(m,OL_BIG);m.scale.setScalar(1.55+rnd()*0.8);
+      parent.add(m);
+      b.creatures.push({mesh:m,dir:d.clone(),yaw:rnd()*TAU,phase:rnd()*TAU,hover:0.12,legendary:true,
+        name:legend,scanned:false,tamed:false,photoed:false});
+      break;
+    }
+  }
 
   // 2. Underground Cave Entrance / Crystal Grotto (provides Storm Shelter & Rare Nodes)
   const caveGeo=merge([
@@ -2166,19 +2465,21 @@ function spawnPlanetaryEcosystem(b,rnd,cfg){
     [new THREE.OctahedronGeometry(0.55,0),0x39c6ff,Mx(-1.1,0.5,-1.2,0.2,0.3,0.4)],
     [new THREE.OctahedronGeometry(0.45,0),0xc77dff,Mx(1.0,0.45,-1.5,-0.2,0.1,-0.3)]
   ]);
-  for(let c=0,tries=0;c<2&&tries<80;tries++){
+  const caveCount=b.R>=42?3:2;
+  for(let c=0,tries=0;c<caveCount&&tries<120;tries++){
     const d=randUnit(rnd);
     const h=b.heightAt(d.x,d.y,d.z);
     if(b.liquid&&!b.liquidSolid&&h<0.6)continue;
     const gr=b.groundR(d.x,d.y,d.z);
     const lp=d.clone().multiplyScalar(gr);
     if(b.colliders.some(col=>col.p.distanceToSquared(lp)<36))continue;
-    const cm=new THREE.Mesh(caveGeo,vcToon);
+    const rare=c===caveCount-1&&caveCount===3;
+    const cm=new THREE.Mesh(caveGeo,rare?new THREE.MeshToonMaterial({vertexColors:true,gradientMap:gradTex,emissive:0x9dfcff,emissiveIntensity:0.28}):vcToon);
     cm.matrixAutoUpdate=false;
-    cm.matrix.copy(placeM(d,gr-0.1,rnd()*TAU,1.35));
+    cm.matrix.copy(placeM(d,gr-0.1,rnd()*TAU,rare?1.55:1.35));
     addOutline(cm,OL_BIG);
     parent.add(cm);
-    b.caves.push({localPos:lp,dir:d.clone(),name:`${b.name} Crystal Cavern #${c+1}`,scanned:false});
+    b.caves.push({localPos:lp,dir:d.clone(),name:rare?`${b.name} Abyssal Cavern`:`${b.name} Crystal Cavern #${c+1}`,scanned:false,rare});
     // Spawn a high-value node inside the cave
     const nType=b.sys==='gargantua'?'vd':(b.sys==='nyx'?'so':'ae');
     const nm=new THREE.Mesh(getNodeGeo(nType),new THREE.MeshToonMaterial({vertexColors:true,gradientMap:gradTex,emissive:RES_META[nType].color,emissiveIntensity:0.65}));
@@ -2269,6 +2570,35 @@ function poiGeo(kind){
     [new THREE.SphereGeometry(0.22,8,6),0xf0cfa0,Mx(0.2,0.95,-1.15)],
     [new THREE.CylinderGeometry(0.17,0.22,0.75,7),0x39c6ff,Mx(0.2,0.45,-1.15)]
   ];
+  else if(kind==='settlement')p=[
+    [new THREE.CylinderGeometry(3.4,3.7,0.42,10),0x596077,Mx(0,0.2,0)],
+    [new THREE.SphereGeometry(1.5,10,6,0,TAU,0,Math.PI/2),0xb9c2d6,Mx(-0.9,0.38,0.35,0,0,0,1.25,0.85,1.25)],
+    [new THREE.SphereGeometry(1.0,8,5,0,TAU,0,Math.PI/2),0x8e9ab5,Mx(1.25,0.38,-0.4,0,0,0,1.1,0.8,1.1)],
+    [new THREE.BoxGeometry(1.05,1.5,1.0),0x6d7890,Mx(-2.3,0.95,-0.85)],
+    [new THREE.BoxGeometry(0.7,0.2,0.08),0x2a3145,Mx(-2.3,1.1,-1.38)],
+    [new THREE.CylinderGeometry(0.045,0.06,3.2,5),0x9aa3b8,Mx(2.35,1.65,0.6)],
+    [new THREE.SphereGeometry(0.13,6,5),0xff4d6d,Mx(2.35,3.28,0.6)],
+    [new THREE.BoxGeometry(1.9,0.08,0.9),0x3d6fa8,Mx(0.2,0.48,-1.95,0,0.2,0.18)],
+    [new THREE.BoxGeometry(0.8,0.7,0.7),0x544b45,Mx(1.9,0.6,1.5,0,0.5,0)]
+  ];
+  else if(kind==='underground')p=[
+    [new THREE.TorusGeometry(1.55,0.38,7,16,Math.PI),0x6a6480,Mx(0,0.35,0)],
+    [new THREE.CylinderGeometry(1.5,1.7,0.5,8,1,true,0,Math.PI),0x171426,Mx(0,0.25,-1.1,Math.PI/2,0,0)],
+    [new THREE.BoxGeometry(0.5,1.9,0.5),0x49435d,Mx(-1.55,1.05,0.4)],
+    [new THREE.BoxGeometry(0.5,1.9,0.5),0x49435d,Mx(1.55,1.05,0.4)],
+    [new THREE.OctahedronGeometry(0.34,0),0x9dfcff,Mx(0,2.25,0.3)],
+    [new THREE.BoxGeometry(2.8,0.16,0.65),0x2b2840,Mx(0,0.12,-0.65)],
+    [new THREE.BoxGeometry(2.2,0.14,0.55),0x3b3756,Mx(0,0.02,-1.55)],
+    [new THREE.BoxGeometry(1.7,0.12,0.45),0x4a4568,Mx(0,-0.06,-2.35)]
+  ];
+  else if(kind==='env')p=[
+    [new THREE.DodecahedronGeometry(1.05,0),0x3c4457,Mx(0,0.32,0,0.4,0.2,0.1,1.4,0.6,1.2)],
+    [new THREE.CylinderGeometry(0.35,0.55,1.5,7),0x51617a,Mx(0,1.1,0)],
+    [new THREE.ConeGeometry(0.6,0.35,7),0xffd23f,Mx(0,1.95,0)],
+    [new THREE.OctahedronGeometry(0.35,0),0x9dfcff,Mx(-0.75,0.75,0.45,0.3,0,0.2)],
+    [new THREE.OctahedronGeometry(0.25,0),0xff8fce,Mx(0.7,0.58,-0.35,-0.2,0.3,-0.2)],
+    [new THREE.TorusGeometry(1.55,0.07,5,22),0x5df2c0,Mx(0,1.95,0,Math.PI/2,0,0)]
+  ];
   else p=[
     [new THREE.ConeGeometry(1.25,0.55,9),0x6b5a3e,Mx(0,0.22,0)],
     [new THREE.BoxGeometry(1.15,0.1,0.15),0xffd23f,Mx(0,0.42,0,0,0,0.7)],
@@ -2334,15 +2664,50 @@ function spawnPOI(b,kind,idx,rnd){
   }else if(kind==='npc'){
     p.name=`${b.name} Stranded Survivor`;p.rescued=!!st.rescued;
     p.label=p.rescued?'SURVIVOR RESCUED':'RESCUE STRANDED SURVIVOR';
+  }else if(kind==='settlement'){
+    const lore=loreFor(b);p.name=lore.settlement;p.loot=st.loot||0;p.looted=p.loot>=2;
+    p.label=p.looted?'SETTLEMENT PICKED CLEAN':`SEARCH ${p.name} (${p.loot}/2)`;
+  }else if(kind==='underground'){
+    const lore=loreFor(b);p.name=lore.underground;p.explored=!!st.explored;
+    p.label=p.explored?'UNDERGROUND RUIN ALREADY CHARTED':`DESCEND INTO ${p.name}`;
+  }else if(kind==='env'){
+    const lore=loreFor(b);p.name=lore.env;p.surveyed=!!st.surveyed;
+    p.label=p.surveyed?'ENVIRONMENTAL SITE SURVEYED':`SURVEY ${p.name}`;
   }
   p.label=p.label||p.name;
+  if(kind==='settlement'||kind==='underground'||kind==='env'){
+    const beacon=new THREE.Mesh(new THREE.OctahedronGeometry(0.2,0),new THREE.MeshBasicMaterial({color:b.skyColor||0x5df2c0}));
+    beacon.position.set(0,kind==='underground'?2.55:kind==='settlement'?3.35:2.4,0);
+    m.add(beacon);p.beacon=beacon;
+  }
   b.pois.push(p);
   return p;
 }
 function spawnPOIs(b,rnd){
   if(!b||b.pois.length)return;
-  const kinds=['wreck','probe','vault','npc','wreck','probe'];
+  const kinds=['wreck','probe','vault','npc','wreck','probe','settlement','underground','env','env'];
   for(let i=0;i<kinds.length;i++)spawnPOI(b,kinds[i],i,rnd);
+}
+function planetPoiTotals(b){
+  const list=((b&&b.pois)||[]).filter(p=>p.kind!=='glyph');
+  let done=0;
+  for(const p of list){
+    if(p.scanned||p.dug||p.rescued||p.opened||p.repaired||p.explored||p.surveyed||(p.salvage>=3)||(p.loot>=2))done++;
+  }
+  return {done,total:list.length};
+}
+function updatePlanetProgress(b){
+  if(!b||!b.landable)return false;
+  const {done,total}=planetPoiTotals(b);
+  if(!total||done<total)return false;
+  if(GAME.planetComplete[b.name])return false;
+  GAME.planetComplete[b.name]=Date.now();
+  earnGold(400,true);INV.rp=(INV.rp||0)+15;INV.lum=(INV.lum||0)+3;
+  grantRep('cartographers',25);factionProgress('scan',3);
+  recordDiscovery('Planet Survey',`${b.name} Fully Charted`,b.name,'Every point of interest on this world has been charted and cleared.');
+  comicPop('PLANET 100% CHARTED!','#5df2c0',50,34);
+  toast(`✦ ${b.name.toUpperCase()} FULLY SURVEYED — +400 🪙 · +15 RP`);
+  SFX.discover();updateResHUD();checkProgression();saveGame(true);return true;
 }
 function spawnTreasureCache(b,dir,id){
   id=id||('cache_'+Date.now().toString(36)+Math.floor(Math.random()*999));
@@ -2427,7 +2792,44 @@ function handlePOI(p){
     p.label='SURVIVOR RESCUED';
     savePOIState(p,{rescued:true});factionProgress('rescue',1);grantRep('guild',14);
     recordDiscovery('Survivor',p.name,p.body.name,'Rescued a stranded frontier colonist. The Guild owes you one.');
+    dynProgress('lost',1,{survivor:true,body:p.body.name});
     SFX.discover();updateResHUD();return true;
+  }
+  if(p.kind==='settlement'){
+    if(p.loot>=2){toast('THE SETTLEMENT HAS NOTHING LEFT BUT COLD ASH');return true;}
+    p.loot++;
+    const haul=[
+      {fe:14,ae:6,so:4,gold:70,rp:2,txt:'REACTOR SCRAP'},
+      {lum:3,seed:2,maps:1,gold:95,rp:4,txt:'SEALED SUPPLY VAULT'}
+    ][Math.min(p.loot,2)-1];
+    for(const k of ['fe','ae','so','lum','seed','maps'])if(haul[k])INV[k]=(INV[k]||0)+haul[k];
+    earnGold(haul.gold,true);INV.rp=(INV.rp||0)+haul.rp;
+    if(p.loot===1)recordDiscovery('Settlement',p.name,p.body.name,'Abandoned colony found intact — its people left in a hurry.');
+    if(Math.random()<0.3)INV.outpostKit=(INV.outpostKit||0)+1;
+    p.looted=p.loot>=2;
+    p.label=p.looted?'SETTLEMENT PICKED CLEAN':`SEARCH ${p.name} (${p.loot}/2)`;
+    savePOIState(p,{loot:p.loot});factionProgress('salvage',1);grantRep('cartographers',7);
+    comicPop(haul.txt,p.looted?'#5df2c0':'#ffd23f',50,40);SFX.minePop();updateResHUD();return true;
+  }
+  if(p.kind==='underground'){
+    if(p.explored){toast('YOU HAVE ALREADY CHARTED THESE DEPTHS');return true;}
+    p.explored=true;p.label='UNDERGROUND RUIN ALREADY CHARTED';
+    INV.lum=(INV.lum||0)+4;INV.rp=(INV.rp||0)+7;earnGold(130,true);
+    if(Math.random()<0.45)INV.outpostKit=(INV.outpostKit||0)+1;
+    savePOIState(p,{explored:true});factionProgress('treasure',1);grantRep('cartographers',12);
+    recordDiscovery('Underground Ruin',p.name,p.body.name,'Descended into a precursor undercroft. Its walls still resonate.');
+    dynProgress('expedition',2,{ruin:true});
+    comicPop('UNDERGROUND RUIN CHARTED!','#9dfcff',50,40);SFX.discover();updateResHUD();return true;
+  }
+  if(p.kind==='env'){
+    if(p.surveyed){toast('THIS LANDMARK IS FULLY SURVEYED');return true;}
+    p.surveyed=true;p.label='ENVIRONMENTAL SITE SURVEYED';
+    INV.lum=(INV.lum||0)+2;INV.rp=(INV.rp||0)+4;earnGold(60,true);
+    if(Math.random()<0.5)INV.maps=(INV.maps||0)+1;
+    GAME.rareFinds++;
+    savePOIState(p,{surveyed:true});factionProgress('scan',1);grantRep('cartographers',9);
+    recordDiscovery('Landmark',p.name,p.body.name,'Surveyed a rare environmental formation for the Cartographers Guild.');
+    comicPop('LANDMARK SURVEYED!','#e6ff7a',50,40);SFX.discover();updateResHUD();return true;
   }
   if(p.kind==='cache'){
     if(p.dug){toast('THIS CACHE HAS ALREADY BEEN EMPTIED');return true;}
@@ -2493,6 +2895,9 @@ function applyPOIStateToBodies(){
         p.mesh.material=new THREE.MeshToonMaterial({vertexColors:true,gradientMap:gradTex,emissive:0x9dfcff,emissiveIntensity:0.65});
       }
       if(p.kind==='cache'&&st.dug){p.dug=true;p.label='CACHE ALREADY DUG';p.mesh.visible=false;}
+      if(p.kind==='settlement'&&st.loot!=null){p.loot=st.loot;p.looted=p.loot>=2;p.label=p.looted?'SETTLEMENT PICKED CLEAN':`SEARCH ${p.name} (${p.loot}/2)`;}
+      if(p.kind==='underground'&&st.explored){p.explored=true;p.label='UNDERGROUND RUIN ALREADY CHARTED';}
+      if(p.kind==='env'&&st.surveyed){p.surveyed=true;p.label='ENVIRONMENTAL SITE SURVEYED';}
     }
     for(const p of b.pois){
       if(p.kind==='vault'&&!(GAME.poiState[p.id]&&GAME.poiState[p.id].code)){
@@ -2539,6 +2944,7 @@ function openVaultCode(p){
     earnGold(160,true);INV.rp=(INV.rp||0)+8;INV.lum=(INV.lum||0)+3;INV.bp=(INV.bp||0)+2;INV.seed=(INV.seed||0)+1;INV.storm=(INV.storm||0)+2;INV.maps=(INV.maps||0)+1;
     grantRep('cartographers',15);factionProgress('treasure',1);
     recordDiscovery('Vault',p.name,p.body.name,'Cracked a three-glyph precursor vault and recovered its sealed archive.');
+    dynProgress('expedition',1,{vault:true});
     comicPop('VAULT UNSEALED!','#ffd23f',50,40);SFX.discover();updateResHUD();
     closeModals();toast('🔓 VAULT OPENED — +160 🪙 · +8 RP · RARE CRYSTALS & A MAP');
   };
@@ -3644,7 +4050,8 @@ const SHIP_SKINS=[
   {id:'arctic',name:'ARCTIC FOX',price:700,body:0xffffff,acc:0x39c6ff,str:0x1d3557,glass:0xbde0fe,gEm:0x1d3557,f1:0x4cc9f0,f2:0xe0fbff,pods:true,desc:'Snow-white hull with extra booster pods.'},
   {id:'midnight',name:'MIDNIGHT RAVEN',price:1000,body:0x2b2d42,acc:0x7b2cbf,str:0x5df2c0,glass:0xff4dd8,gEm:0x7a1060,f1:0xc77dff,f2:0xffffff,fin2:true,pods:true,desc:'Stealth-dark hull, neon trim, purple plasma.'},
   {id:'golden',name:'GOLDEN FALCON',price:2000,body:0xffd23f,acc:0xe09f1f,str:0xffffff,glass:0x5df2c0,gEm:0x0a6a50,f1:0xffffff,f2:0xffe066,fin2:true,pods:true,desc:'Solid-gold legend. Every pilot will know you made it.'},
-  {id:'goldenbloom',name:'GOLDEN BLOOM',price:0,locked:true,body:0xffe08a,acc:0xff8fce,str:0x7dffc4,glass:0xe6ff7a,gEm:0x2a6a1a,f1:0xe6ff7a,f2:0xffd1ec,fin2:true,pods:true,desc:'Eternal Explorer reward — living gold petals with bloom-green plasma.'}
+  {id:'goldenbloom',name:'GOLDEN BLOOM',price:0,locked:true,body:0xffe08a,acc:0xff8fce,str:0x7dffc4,glass:0xe6ff7a,gEm:0x2a6a1a,f1:0xe6ff7a,f2:0xffd1ec,fin2:true,pods:true,desc:'Eternal Explorer reward — living gold petals with bloom-green plasma.'},
+  {id:'voidlight',name:'VOIDLIGHT ENVOY',price:0,locked:true,body:0x10243f,acc:0x39c6ff,str:0x9dfcff,glass:0x5df2c0,gEm:0x0a6a7a,f1:0x39c6ff,f2:0xffffff,fin2:true,pods:true,desc:'Galactic Diplomat reward — a deep-void hull etched with living star-charts.'}
 ];
 const ASTRO_SKINS=[
   {id:'classic',name:'CLASSIC SUIT',price:0,suit:0xffffff,legs:0xe8ecff,chest:0x7a86b8,belt:0xff4d6d,visor:0xffb23f,vEm:0x7a3a00,desc:'Standard-issue white explorer suit.'},
@@ -3931,6 +4338,10 @@ function triggerScan(){
   scanWave.mesh.visible=true;
   comicPop('TERRAIN SCANNER!','#39c6ff',50,45);
 
+  if(GALAXY.anomaly&&!GALAXY.anomaly.scanned&&ship.group.position.distanceTo(GALAXY.anomaly.pos)<GALAXY.anomaly.scanR){
+    scanAnomaly();
+  }
+
   // Scan nearby discoveries on current planet
   const b=PL.mode==='walk'||PL.mode==='rover'?PL.body:PL.near;
   if(!b)return;
@@ -3941,6 +4352,16 @@ function triggerScan(){
     if(ref.distanceTo(_a)<scanWave.maxR && !cr.scanned){
       cr.scanned=true;found++;
       recordDiscovery('Species',cr.name,b.name,'Alien fauna documented via Multi-Tool Bio-Scanner.');
+      if(cr.legendary){
+        if(!GAME.legendSeen.includes(cr.name)){
+          GAME.legendSeen.push(cr.name);GAME.rareFinds++;
+          grantAch('legend');earnGold(160,true);INV.rp=(INV.rp||0)+8;
+          comicPop('LEGENDARY CREATURE!','#ffd23f',50,40);
+          toast(`✦ ${cr.name.toUpperCase()} IS NOW IN YOUR LEGENDARY BESTIARY`);
+          saveGame(true);
+        }
+        dynProgress('anomaly',1,{legend:true});
+      }
     }
   }
   for(const cvItem of b.caves){
@@ -3969,8 +4390,9 @@ function triggerScan(){
     _a.copy(b.center).add(poi.localPos);
     if(ref.distanceTo(_a)<scanWave.maxR&&!poi.scanned){
       poi.scanned=true;found++;
-      const cat=poi.kind==='wreck'?'Wreck':poi.kind==='probe'?'Derelict Tech':poi.kind==='vault'?'Vault':poi.kind==='npc'?'Survivor':'Treasure';
+      const cat=poi.kind==='wreck'?'Wreck':poi.kind==='probe'?'Derelict Tech':poi.kind==='vault'?'Vault':poi.kind==='npc'?'Survivor':poi.kind==='settlement'?'Settlement':poi.kind==='underground'?'Ruins':poi.kind==='env'?'Landmark':'Treasure';
       recordDiscovery(cat,poi.name,b.name,'Frontier point of interest charted by Terrain Pulse Scanner.');
+      if(poi.kind==='underground')dynProgress('expedition',1,{ruin:true});
     }
   }
   if(b.netNodes)for(const nn of b.netNodes){
@@ -3986,6 +4408,7 @@ function triggerScan(){
     }
   }
   if(found>0)toast(`SCAN IDENTIFIED ${found} NEW DISCOVER${found>1?'IES':'Y'}!`);
+  if(b&&b.landable)updatePlanetProgress(b);
 }
 
 /* ---------- 9. INPUT + MOBILE UI ---------- */
@@ -4002,7 +4425,7 @@ function openModal(id){
 }
 function closeModals(){
   modalOpen=false;
-  ['upgradeModal','craftModal','journalModal','mapModal','settingsModal','shopModal','helpModal','confirmModal','codeModal','baseModal','photoModal'].forEach(id=>$(id).classList.remove('open'));
+  ['upgradeModal','craftModal','journalModal','mapModal','settingsModal','shopModal','helpModal','confirmModal','codeModal','baseModal','photoModal','alienModal'].forEach(id=>$(id).classList.remove('open'));
   clearTimeout(baseTimer);
 }
 function askConfirm(title,msg,btns){
@@ -4020,6 +4443,8 @@ $('btnUpgrade').addEventListener('click',e=>{e.stopPropagation();SFX.init();rend
 $('closeUpgrade').addEventListener('click',e=>{e.stopPropagation();closeModals();});
 $('closeShop').addEventListener('click',e=>{e.stopPropagation();closeModals();});
 $('closeHelp').addEventListener('click',e=>{e.stopPropagation();closeModals();});
+$('closeAlien').addEventListener('click',e=>{e.stopPropagation();closeModals();});
+$('alienModal').addEventListener('click',e=>{if(e.target===$('alienModal'))closeModals();});
 $('btnHelpOk').addEventListener('click',e=>{e.stopPropagation();closeModals();});
 $('btnHelp').addEventListener('click',e=>{e.stopPropagation();SFX.init();openModal('helpModal');});
 $('howBtn').addEventListener('click',e=>{e.stopPropagation();openModal('helpModal');});
@@ -4047,6 +4472,7 @@ $('tabMissions').addEventListener('click',()=>{journalTab='missions';renderJourn
 $('tabDisc').addEventListener('click',()=>{journalTab='disc';renderJournalModal();});
 $('tabFactions').addEventListener('click',()=>{journalTab='factions';renderJournalModal();});
 $('tabFauna').addEventListener('click',()=>{journalTab='fauna';renderJournalModal();});
+$('tabCodex').addEventListener('click',()=>{journalTab='codex';renderJournalModal();});
 $('tabResearch').addEventListener('click',()=>{journalTab='research';renderJournalModal();});
 $('tabSave').addEventListener('click',()=>{journalTab='save';renderJournalModal();});
 
@@ -4298,7 +4724,7 @@ function renderShop(){
   }
   grid.querySelectorAll('[data-skin]').forEach(b=>b.addEventListener('click',()=>{
     const id=b.dataset.skin,k=list.find(s=>s.id===id);
-    if(k.locked&&!owned.includes(id)){toast('RESTORE THE ETERNAL BLOOM TO EARN THE GOLDEN BLOOM SKIN');return;}
+    if(k.locked&&!owned.includes(id)){toast(k.id==='goldenbloom'?'RESTORE THE ETERNAL BLOOM TO EARN THE GOLDEN BLOOM SKIN':'REACH EXPLORER RANK III TO EARN THE VOIDLIGHT ENVOY SKIN');return;}
     if(!owned.includes(id)){if((INV.gold||0)<k.price)return;INV.gold-=k.price;owned.push(id);toast(`PURCHASED ${k.name}!`);SFX.coin();}
     if(isShip){SKIN.ship=id;dressShip(ship.model,ship.flame,id);}else{SKIN.astro=id;dressAstro(astro,id);}
     SFX.upgrade();updateResHUD();saveGame(true);renderShop();
@@ -4455,11 +4881,35 @@ function renderJournalModal(){
   $('tabDisc').classList.toggle('active',journalTab==='disc');
   $('tabFactions').classList.toggle('active',journalTab==='factions');
   $('tabFauna').classList.toggle('active',journalTab==='fauna');
+  $('tabCodex').classList.toggle('active',journalTab==='codex');
   $('tabResearch').classList.toggle('active',journalTab==='research');
   $('tabSave').classList.toggle('active',journalTab==='save');
   const body=$('journalBody');body.innerHTML='';
 
   if(journalTab==='missions'){
+    ensureDynOffers();
+    const active=(GAME.dynMissions||[]).filter(m=>m.status==='active');
+    const offers=GAME.missionOffers||[];
+    const hist=(GAME.missionHistory||[]).slice(0,6);
+    let html=`<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin:2px 0 7px">
+        <div style="font-family:var(--display);font-size:22px;color:#5a2ca0">D Y N A M I C  O P E R A T I O N S</div>
+        <span class="jBadge">${active.length}/3 ACTIVE</span></div>
+      <div class="uDesc" style="margin-bottom:8px">Repeatable multi-stage operations generated by the living galaxy. Complete them for credits, Research Points, faction reputation and permanent mission achievements.</div>`;
+    if(active.length){
+      html+=`<div style="font-family:var(--display);font-size:17px;color:#2b7a5b;margin:6px 0 5px">▶ ACTIVE OPERATIONS</div>`;
+      for(const m of active)html+=`<div class="jItem" style="align-items:flex-start">${renderDynMissionCard(m)}</div>`;
+    }else html+=`<div class="uCard" style="margin-bottom:8px"><div class="uDesc">No active operations. Accept one below — each type can be repeated and scales with your ship level.</div></div>`;
+    html+=`<div style="font-family:var(--display);font-size:17px;color:#5a2ca0;margin:10px 0 5px">✦ AVAILABLE CONTRACTS</div><div class="uGrid">`;
+    for(const o of offers)html+=renderDynOfferCard(o);
+    html+=`</div>`;
+    if(hist.length){
+      html+=`<div style="font-family:var(--display);font-size:17px;color:#5a2ca0;margin:12px 0 5px">MISSION HISTORY</div>`;
+      html+=hist.map(h=>`<div class="jItem"><div><div style="font-family:var(--display);font-size:16px">✓ ${h.title}</div>
+        <div style="font-size:9.5px;font-weight:800;opacity:.65">${new Date(h.done).toLocaleString([], {month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'})}</div></div>
+        <span class="jBadge">+${h.reward.gold} 🪙</span></div>`).join('');
+    }
+    html+=`<div style="font-family:var(--display);font-size:18px;color:#5a2ca0;margin:13px 0 5px">STANDING EXPEDITIONS</div>`;
+    body.innerHTML=html;
     for(const m of MISSIONS){
       const el=document.createElement('div');el.className='jItem';
       el.innerHTML=`<div><div style="font-family:var(--display);font-size:20px;color:${m.done?'#2b7a5b':'#ff4d6d'}">${m.done?'✓':'★'} ${m.title}</div>
@@ -4468,6 +4918,7 @@ function renderJournalModal(){
         <span class="jBadge" style="background:${m.done?'var(--mint)':'var(--sun)'}">${m.done?'COMPLETE':`${m.prog}/${m.goal}`}</span>`;
       body.appendChild(el);
     }
+    body.querySelectorAll('[data-dyn]').forEach(b=>b.addEventListener('click',()=>acceptDynMission(b.dataset.dyn)));
   }else if(journalTab==='disc'){
     if(!DISCOVERIES.length){
       body.innerHTML=`<div style="text-align:center;padding:24px;font-weight:700">No field discoveries logged yet! Land on a planet and press <b>[C]</b> to run your Terrain Pulse Scanner.</div>`;
@@ -4531,6 +4982,74 @@ function renderJournalModal(){
       <button class="uBtn" id="btnPhotoMode" style="width:auto">ENTER PHOTO MODE [P]</button></div></div>`+cards;
     $('btnOpenPhotos').addEventListener('click',()=>{renderPhotoModal(null,null);openModal('photoModal');});
     $('btnPhotoMode').addEventListener('click',()=>{closeModals();togglePhotoMode(true);});
+  }else if(journalTab==='codex'){
+    const score=explorerScore(),idx=explorerRankIdx(),nextR=EXPLORER_RANKS[idx+1];
+    const pct=nextR?clamp((score-EXPLORER_RANKS[idx].min)/(nextR.min-EXPLORER_RANKS[idx].min),0,1)*100:100;
+    const rankTitle=EXPLORER_TITLES[Math.max(idx,1)]||'UNRANKED';
+    const metCount=Object.keys(GAME.civMet||{}).filter(k=>CIV_IDS.includes(k)).length;
+    const shipCount=Object.keys(GAME.shipSeen||{}).length;
+    const civCards=NPC_SPECIES.map(sp=>{
+      const met=GAME.civMet[sp.id],rep=civRep(sp.id),rc=civColor(sp);
+      let nxt=null;for(const th of CIV_STANDING_TH)if(th>rep){nxt=th;break;}
+      const below=[...CIV_STANDING_TH].reverse().find(t=>t<=rep);
+      const prev=below==null?-99:below;
+      const rpct=nxt==null?100:clamp((rep-prev)/(nxt-prev),0,1)*100;
+      const seen=Object.keys(GAME.shipSeen||{}).filter(k=>k.startsWith(sp.id+':'));
+      return `<div class="uCard civCard" style="--c:${rc};margin-bottom:9px">
+        <div class="alienHead" style="border-color:${rc}55">
+          <div class="alienSigil" style="color:${rc}">${sp.sigil}</div>
+          <div style="flex:1"><div class="aName" style="color:${rc}">${sp.species}</div>
+            <div class="aSub">${sp.trait} · ${sp.home}</div></div>
+          <span class="civChip" style="color:${rc};border-color:${rc}">${met?civRank(rep):'UNMET'}</span>
+        </div>
+        <div class="uDesc">${sp.personality}</div>
+        <div class="rankTrack"><i style="width:${rpct.toFixed(1)}%;background:${rc}"></i></div>
+        <div style="font-size:10.5px;font-weight:900;letter-spacing:.3px">${met?`REP ${rep} · SHIPS ARCHIVED ${seen.length}/3 · FIRST CONTACT ${new Date(met.first).toLocaleDateString([],{month:'short',day:'numeric'})}`:'NO CONTACT — HAIL THEIR VESSELS AND OPEN A CHANNEL'}</div>
+      </div>`;
+    }).join('');
+    const classRows=['scout','convoy','mothership'].map(cls=>{
+      const chips=NPC_SPECIES.map(sp=>{
+        const seen=!!GAME.shipSeen[`${sp.id}:${cls}`];
+        return `<span class="civChip" style="color:${seen?civColor(sp):'#8a93b8'};border-color:${seen?civColor(sp)+'88':'#00000022'}">${seen?sp.sigil+' '+sp.species:'???'}</span>`;
+      }).join('');
+      return `<div style="margin:5px 0"><div style="font-size:10px;font-weight:900;letter-spacing:.5px;margin-bottom:3px">${cls.toUpperCase()} CLASS</div>
+        <div style="display:flex;gap:4px;flex-wrap:wrap">${chips}</div></div>`;
+    }).join('');
+    const contacts=Object.entries(GAME.civMet||{}).filter(([k])=>CIV_IDS.includes(k))
+      .sort((a,b)=>(a[1].first||0)-(b[1].first||0))
+      .map(([id,m])=>{const sp=civById(id);return `<div class="jItem"><div><div style="font-family:var(--display);font-size:16px;color:${civColor(sp)}">${sp.sigil} ${sp.species}</div>
+        <div style="font-size:10px;font-weight:800;opacity:.7">${m.sys?m.sys.toUpperCase():'UNKNOWN'} · ${new Date(m.first).toLocaleString([],{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'})}</div></div>
+        <span class="jBadge">FIRST CONTACT</span></div>`;}).join('')||`<div class="uDesc">No first-contact records yet.</div>`;
+    const legends=(GAME.legendSeen||[]).map(n=>`<div class="jItem"><div style="font-family:var(--display);font-size:16px">✦ ${n}</div><span class="jBadge">LEGENDARY</span></div>`).join('')||`<div class="uDesc">No legendary creatures scanned. Scan rare fauna on planetary surfaces.</div>`;
+    const charted=Object.keys(GAME.planetComplete||{});
+    const planetRows=charted.map(n=>`<div class="jItem"><div style="font-family:var(--display);font-size:16px">🌍 ${n}</div><span class="jBadge" style="background:var(--mint)">100% CHARTED</span></div>`).join('')
+      ||`<div class="uDesc">No worlds fully charted yet. Scan and clear every point of interest on a planet.</div>`;
+    const titleBtns=GAME.titles.length?GAME.titles.map(t=>`<button class="uBtn${GAME.equippedTitle===t?' buy':''}" data-title="${t}" style="width:auto">${GAME.equippedTitle===t?'★ ':''}${t}</button>`).join(''):`<div class="uDesc">Earn titles by reaching higher Explorer Ranks.</div>`;
+    body.innerHTML=`
+      <div class="uCard" style="margin-bottom:9px">
+        <div class="uTitle"><span>🧭 GALACTIC EXPLORER RANK ${idx?ROMAN[idx]:'0'} — ${EXPLORER_RANKS[idx].name}</span><span class="uLvl">${score} EXP</span></div>
+        <div class="rankTrack"><i style="width:${pct.toFixed(1)}%"></i></div>
+        <div class="uDesc">${nextR?`${nextR.min-score} EXP TO RANK ${ROMAN[idx+1]} · ${nextR.name}`:'MAXIMUM EXPLORER RANK ACHIEVED'}</div>
+        <div class="uDesc" style="margin-top:5px">ACTIVE TITLE: <b>${GAME.equippedTitle||GAME.title||'NONE'}</b> · Species ${metCount}/6 · Ships ${shipCount}/18 · Worlds ${charted.length}</div>
+      </div>
+      <div style="font-family:var(--display);font-size:20px;color:#5a2ca0;margin:10px 0 6px">🛸 ALIEN SPECIES CATALOGUE</div>
+      ${civCards}
+      <div class="uCard" style="margin-bottom:9px"><div class="uTitle"><span>🚀 SHIP DISCOVERY COLLECTION</span><span class="uLvl">${shipCount}/18</span></div>
+        <div class="uDesc" style="margin:5px 0 6px">Hail different species and vessel classes to archive their hulls.</div>${classRows}</div>
+      <div style="font-family:var(--display);font-size:20px;color:#5a2ca0;margin:10px 0 6px">📡 FIRST CONTACT RECORDS</div>
+      ${contacts}
+      <div style="font-family:var(--display);font-size:20px;color:#5a2ca0;margin:12px 0 6px">✦ LEGENDARY BESTIARY</div>
+      ${legends}
+      <div style="font-family:var(--display);font-size:20px;color:#5a2ca0;margin:12px 0 6px">🌍 PLANET COMPLETION</div>
+      ${planetRows}
+      <div class="uCard" style="margin-top:12px"><div class="uTitle"><span>🏅 EXPLORER TITLES &amp; COSMETICS</span><span class="uLvl">${GAME.titles.length} TITLES</span></div>
+        <div class="uDesc" style="margin:5px 0 7px">Permanent titles equip on your pilot record. Rank III unlocks the VOIDLIGHT ENVOY ship skin.</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap">${titleBtns}</div>
+        <div class="uDesc" style="margin-top:7px">VOIDLIGHT ENVOY SKIN: <b>${SKIN.ownedShip.includes('voidlight')?'UNLOCKED':'LOCKED — REACH RANK III'}</b></div></div>`;
+    body.querySelectorAll('[data-title]').forEach(btn=>btn.addEventListener('click',()=>{
+      GAME.equippedTitle=btn.dataset.title;GAME.title=btn.dataset.title;
+      SFX.upgrade();toast(`TITLE EQUIPPED: ${GAME.equippedTitle}`);saveGame(true);renderJournalModal();
+    }));
   }else if(journalTab==='research'){
     const rw=r=>[r.gold?`${r.gold}🪙`:null,r.rp?`${r.rp} RP`:null,['fe','ae','so','vd','lum','bp','vw','seed'].filter(k=>r[k]).map(k=>`+${r[k]} ${k.toUpperCase()}`)].flat().filter(Boolean).join(' · ');
     body.innerHTML=`
@@ -4777,10 +5296,16 @@ function saveGame(silent=false){
       skins:SKIN,
       vitals:{hp:Math.round(PL.hp),food:Math.round(PL.food)},
       elys:{nodes:ELYS.nodes.map(n=>({id:n.id,activated:n.activated,pylons:n.pylons.map(p=>p.lit)})),restored:ELYS.restored},
-      game:{title:GAME.title,achievements:GAME.achievements,milestones:GAME.milestones,contracts:GAME.contracts,contractSeed:GAME.contractSeed,outposts:GAME.outposts,sysVisited:GAME.sysVisited,seenElysian:GAME.seenElysian,
-        rep:GAME.rep,factionContracts:GAME.factionContracts,factionSeed:GAME.factionSeed,tamed:GAME.tamed,photoLog:GAME.photoLog,catReward:GAME.catReward,poiState:GAME.poiState,treasure:GAME.treasure,crew:GAME.crew,raiderKills:GAME.raiderKills,contacts:GAME.contacts},
+      game:{...GAME_EXTRA,title:GAME.title,achievements:GAME.achievements,milestones:GAME.milestones,contracts:GAME.contracts,contractSeed:GAME.contractSeed,outposts:GAME.outposts,sysVisited:GAME.sysVisited,seenElysian:GAME.seenElysian,
+        rep:GAME.rep,factionContracts:GAME.factionContracts,factionSeed:GAME.factionSeed,tamed:GAME.tamed,photoLog:GAME.photoLog,catReward:GAME.catReward,poiState:GAME.poiState,treasure:GAME.treasure,crew:GAME.crew,raiderKills:GAME.raiderKills,contacts:GAME.contacts,
+        civRep:GAME.civRep,civMet:GAME.civMet,civTrades:GAME.civTrades,shipSeen:GAME.shipSeen,legendSeen:GAME.legendSeen,
+        missionOffers:GAME.missionOffers,dynMissions:GAME.dynMissions,missionHistory:GAME.missionHistory,missionCompletions:GAME.missionCompletions,missionDay:GAME.missionDay,
+        galaxySeen:GAME.galaxySeen,anomalyLog:GAME.anomalyLog,rescues:GAME.rescues,escorts:GAME.escorts,diplomacy:GAME.diplomacy,
+        titles:GAME.titles,equippedTitle:GAME.equippedTitle,cosmetics:GAME.cosmetics,planetComplete:GAME.planetComplete,planetLooted:GAME.planetLooted,
+        strangerWrecks:GAME.strangerWrecks,rareFinds:GAME.rareFinds},
       hazard:{stormActive:PL.stormActive,stormTimer:PL.stormTimer,stormWarned:PL.stormWarned,pollenActive:PL.pollenActive,pollenTimer:PL.pollenTimer,pollenWarned:PL.pollenWarned}
     };
+    Object.assign(data,SAVE_EXTRA);
     localStorage.setItem('cosmic_hop_gf_save',JSON.stringify(data));
     if(!silent)toast('EXPEDITION PROGRESS SAVED!');
   }catch(_){}
@@ -4790,6 +5315,7 @@ function loadGame(){
     const raw=localStorage.getItem('cosmic_hop_gf_save');
     if(!raw)return false;
     const data=JSON.parse(raw);
+    for(const k in data)if(!['inv','upgrades','visited','discoveries','missions','sys','skins','vitals','elys','game','hazard'].includes(k))SAVE_EXTRA[k]=data[k];
     if(data.inv)Object.assign(INV,data.inv);
     if(data.vitals){PL.hp=clamp(+data.vitals.hp||100,20,100);PL.food=clamp(+data.vitals.food||100,0,100);}
     if(data.skins){
@@ -4839,6 +5365,46 @@ function loadGame(){
       GAME.crew=clamp(+data.game.crew||0,0,999);
       GAME.raiderKills=clamp(+data.game.raiderKills||0,0,99999);
       GAME.contacts=Array.isArray(data.game.contacts)?data.game.contacts.filter(x=>typeof x==='string').slice(0,64):[];
+      const GK=['title','achievements','milestones','contracts','contractSeed','outposts','sysVisited','seenElysian','rep','factionContracts','factionSeed','tamed','photoLog','catReward','poiState','treasure','crew','raiderKills','contacts',
+        'civRep','civMet','civTrades','shipSeen','legendSeen','missionOffers','dynMissions','missionHistory','missionCompletions','missionDay',
+        'galaxySeen','anomalyLog','rescues','escorts','diplomacy','titles','equippedTitle','cosmetics','planetComplete','planetLooted','strangerWrecks','rareFinds'];
+      for(const k in data.game)if(!GK.includes(k))GAME_EXTRA[k]=data.game[k];
+      const obj=v=>v&&typeof v==='object'&&!Array.isArray(v)?v:{};
+      const num=(v,d=0)=>Number.isFinite(+v)?+v:d;
+      const civRepSrc=obj(data.game.civRep);GAME.civRep={};
+      for(const c of CIV_IDS)GAME.civRep[c]=clamp(num(civRepSrc[c]),-99,999);
+      const civMetSrc=obj(data.game.civMet);GAME.civMet={};
+      for(const c of CIV_IDS){const m=civMetSrc[c];if(m&&typeof m==='object')GAME.civMet[c]={first:num(m.first,Date.now()),ship:typeof m.ship==='string'?m.ship:'scout',sys:typeof m.sys==='string'?m.sys:''};}
+      GAME.civTrades=obj(data.game.civTrades);
+      GAME.shipSeen=obj(data.game.shipSeen);
+      GAME.legendSeen=Array.isArray(data.game.legendSeen)?data.game.legendSeen.filter(x=>typeof x==='string').slice(0,64):[];
+      const fixReward=r=>({gold:clamp(num(r&&r.gold,120),1,99999),rp:clamp(num(r&&r.rp,3),0,999),rep:clamp(num(r&&r.rep,6),0,99),res:obj(r&&r.res)});
+      GAME.missionOffers=Array.isArray(data.game.missionOffers)?data.game.missionOffers.filter(o=>o&&o.id&&DYN_DEFS[o.type]).map(o=>({
+        id:String(o.id),type:o.type,title:String(o.title||DYN_DEFS[o.type].title),desc:String(o.desc||DYN_DEFS[o.type].desc),
+        goal:clamp(num(o.goal,DYN_DEFS[o.type].goal),1,999),unit:typeof o.unit==='string'?o.unit:'',reward:fixReward(o.reward),
+        day:num(o.day,0),targetCiv:CIV_IDS.includes(o.targetCiv)?o.targetCiv:'vaelor',targetBody:typeof o.targetBody==='string'?o.targetBody:'',pending:!!o.pending
+      })).slice(0,6):[];
+      GAME.dynMissions=Array.isArray(data.game.dynMissions)?data.game.dynMissions.filter(m=>m&&m.id&&DYN_DEFS[m.type]&&m.status==='active').map(m=>({
+        id:String(m.id),type:m.type,title:String(m.title||DYN_DEFS[m.type].title),desc:String(m.desc||DYN_DEFS[m.type].desc),
+        goal:clamp(num(m.goal,DYN_DEFS[m.type].goal),1,999),unit:typeof m.unit==='string'?m.unit:'',reward:fixReward(m.reward),
+        status:'active',prog:clamp(num(m.prog,0),0,clamp(num(m.goal,1),1,999)),stage:0,accepted:num(m.accepted,Date.now()),
+        targetCiv:CIV_IDS.includes(m.targetCiv)?m.targetCiv:'',targetBody:typeof m.targetBody==='string'?m.targetBody:'',
+        pending:!!m.pending,shipId:num(m.shipId,0)
+      })).slice(0,3):[];
+      GAME.missionHistory=Array.isArray(data.game.missionHistory)?data.game.missionHistory.filter(h=>h&&h.title).map(h=>({type:typeof h.type==='string'?h.type:'',title:String(h.title),done:num(h.done,0),reward:fixReward(h.reward)})).slice(0,24):[];
+      const mcSrc=obj(data.game.missionCompletions);GAME.missionCompletions={};
+      for(const t of DYN_ORDER)GAME.missionCompletions[t]=clamp(num(mcSrc[t]),0,99999);
+      GAME.missionDay=num(data.game.missionDay,0);
+      GAME.galaxySeen=Array.isArray(data.game.galaxySeen)?data.game.galaxySeen.filter(x=>typeof x==='string').slice(0,64):[];
+      GAME.anomalyLog=Array.isArray(data.game.anomalyLog)?data.game.anomalyLog.filter(x=>x&&typeof x==='object').slice(-40):[];
+      GAME.rescues=clamp(num(data.game.rescues),0,99999);GAME.escorts=clamp(num(data.game.escorts),0,99999);GAME.diplomacy=clamp(num(data.game.diplomacy),0,99999);
+      GAME.titles=Array.isArray(data.game.titles)?data.game.titles.filter(t=>typeof t==='string').slice(0,32):[];
+      GAME.equippedTitle=GAME.titles.includes(data.game.equippedTitle)?data.game.equippedTitle:(GAME.title||'');
+      if(GAME.equippedTitle&&!GAME.titles.includes(GAME.equippedTitle))GAME.titles.push(GAME.equippedTitle);
+      GAME.cosmetics=Array.isArray(data.game.cosmetics)?data.game.cosmetics.filter(x=>typeof x==='string').slice(0,32):[];
+      GAME.planetComplete=obj(data.game.planetComplete);
+      GAME.planetLooted=obj(data.game.planetLooted);
+      GAME.strangerWrecks=clamp(num(data.game.strangerWrecks),0,99999);GAME.rareFinds=clamp(num(data.game.rareFinds),0,99999);
       for(const op of GAME.outposts)ensureOutpostDefaults(op);
     }
     if(data.hazard){
@@ -5137,6 +5703,7 @@ function destroyRaider(r){
   }
   updateResHUD();
   factionProgress('combat',isBoss?2:1);grantRep('guild',isBoss?16:7);
+  dynProgress('bounty',1,{raider:true});
   if(first)recordDiscovery('Combat','Alien Raider','Deep Space','A hostile alien raider skiff destroyed in ship-to-ship combat over the frontier.');
   if(isBoss){
     grantAch('dreadnought');
@@ -5279,13 +5846,104 @@ const npcHullGeo=merge([
 ]);
 const npcRingGeo=new THREE.TorusGeometry(1.55,0.09,6,20);
 const NPC_SPECIES=[
-  {species:'VAELOR',color:0x7cf5d0,ring:false,lines:['We drift between stars. Your engine-song carries far, traveler.','The Veil remembers every ship that passes. Yours is new.']},
-  {species:"ITH'KA",color:0xff9f43,ring:true,lines:['A bright wake follows you. Do you seek the old gates?','Our hive listens. Speak, and the dark grows quieter.']},
-  {species:'SABLE CHOIR',color:0xc77dff,ring:false,lines:['We sing the distance between suns. Join a verse, wanderer.','Your silhouette is strange. We will remember it.']},
-  {species:'MORROW KIN',color:0x76a8ff,ring:true,lines:['Morrow watches the frontier. The raiders grow bold near the rim.','Carry light into the empty places. We will know your name.']},
-  {species:'XEN-9',color:0xffd23f,ring:false,lines:['Unit XEN-9 acknowledges a non-hostile carbon vessel.','Our charts end here. Perhaps yours continue.']}
+  {id:'vaelor',species:'VAELOR',sigil:'V',color:0x7cf5d0,ring:false,style:'sleek',home:'ELYSIAN VEIL',trait:'CURIOUS CARTOGRAPHERS',personality:'Gentle, inquisitive, obsessed with engine-song.',
+    lines:['We drift between stars. Your engine-song carries far, traveler.','The Veil remembers every ship that passes. Yours is new.','Your wake is bright. May we chart it?'],
+    trade:{cost:{ae:5},gold:78,rp:2,label:'TRADE 5 AETHERIUM FOR VEIL STAR-CHARTS'}},
+  {id:'ithka',species:"ITH'KA",sigil:'I',color:0xff9f43,ring:true,style:'organic',home:'NYX BINARY RIFT',trait:'HIVE NAVIGATORS',personality:'Communal, patient, speaks in overlapping voices.',
+    lines:['A bright wake follows you. Do you seek the old gates?','Our hive listens. Speak, and the dark grows quieter.','Many voices taste your signal. One of them is curious.'],
+    trade:{cost:{so:4},gold:84,rp:2,label:'TRADE 4 SOLARITE FOR HIVE RESIN'}},
+  {id:'sable',species:'SABLE CHOIR',sigil:'S',color:0xc77dff,ring:false,style:'fin',home:'THE DARK BETWEEN',trait:'VOID SINGERS',personality:'Poetic, theatrical, impossible to offend — until you interrupt the song.',
+    lines:['We sing the distance between suns. Join a verse, wanderer.','Your silhouette is strange. We will remember it.','Every silence has a color. Yours is almost blue.'],
+    trade:{cost:{vd:2},gold:96,rp:3,label:'TRADE 2 VOID SHARDS FOR A HALF-VERSE'}},
+  {id:'morrow',species:'MORROW KIN',sigil:'M',color:0x76a8ff,ring:true,style:'wing',home:'SOLARA SYSTEM',trait:'FRONTIER WARDENS',personality:'Stoic, protective, deeply suspicious of raiders.',
+    lines:['Morrow watches the frontier. The raiders grow bold near the rim.','Carry light into the empty places. We will know your name.','You fly alone. That is either courage or a very bad plan.'],
+    trade:{cost:{fe:12},gold:76,rp:2,label:'TRADE 12 FERRITE FOR A WARDEN ESCORT BEACON'}},
+  {id:'xen9',species:'XEN-9',sigil:'9',color:0xffd23f,ring:false,style:'angular',home:'GARGANTUA ABYSS',trait:'ARCHIVE MACHINES',personality:'Precise, literal, mildly insulting about carbon biology.',
+    lines:['Unit XEN-9 acknowledges a non-hostile carbon vessel.','Our charts end here. Perhaps yours continue.','Carbon vessel: your hull integrity is acceptable. Continue.'],
+    trade:{cost:{lum:3},gold:102,rp:3,label:'TRADE 3 LUMINA FOR RECOVERED ABYSS DATA'}},
+  {id:'helion',species:'HELION CONCORD',sigil:'H',color:0xff6b9a,ring:true,style:'wing',home:'THE OUTER RIM',trait:'DYNASTIC TRADERS',personality:'Regal, transactional, keeps a ledger of every slight.',
+    lines:['The Concord extends a measured welcome. Mind your wake.','Every favor is a debt. Every debt is a song.','You have not yet earned a full bow. Continue impressively.'],
+    trade:{cost:{fe:8,ae:6},gold:130,rp:4,label:'TRADE 8 FE + 6 AE FOR A CONCORD LEDGER-SEAL'}}
 ];
-const NPC={list:[],nextIn:20+Math.random()*24,uid:0};
+const NPC={list:[],nextIn:20+Math.random()*24,uid:0,bolts:[]};
+const CIV_IDS=NPC_SPECIES.map(s=>s.id);
+const CIV_RANKS=['HOSTILE','WARY','NEUTRAL','TRUSTED','ALLIED'];
+const CIV_STANDING_TH=[-25,0,20,55];
+function civById(id){return NPC_SPECIES.find(s=>s.id===id)||NPC_SPECIES[0];}
+function civRep(id){return (GAME.civRep&&GAME.civRep[id])||0;}
+function civRankId(v){return v<CIV_STANDING_TH[0]?0:v<CIV_STANDING_TH[1]?1:v<CIV_STANDING_TH[2]?2:v<CIV_STANDING_TH[3]?3:4;}
+function civRank(v){return CIV_RANKS[civRankId(v)];}
+function civColor(sp){return '#'+sp.color.toString(16).padStart(6,'0');}
+function grantCivRep(id,n){
+  if(!id||!n)return;
+  const before=civRep(id),after=clamp(before+n,-99,999);
+  GAME.civRep[id]=after;
+  const rb=civRankId(before),ra=civRankId(after),sp=civById(id);
+  if(ra>rb){
+    earnGold(40+ra*25,true);INV.rp=(INV.rp||0)+ra;updateResHUD();
+    toast(`${sp.species}: ${civRank(after)} · +${40+ra*25} 🪙 +${ra} RP`);
+    SFX.upgrade();
+  }else if(ra<rb){
+    toast(`${sp.species} RELATIONS FALL TO ${civRank(after)}`);
+    SFX.alarm();
+  }
+  checkAchievements();saveGame(true);
+}
+function civRecord(id,shipClass){
+  GAME.civMet[id]=GAME.civMet[id]||{first:Date.now(),ship:shipClass||'scout',sys:activeSystemId};
+  if(shipClass)GAME.shipSeen[`${id}:${shipClass}`]=Date.now();
+  const sp=civById(id);
+  if(Object.keys(GAME.civMet).filter(k=>CIV_IDS.includes(k)).length>=6)grantAch('civ6');
+}
+function civShipSeen(id,shipClass){
+  const key=`${id}:${shipClass}`;
+  if(GAME.shipSeen[key])return false;
+  GAME.shipSeen[key]=Date.now();
+  toast(`🛸 SHIP ARCHIVE: ${civById(id).species} ${shipClass.toUpperCase()} ADDED TO CODEX`);
+  saveGame(true);return true;
+}
+/* ---- Exploration progression: explorer ranks, titles & codex cosmetics ---- */
+const EXPLORER_RANKS=[
+  {name:'DRIFTER',min:0},{name:'SCOUT',min:40},{name:'PATHFINDER',min:110},
+  {name:'CARTOGRAPHER',min:220},{name:'VOIDWALKER',min:360},{name:'LEGEND',min:520}
+];
+const EXPLORER_TITLES=['','STAR SCOUT','VEIL PATHFINDER','GALACTIC CARTOGRAPHER','VOIDWALKER PRIME','LEGEND OF THE VEIL'];
+const ROMAN=['0','I','II','III','IV','V'];
+function explorerScore(){
+  const civs=Object.keys(GAME.civMet||{}).filter(k=>CIV_IDS.includes(k)).length;
+  const ships=Object.keys(GAME.shipSeen||{}).length;
+  const planets=Object.keys(GAME.planetComplete||{}).length;
+  const missions=Object.values(GAME.missionCompletions||{}).reduce((a,n)=>a+(n||0),0);
+  return DISCOVERIES.length*2+civs*10+ships*3+planets*12+missions*8+
+    (GAME.legendSeen||[]).length*15+(GAME.anomalyLog||[]).length*6+
+    (GAME.rescues||0)*4+(GAME.escorts||0)*4+(GAME.diplomacy||0)*3;
+}
+function explorerRankIdx(){
+  const s=explorerScore();let idx=0;
+  for(let i=0;i<EXPLORER_RANKS.length;i++)if(s>=EXPLORER_RANKS[i].min)idx=i;
+  return idx;
+}
+function checkProgression(){
+  const idx=explorerRankIdx();let changed=false;
+  for(let i=1;i<=idx;i++){
+    const t=EXPLORER_TITLES[i];
+    if(t&&!GAME.titles.includes(t)){
+      GAME.titles.push(t);
+      if(!GAME.equippedTitle){GAME.equippedTitle=t;GAME.title=t;}
+      changed=true;
+      toast(`🏅 EXPLORER RANK ${ROMAN[i]} — TITLE UNLOCKED: ${t}`);
+      SFX.upgrade();earnGold(60*i,true);INV.rp=(INV.rp||0)+i*2;updateResHUD();
+    }
+  }
+  if(idx>=3&&!SKIN.ownedShip.includes('voidlight')){
+    SKIN.ownedShip.push('voidlight');changed=true;
+    toast('🛸 VOIDLIGHT ENVOY SKIN UNLOCKED — EQUIP IT IN THE HANGAR');
+  }
+  if(idx>=5)grantAch('rank5');
+  if(GAME.equippedTitle&&GAME.equippedTitle!==GAME.title)GAME.title=GAME.equippedTitle;
+  if(changed){updateMissionHUD();saveGame(true);}
+  return changed;
+}
 
 function ensureNpcMarker(n){
   if(n.mk||!markersEl)return;
@@ -5293,10 +5951,19 @@ function ensureNpcMarker(n){
   el.className='mk npc';el.innerHTML='<b></b><span></span>';el.style.display='none';
   markersEl.appendChild(el);n.mk=el;
 }
-function makeNpc(i,count,sp){
+function makeNpc(i,count,sp,opts){
+  opts=opts||{};
   const g=new THREE.Group();
   const hull=new THREE.Mesh(npcHullGeo,new THREE.MeshToonMaterial({vertexColors:true,gradientMap:gradTex,color:sp.color,emissive:sp.color,emissiveIntensity:0.18}));
   addOutline(hull,OL_PROP);g.add(hull);
+  const accentMat=new THREE.MeshToonMaterial({vertexColors:true,gradientMap:gradTex,color:sp.color,emissive:sp.color,emissiveIntensity:0.5});
+  let accentGeo=null;
+  if(sp.style==='sleek')accentGeo=merge([[new THREE.ConeGeometry(0.3,1.5,7),0xffffff,Mx(0,0,-1.7,-Math.PI/2,0,0)],[new THREE.BoxGeometry(2.8,0.06,0.5),0xffffff,Mx(0,-0.18,0.25,0,0,0.12)]]);
+  else if(sp.style==='organic')accentGeo=merge([[new THREE.ConeGeometry(0.24,1.6,6),0xffffff,Mx(0,0.6,-0.35,0.45,0,0)],[new THREE.ConeGeometry(0.2,1.2,6),0xffffff,Mx(-0.55,0.3,0.2,0.3,0,0.7)],[new THREE.ConeGeometry(0.2,1.2,6),0xffffff,Mx(0.55,0.3,0.2,0.3,0,-0.7)]]);
+  else if(sp.style==='fin')accentGeo=merge([[new THREE.ConeGeometry(0.42,2.4,4),0xffffff,Mx(0,1.0,0.5,-0.35,0,0)],[new THREE.ConeGeometry(0.28,1.5,4),0xffffff,Mx(0,-0.85,0.4,0.4,0,0)]]);
+  else if(sp.style==='wing')accentGeo=merge([[new THREE.BoxGeometry(3.4,0.08,0.75),0xffffff,Mx(0,0,0.15,0,0,0.16)],[new THREE.BoxGeometry(0.7,0.3,1.7),0xffffff,Mx(0,0.25,0.9)]]);
+  else accentGeo=merge([[new THREE.BoxGeometry(2.1,0.35,1.0),0xffffff,Mx(0,0.12,0.25)],[new THREE.BoxGeometry(0.36,0.7,0.9),0xffffff,Mx(-0.8,0.15,0.2)],[new THREE.BoxGeometry(0.36,0.7,0.9),0xffffff,Mx(0.8,0.15,0.2)]]);
+  const accent=new THREE.Mesh(accentGeo,accentMat);addOutline(accent,OL_PROP);g.add(accent);
   let ring=null;
   if(sp.ring){
     ring=new THREE.Mesh(npcRingGeo,new THREE.MeshBasicMaterial({color:sp.color,transparent:true,opacity:.8}));
@@ -5307,25 +5974,36 @@ function makeNpc(i,count,sp){
     const gl=new THREE.Mesh(new THREE.OctahedronGeometry(0.3,0),new THREE.MeshBasicMaterial({color:sp.color}));
     gl.position.set(sx,0,1.78);g.add(gl);glows.push(gl);
   }
+  const cls=opts.shipClass||'scout',mother=cls==='mothership';
+  if(mother){
+    for(let k=0;k<6;k++){
+      const gl=new THREE.Mesh(new THREE.OctahedronGeometry(0.28,0),new THREE.MeshBasicMaterial({color:0xffd23f}));
+      const a=k/6*TAU;gl.position.set(Math.cos(a)*1.35,Math.sin(a)*0.72,0.1);g.add(gl);glows.push(gl);
+    }
+    const halo=new THREE.Mesh(new THREE.TorusGeometry(2.1,0.08,6,40),new THREE.MeshBasicMaterial({color:sp.color,transparent:true,opacity:.65}));
+    halo.rotation.x=Math.PI/2;g.add(halo);ring=ring||halo;
+  }
   const fwd=new V3(0,0,-1).applyQuaternion(ship.group.quaternion);
   const right=new V3().crossVectors(fwd,AY);if(right.lengthSq()<1e-4)right.set(1,0,0);right.normalize();
   const up=new V3().crossVectors(right,fwd).normalize();
-  const side=count===1?0:(i?1:-1)*72;
+  const side=count===1?0:(i-(count-1)/2)*68;
   g.position.copy(ship.group.position)
-    .addScaledVector(fwd,125+Math.random()*40)
+    .addScaledVector(fwd,opts.dist||(125+Math.random()*40))
     .addScaledVector(right,side)
-    .addScaledVector(up,(Math.random()-.5)*24);
-  g.scale.setScalar(0.92);
+    .addScaledVector(up,(Math.random()-.5)*24+(opts.lift||0));
+  const baseScale=mother?2.5:cls==='convoy'?1.12:0.92;
+  g.scale.setScalar(baseScale);
   scene.add(g);
-  const origin=(SYSTEMS.find(s=>s.id!==activeSystemId)||SYSTEMS[0]).name;
-  const npc={id:++NPC.uid,group:g,ring,glows,species:sp.species,origin,color:sp.color,lines:sp.lines,line:'',
-    dir:Math.random()<.5?-1:1,cruise:26+Math.random()*10,age:0,life:34+Math.random()*14,
-    chatT:6+Math.random()*6,hailed:false,mk:null,vel:new V3()};
+  const npc={id:++NPC.uid,group:g,ring,glows,sp,civId:sp.id,species:sp.species,origin:sp.home,color:sp.color,lines:sp.lines,line:'',
+    role:opts.role||'scout',shipClass:cls,mothership:mother,baseScale,
+    dir:Math.random()<.5?-1:1,cruise:mother?18:(cls==='convoy'?22:26)+Math.random()*8,age:0,life:opts.life||(mother?80:34+Math.random()*14),
+    chatT:6+Math.random()*6,hailed:false,mk:null,vel:new V3(),hostile:false,fireT:1.6+Math.random()*1.4,follow:!!opts.follow,escort:!!opts.escort,distress:!!opts.distress,rescueT:0};
   const to=new V3().subVectors(ship.group.position,g.position).normalize();
   npc.vel.crossVectors(to,AY);if(npc.vel.lengthSq()<1e-4)npc.vel.set(1,0,0);
   npc.vel.normalize().multiplyScalar(npc.cruise*npc.dir);
   const face=npc.vel.clone().normalize(),up2=Math.abs(face.dot(AY))>0.94?AX:AY;
   g.quaternion.setFromRotationMatrix(setBasis(_rm,_rvx.set(0,0,0),face,up2));
+  civShipSeen(sp.id,cls);
   ensureNpcMarker(npc);
   return npc;
 }
@@ -5339,18 +6017,156 @@ function canSpawnNpc(){
 }
 function spawnNpcConvoy(){
   if(NPC.list.length||!canSpawnNpc())return false;
-  const count=Math.random()<0.35?2:1;
+  const lvl=UPGRADES.ship.lvl||1;
+  const mother=lvl>=3&&(activeSystemId==='gargantua'||activeSystemId==='elysian')&&Math.random()<0.11;
+  const count=mother?3:(Math.random()<0.55?2:1);
   const pool=NPC_SPECIES.slice();
+  const style=mother?'mothership':count>1?'convoy':'scout';
+  const role=count>1?'trade convoy':(Math.random()<0.3?'exploration fleet':'patrol');
   for(let i=0;i<count;i++){
     const idx=(Math.random()*pool.length)|0;
     const sp=pool.splice(idx,1)[0]||NPC_SPECIES[0];
-    NPC.list.push(makeNpc(i,count,sp));
+    const cls=(mother&&i===0)?'mothership':(count>1?'convoy':'scout');
+    NPC.list.push(makeNpc(i,count,sp,{shipClass:cls,role:i===0?role:'escort',life:mother?90:44+Math.random()*18,
+      dist:mother?165:125+Math.random()*40}));
   }
   SFX.npcWarp();
-  comicPop('🛸 UNKNOWN VESSEL DETECTED','#5df2c0',50,34);
   const n=NPC.list[0];
-  toast(`🛸 ${n.species} VESSEL FROM ${n.origin} — GET CLOSE AND ${touchUI?'TAP HAIL':'PRESS E'} TO HAIL`);
+  if(mother){
+    comicPop('🛸 ALIEN MOTHERSHIP DETECTED','#ffd23f',50,34);
+    toast(`🛸 ${n.species} MOTHERSHIP + ESCORTS — APPROACH SLOWLY AND ${touchUI?'TAP HAIL':'PRESS E'} TO REQUEST AN AUDIENCE`);
+  }else{
+    comicPop('🛸 UNKNOWN VESSEL DETECTED','#5df2c0',50,34);
+    toast(`🛸 ${n.species} ${count>1?'FLEET':'VESSEL'} FROM ${n.origin} — GET CLOSE AND ${touchUI?'TAP HAIL':'PRESS E'} TO HAIL`);
+  }
   return true;
+}
+function spawnEscortFleet(){
+  if(NPC.list.length>=2||!canSpawnNpc())return false;
+  const pool=NPC_SPECIES.slice();
+  for(let i=0;i<2;i++){
+    const idx=(Math.random()*pool.length)|0,sp=pool.splice(idx,1)[0]||NPC_SPECIES[0];
+    NPC.list.push(makeNpc(i,2,sp,{shipClass:'convoy',role:'escort',life:150,follow:true,escort:true,dist:130}));
+  }
+  SFX.npcWarp();
+  for(const n of NPC.list)n.follow=true;
+  const n=NPC.list[0];
+  comicPop('🛸 ESCORT FLEET ON YOUR WING','#5df2c0',50,34);
+  toast(`COURIER FLEET FROM ${n.origin} HAS FORMED UP — STAY WITHIN 220m AND KEEP THEM SAFE`);
+  return true;
+}
+function spawnDistressShip(){
+  if(NPC.list.length>=2||!canSpawnNpc())return false;
+  const sp=NPC_SPECIES[(Math.random()*NPC_SPECIES.length)|0];
+  const n=makeNpc(0,1,sp,{shipClass:'convoy',role:'distress',life:150,dist:145});
+  n.hostile=false;n.follow=false;n.distress=true;
+  for(const gl of n.glows)gl.material.color.setHex(0xff4d6d);
+  NPC.list.push(n);
+  SFX.alarm();
+  comicPop('🆘 DISTRESS SIGNAL DETECTED','#ff4d6d',50,34);
+  toast(`🆘 ${n.species} FREIGHTER SENDING DISTRESS — FLY CLOSE AND ${touchUI?'TAP HAIL':'PRESS E'} TO RESPOND`);
+  return true;
+}
+function makeNpcHostile(n,reason){
+  if(!n||n.hostile)return;
+  n.hostile=true;n.role='hostile';n.life=Math.max(n.life,n.age+55);n.fireT=1.2+Math.random();
+  for(const gl of n.glows)gl.material.color.setHex(0xff4d6d);
+  SFX.alarm();
+  comicPop('☠ HOSTILE VESSEL!','#ff4d6d',50,36);
+  toast(`${n.species} TURNS WEAPONS ON YOU — ${reason||'DIPLOMACY FAILED'}`);
+}
+/* ---- Living galaxy: roaming events, anomalies, planetary occurrences ---- */
+const GALAXY={nextEvent:70+Math.random()*60,nextDistress:35+Math.random()*40,nextConvoy:55+Math.random()*50,
+  nextAnomaly:150+Math.random()*120,nextFaction:140+Math.random()*140,anomaly:null};
+function spawnAnomaly(force){
+  if(GALAXY.anomaly)return false;
+  if(!force&&!canSpawnNpc())return false;
+  const g=new THREE.Group();
+  const core=new THREE.Mesh(new THREE.IcosahedronGeometry(6,0),new THREE.MeshBasicMaterial({color:0xc77dff,wireframe:true,transparent:true,opacity:.85}));
+  g.add(core);
+  const rings=[];
+  for(let i=0;i<3;i++){
+    const r=new THREE.Mesh(new THREE.TorusGeometry(11+i*5,0.5,6,40),new THREE.MeshBasicMaterial({color:i%2?0x39c6ff:0xc77dff,transparent:true,opacity:.7}));
+    r.rotation.set(Math.random()*TAU,Math.random()*TAU,Math.random()*TAU);g.add(r);rings.push(r);
+  }
+  const fwd=new V3(0,0,-1).applyQuaternion(ship.group.quaternion);
+  const right=new V3().crossVectors(fwd,AY);if(right.lengthSq()<1e-4)right.set(1,0,0);right.normalize();
+  const up=new V3().crossVectors(right,fwd).normalize();
+  const dir=fwd.clone().addScaledVector(right,(Math.random()-.5)*1.4).addScaledVector(up,(Math.random()-.5)*0.9).normalize();
+  g.position.copy(ship.group.position).addScaledVector(dir,185+Math.random()*140);
+  scene.add(g);
+  GALAXY.anomaly={group:g,core,rings,pos:g.position,age:0,life:150,scanR:125,scanned:false,collapseT:0};
+  comicPop('🌀 SPATIAL ANOMALY DETECTED','#c77dff',50,34);
+  toast('🌀 SPACE DISTORTS NEARBY — FLY CLOSE AND SCAN IT BEFORE IT COLLAPSES');
+  SFX.alarm();return true;
+}
+function removeAnomaly(){
+  const a=GALAXY.anomaly;if(!a)return;
+  scene.remove(a.group);
+  a.group.traverse(o=>{if(o.geometry)o.geometry.dispose();if(o.material)o.material.dispose();});
+  GALAXY.anomaly=null;
+}
+function scanAnomaly(){
+  const a=GALAXY.anomaly;if(!a||a.scanned)return false;
+  a.scanned=true;a.collapseT=4;
+  GAME.anomalyLog.push({sys:activeSystemId,at:Date.now()});
+  if(GAME.anomalyLog.length>40)GAME.anomalyLog.shift();
+  earnGold(120,true);INV.rp=(INV.rp||0)+6;INV.lum=(INV.lum||0)+2;
+  if(Math.random()<0.6)INV.maps=(INV.maps||0)+1;
+  recordDiscovery('Anomaly',`${activeSystemId.toUpperCase()} Spatial Anomaly`,activeSystemId,'Scanned a collapsing spatial anomaly and recovered its signature.');
+  dynProgress('anomaly',1,{scan:true});
+  comicPop('ANOMALY SCANNED!','#39c6ff',50,40);
+  toast('✦ ANOMALY SIGNATURE ARCHIVED — +120 🪙 · +6 RP');
+  SFX.discover();updateResHUD();saveGame(true);return true;
+}
+function planetaryEvent(b){
+  if(!b||!b.landable||!b.pois||b.pois.length<6)return false;
+  if(!started||modalOpen||photoMode||CINE.open)return false;
+  const roll=Math.random();
+  if(roll<0.38&&!b.stormNodes.length){spawnStormCrystals(b);return true;}
+  if(roll<0.72){
+    const dir=PL.mode==='walk'?astro.dir.clone():PL.mode==='rover'?rover.dir.clone():new V3().subVectors(ship.group.position,b.center).normalize();
+    spawnTreasureCache(b,dir);
+    comicPop('✦ RELIC SURGE','#ffd23f',50,36);
+    toast('✦ A RELIC SURGE EXPOSED A BURIED CACHE NEARBY — FOLLOW THE ✦ MARKER');
+    SFX.discover();return true;
+  }
+  const p=spawnPOI(b,'underground',90+Math.floor(Math.random()*9),mulberry32((Date.now()&0xffff)|0));
+  if(p){comicPop('⛏ HIDDEN RUIN SURFACED','#9dfcff',50,36);toast('⛏ A SEISMIC SHIFT UNCOVERED AN UNDERGROUND RUIN — TERRAIN SCAN TO CHART IT');return true;}
+  return false;
+}
+function updateGalaxy(dt){
+  if(!started)return;
+  const a=GALAXY.anomaly;
+  if(a){
+    a.age+=dt;
+    a.group.rotation.y+=dt*0.5;a.group.rotation.x+=dt*0.22;
+    for(let i=0;i<a.rings.length;i++){a.rings[i].rotation.z+=dt*(0.4+i*0.3);a.rings[i].rotation.x+=dt*0.16;}
+    a.core.material.opacity=0.55+Math.sin(uTime.value*3)*0.25;
+    if(a.scanned){a.collapseT-=dt;if(a.collapseT<=0){toast('🌀 THE ANOMALY COLLAPSES — DATA SECURED');removeAnomaly();}}
+    else if(a.age>a.life){toast('🌀 THE ANOMALY FADES — YOU MISSED THE WINDOW');removeAnomaly();}
+  }
+  if(PL.mode!=='fly'||modalOpen||photoMode||CINE.open)return;
+  GALAXY.nextEvent-=dt;GALAXY.nextDistress-=dt;GALAXY.nextConvoy-=dt;GALAXY.nextAnomaly-=dt;GALAXY.nextFaction-=dt;
+  if(RAIDER.active)return;
+  if(GALAXY.nextAnomaly<=0&&!GALAXY.anomaly&&NPC.list.length<2){
+    if(spawnAnomaly())GALAXY.nextAnomaly=280+Math.random()*260;else GALAXY.nextAnomaly=45;
+  }
+  if(GALAXY.nextEvent<=0){
+    GALAXY.nextEvent=110+Math.random()*100;
+    if(PL.near&&PL.near.landable&&!NPC.list.length&&Math.random()<0.5)planetaryEvent(PL.near);
+  }
+  if(GALAXY.nextFaction<=0){
+    GALAXY.nextFaction=240+Math.random()*200;
+    if(Math.random()<0.5){
+      RAIDER.nextIn=Math.min(RAIDER.nextIn,12);
+      toast('☠ RAIDER WARBANDS MASSING NEAR THE LANE — EXPECT COMPANY');
+    }else{
+      const sp=civById('morrow');
+      spawnNpcConvoy();
+      toast(`🛡 ${sp.species} ${sp.trait} REPORT RAIDER MOVEMENTS — ${activeSystemId.toUpperCase()} PATROL INBOUND`);
+    }
+  }
 }
 function removeNpc(n){
   if(n.mk)n.mk.remove();
@@ -5372,40 +6188,159 @@ function nearestNpc(range=150){
   return best;
 }
 function hailNpc(){
-  const n=nearestNpc(150);
+  const n=nearestNpc(190);
   if(!n)return false;
   n.hailed=true;n.line=n.lines[(Math.random()*n.lines.length)|0];
   SFX.alienChatter();
   const first=!(GAME.contacts||[]).includes(n.species);
   if(first){
     GAME.contacts.push(n.species);
-    earnGold(35,true);INV.rp=(INV.rp||0)+1;updateResHUD();
-    grantRep('cartographers',5);factionProgress('contact',1);
+    const bonus=n.mothership?75:35;
+    earnGold(bonus,true);INV.rp=(INV.rp||0)+(n.mothership?3:1);updateResHUD();
+    grantRep('cartographers',n.mothership?12:5);factionProgress('contact',1);
     recordDiscovery('First Contact',`${n.species} Envoy`,n.origin,`Opened a comm channel with a ${n.species} vessel from ${n.origin}.`);
     checkAchievements();checkMilestones();saveGame(true);
     SFX.discover();comicPop('FIRST CONTACT!','#5df2c0',50,36);
-    toast(`🛸 ${n.species} (${n.origin}): "${n.line}" · FIRST CONTACT! +35 🪙 +1 RP`);
-  }else{
-    toast(`🛸 ${n.species} (${n.origin}): "${n.line}"`);
-    comicPop('🛸 ALIEN GREETING','#5df2c0',50,38);
+    toast(`🛸 ${n.species} (${n.origin}): "${n.line}" · FIRST CONTACT! +${bonus} 🪙`);
   }
-  n.life=Math.min(n.life,n.age+15);
+  civRecord(n.civId,n.shipClass);
+  if(n.mothership){
+    civShipSeen(n.civId,'mothership');
+    grantAch('mothership');
+    recordDiscovery('Mothership',`${n.species} Mothership`,n.origin,'Stood aboard a comm channel with a civilisation-scale mothership.');
+    GAME.diplomacy=(GAME.diplomacy||0)+1;
+  }
+  if(n.distress){
+    n.life=Math.max(n.life,n.age+90);
+    renderDistressDialog(n);
+    openModal('alienModal');
+    return true;
+  }
+  if(civRep(n.civId)<=-25&&Math.random()<0.75){
+    makeNpcHostile(n,'YOUR REPUTATION PRECEDES YOU');
+    return true;
+  }
+  renderAlienDialog(n);
+  openModal('alienModal');
   return true;
+}
+function todayKey(){return Math.floor(Date.now()/86400000);}
+function renderAlienDialog(n){
+  const sp=n.sp,rep=civRep(sp.id),rank=civRank(rep),th=CIV_STANDING_TH;
+  const pct=rep<0?0:clamp(rep/180,0,1)*100;
+  const trade=n.sp.trade, traded=GAME.civTrades[sp.id]===todayKey();
+  const cost=Object.entries(trade.cost).map(([k,v])=>`${v} ${k.toUpperCase()}`).join(' + ');
+  const canTrade=!traded&&Object.entries(trade.cost).every(([k,v])=>(INV[k]||0)>=v);
+  const first=!!GAME.civMet[sp.id];
+  $('alienBody').innerHTML=`
+    <div class="alienHead" style="color:${civColor(sp)}">
+      <div class="alienSigil">${sp.sigil}</div>
+      <div><div class="aName">${sp.species}</div>
+      <div class="aSub">${sp.trait} · ${first?'CODEX CONTACT LOGGED':'UNREGISTERED CONTACT'} · ${n.shipClass.toUpperCase()}</div>
+      <div style="display:flex;gap:5px;flex-wrap:wrap;margin-top:5px"><span class="civChip">${rank}</span><span class="civChip">REP ${rep}</span><span class="civChip">HOME ${sp.home}</span></div></div>
+    </div>
+    <div class="dialogQuote" style="--c:${civColor(sp)}">"${n.line}"</div>
+    <div class="uDesc" style="margin-bottom:6px">${sp.personality}</div>
+    <div class="rankTrack"><i style="width:${pct.toFixed(1)}%"></i></div>
+    <div style="font-size:10px;font-weight:800;opacity:.75;margin-bottom:8px">RELATIONSHIP: ${rank} · ${rep<0?'REPAIR RELATIONS WITH TRADES AND GREETINGS':'EARN TRUST FOR BETTER TRADE ROUTES'}</div>
+    <button class="uBtn buy choiceBtn" id="adGreet"><svg class="ic"><use href="#i-comms"/></svg><span>OFFER A PEACEFUL GREETING<br><small style="font-weight:700;opacity:.8">+6 ${sp.species} reputation · share star-charts</small></span></button>
+    <button class="uBtn sky choiceBtn" id="adTrade" ${canTrade?'':'disabled'}><svg class="ic"><use href="#i-exchange"/></svg><span>${traded?'TRADE COMPLETED TODAY':'OPEN TRADE CHANNEL'}<br><small style="font-weight:700;opacity:.8">${trade.label} · +${trade.gold} 🪙 +${trade.rp} RP · +4 REP</small></span></button>
+    <button class="uBtn choiceBtn" id="adDemand" style="border-color:rgba(255,77,109,.5);color:#ffc9d5"><svg class="ic"><use href="#i-warning"/></svg><span>DEMAND A TOLL<br><small style="font-weight:700;opacity:.8">−14 reputation · risk immediate hostility · may yield 45 🪙</small></span></button>
+    <div style="font-size:9.5px;font-weight:800;opacity:.6;margin-top:9px">${n.mothership?'THE MOTHERSHIP LISTENS TO EVERY WORD.':(n.shipClass==='convoy'?'THE ESCORT FLEET WATCHES YOUR WEAPONS.':'THE CHANNEL IS OPEN. CHOOSE CAREFULLY.')}</div>`;
+  $('adGreet').onclick=()=>{n.line=n.lines[(Math.random()*n.lines.length)|0];grantCivRep(sp.id,6);GAME.diplomacy=(GAME.diplomacy||0)+1;
+    recordDiscovery('Diplomacy',`${sp.species} Greeting`,n.origin,'Exchanged formal greetings and star-chart fragments with a xeno envoy.');
+    dynProgress('negotiation',1,{civId:sp.id});
+    closeModals();toast(`🛸 ${sp.species}: "Your signal is welcome, wanderer."`);checkProgression();};
+  $('adTrade').onclick=()=>{
+    if(traded){toast('THIS CIVILISATION HAS ALREADY TRADED TODAY');return;}
+    if(!canTrade){toast(`TRADE NEEDS ${cost}`);return;}
+    for(const [k,v] of Object.entries(trade.cost))INV[k]-=v;
+    earnGold(trade.gold,true);INV.rp=(INV.rp||0)+trade.rp;
+    GAME.civTrades[sp.id]=todayKey();GAME.diplomacy=(GAME.diplomacy||0)+1;GAME.rareFinds=(GAME.rareFinds||0)+1;
+    grantCivRep(sp.id,4);factionProgress('contact',1);updateResHUD();
+    recordDiscovery('Xeno Trade',`${sp.species} Trade Compact`,n.origin,`Completed a sanctioned trade exchange with the ${sp.species}.`);
+    closeModals();comicPop('TRADE SEALED!','#5df2c0',50,38);toast(`TRADE COMPLETE — +${trade.gold} 🪙 +${trade.rp} RP +4 ${sp.species} REP`);SFX.coin();saveGame(true);checkProgression();};
+  $('adDemand').onclick=()=>{
+    grantCivRep(sp.id,-14);
+    const r=Math.random(),hostile=r<0.55||civRep(sp.id)<=-25;
+    if(hostile){makeNpcHostile(n,'THEY REJECT YOUR TRIBUTE DEMAND');closeModals();}
+    else{earnGold(45,true);updateResHUD();closeModals();comicPop('TOLL PAID — FOR NOW','#ffd23f',50,36);toast(`THEY PAY 45 🪙 TO END THE CONFRONTATION — RELATIONS DAMAGED`);}
+    saveGame(true);checkProgression();};
+}
+function renderDistressDialog(n){
+  const sp=n.sp;
+  $('alienBody').innerHTML=`
+    <div class="alienHead" style="color:#ff4d6d"><div class="alienSigil">SOS</div>
+      <div><div class="aName">${sp.species} FREIGHTER</div><div class="aSub">HULL BREACH · LIFE SUPPORT FAILING · ${sp.home}</div>
+      <div style="display:flex;gap:5px;margin-top:5px"><span class="civChip">DISTRESS</span><span class="civChip">CREW ABOARD</span></div></div></div>
+    <div class="dialogQuote" style="--c:#ff4d6d">"This is the ${sp.species} hauler <b>LONG AFTERNOON</b>. Our drive is gone and something is moving in the cargo bay. Please. Respond."</div>
+    <button class="uBtn buy choiceBtn" id="adRescue"><svg class="ic"><use href="#i-heart"/></svg><span>RESCUE THE CREW<br><small style="font-weight:700;opacity:.8">Escort the crippled freighter to safety · +10 REP · rescue rewards</small></span></button>
+    <button class="uBtn choiceBtn" id="adLeave" style="border-color:rgba(255,77,109,.4)"><span>LEAVE THEM TO THE DARK<br><small style="font-weight:700;opacity:.8">−6 REP · the void remembers</small></span></button>`;
+  $('adRescue').onclick=()=>{
+    n.distress=false;n.follow=true;n.escort=true;n.life=Math.max(n.life,n.age+130);
+    for(const gl of n.glows)gl.material.color.setHex(sp.color);
+    startRescue(n);
+    closeModals();comicPop('RESCUE IN PROGRESS','#5df2c0',50,36);
+    toast('🛸 STAY WITHIN 220m OF THE FREIGHTER UNTIL ITS CREW IS SAFE');
+    SFX.discover();saveGame(true);};
+  $('adLeave').onclick=()=>{
+    grantCivRep(sp.id,-6);
+    n.life=Math.min(n.life,n.age+8);
+    const i=NPC.list.indexOf(n);if(i>=0){removeNpc(n);NPC.list.splice(i,1);SFX.jump();}
+    closeModals();toast('YOU LEAVE THE DISTRESS CALL UNANSWERED');saveGame(true);};
+}
+const npcBoltMat=new THREE.MeshBasicMaterial({color:0xffb36b,transparent:true,opacity:.95,blending:THREE.AdditiveBlending,depthWrite:false});
+const npcBoltGeo=new THREE.OctahedronGeometry(0.24,0);
+function spawnNpcBolt(n){
+  const aim=ship.group.position.clone().addScaledVector(PL.vel,0.18);
+  aim.x+=(Math.random()-.5)*7;aim.y+=(Math.random()-.5)*6;aim.z+=(Math.random()-.5)*7;
+  const dir=aim.sub(n.group.position),len=dir.length()||1;dir.multiplyScalar(1/len);
+  const mesh=new THREE.Mesh(npcBoltGeo,npcBoltMat);
+  mesh.position.copy(n.group.position).addScaledVector(dir,3.0);
+  mesh.scale.set(1,1,2.4);scene.add(mesh);
+  NPC.bolts.push({mesh,vel:dir.multiplyScalar(78),life:0,dmg:n.mothership?11:8});
+  SFX.raiderShot();
+}
+function updateNpcBolts(dt){
+  for(let i=NPC.bolts.length-1;i>=0;i--){
+    const b=NPC.bolts[i];b.life+=dt;b.mesh.position.addScaledVector(b.vel,dt);
+    b.mesh.rotation.z+=dt*5;b.mesh.rotation.x+=dt*2.5;
+    const hit=b.mesh.position.distanceTo(ship.group.position)<5.4;
+    if(hit){raiderHitShip(b.dmg);boom(b.mesh.position,0xffb36b,0.4);}
+    if(hit||b.life>4.2){scene.remove(b.mesh);NPC.bolts.splice(i,1);}
+  }
 }
 function updateNpcs(dt){
   if(!started)return;
-  if(PL.mode!=='fly'){if(NPC.list.length)fleeNpcs(true);NPC.nextIn=Math.max(NPC.nextIn,30);return;}
+  updateNpcBolts(dt);
+  if(PL.mode!=='fly'){if(NPC.list.length)fleeNpcs(true);for(const b of NPC.bolts)scene.remove(b.mesh);NPC.bolts.length=0;NPC.nextIn=Math.max(NPC.nextIn,30);return;}
   if(RAIDER.active){if(NPC.list.length)fleeNpcs(true);return;}
   if(modalOpen||photoMode||CINE.open)return;
+  updateDynMissions(dt);
   const sp=ship.group.position;
   if(!NPC.list.length){
     NPC.nextIn-=dt;
-    if(NPC.nextIn<=0&&canSpawnNpc())spawnNpcConvoy();
+    if(NPC.nextIn<=0&&canSpawnNpc()){
+      let ok=false;
+      if(GALAXY.nextDistress<=0&&Math.random()<0.55){
+        ok=spawnDistressShip();
+        GALAXY.nextDistress=ok?120+Math.random()*120:25;
+      }
+      if(!ok)spawnNpcConvoy();
+      NPC.nextIn=45+Math.random()*40;
+    }
     return;
   }
   for(let i=NPC.list.length-1;i>=0;i--){
     const n=NPC.list[i];n.age+=dt;
-    if(n.age>n.life||n.group.position.distanceToSquared(sp)>250000){
+    const dNow=n.group.position.distanceTo(sp);
+    if(n.hostile&&dNow>430){
+      const spName=n.species;removeNpc(n);NPC.list.splice(i,1);SFX.jump();
+      toast(`☠ ${spName} BREAKS OFF AND JUMPS OUT — YOU ESCAPED`);
+      if(!NPC.list.length)NPC.nextIn=55+Math.random()*50;
+      continue;
+    }
+    if(n.age>n.life||dNow>500){
       removeNpc(n);NPC.list.splice(i,1);SFX.jump();
       if(!NPC.list.length)NPC.nextIn=55+Math.random()*50;
       continue;
@@ -5414,19 +6349,30 @@ function updateNpcs(dt){
     const d=to.length()||1;to.multiplyScalar(1/d);
     const tangent=new V3().crossVectors(to,AY);if(tangent.lengthSq()<1e-4)tangent.set(1,0,0);tangent.normalize();
     const desired=new V3();
-    if(d>175)desired.copy(to);
+    if(n.hostile){
+      if(d>65)desired.copy(to);else desired.copy(to).multiplyScalar(-0.4).addScaledVector(tangent,n.dir);
+      n.fireT-=dt;
+      if(n.fireT<=0&&d<205){n.fireT=(n.mothership?1.6:2.1)+Math.random()*1.2;spawnNpcBolt(n);}
+    }else if(n.follow){
+      if(d>120)desired.copy(to);
+      else if(d<68)desired.copy(to).multiplyScalar(-1).addScaledVector(tangent,n.dir*0.8);
+      else desired.copy(tangent).multiplyScalar(n.dir).addScaledVector(to,(100-d)/240);
+    }else if(d>175)desired.copy(to);
     else if(d<90)desired.copy(to).multiplyScalar(-1).addScaledVector(tangent,n.dir*0.9);
     else desired.copy(tangent).multiplyScalar(n.dir).addScaledVector(to,(110-d)/220);
-    desired.normalize().multiplyScalar(n.cruise);
-    n.vel.lerp(desired,1-Math.exp(-dt*0.55));
+    const speed=n.hostile?(n.mothership?34:46):(n.follow?38:n.cruise);
+    desired.normalize().multiplyScalar(speed);
+    n.vel.lerp(desired,1-Math.exp(-dt*(n.hostile?1.1:0.55)));
     n.group.position.addScaledVector(n.vel,dt);
     const face=n.vel.clone().normalize();if(face.lengthSq()<1e-4)face.set(0,0,-1);
     const up2=Math.abs(face.dot(AY))>0.94?AX:AY;
     n.group.quaternion.setFromRotationMatrix(setBasis(_rm,_rvx.set(0,0,0),face,up2));
     if(n.ring)n.ring.rotation.z+=dt*(0.5+n.dir*0.4);
+    const pop=n.age<0.6?0.35+0.65*sstep(0,0.6,n.age):1;
+    n.group.scale.setScalar(n.baseScale*pop);
     for(let gi=0;gi<n.glows.length;gi++)n.glows[gi].scale.setScalar(0.8+Math.sin(uTime.value*7+gi+n.id)*0.2);
     n.chatT-=dt;
-    if(d<130&&n.chatT<=0){n.chatT=9+Math.random()*8;SFX.alienChatter();}
+    if(!n.hostile&&d<130&&n.chatT<=0){n.chatT=9+Math.random()*8;SFX.alienChatter();}
   }
 }
 function updateNpcMarkers(){
@@ -5443,11 +6389,35 @@ function updateNpcMarkers(){
     if(behind){x=-x;y=-y;}
     let off=behind||Math.abs(x)>0.95||Math.abs(y)>0.9;
     if(off){const k=1/Math.max(Math.abs(x)/0.95,Math.abs(y)/0.88,1e-4);if(behind||k<1){x*=k;y*=k;}}
+    const d=Math.round(n.group.position.distanceTo(ship.group.position));
     el.style.display='';
-    el.className='mk npc'+(off?' off':'');
+    el.className='mk npc'+(n.hostile||n.distress?' foe':'')+(off?' off':'');
     el.style.transform=`translate(${((x*0.5+0.5)*innerWidth).toFixed(1)}px,${((-y*0.5+0.5)*innerHeight).toFixed(1)}px) translate(-50%,${off?'-50%':'-135%'})`;
-    el.lastChild.textContent=`◇ ${n.species}`;
+    el.lastChild.textContent=n.distress?`🆘 DISTRESS ${d}`:n.hostile?`☠ ${n.species} ${d}`:n.mothership?`◈ MOTHERSHIP ${d}`:`◇ ${n.species} ${d}`;
   }
+}
+let anomalyMkEl=null;
+function updateAnomalyMarker(){
+  const a=GALAXY.anomaly;
+  if(!anomalyMkEl){
+    if(!a||!markersEl)return;
+    anomalyMkEl=document.createElement('div');anomalyMkEl.className='mk poi';
+    anomalyMkEl.innerHTML='<b></b><span></span>';markersEl.appendChild(anomalyMkEl);
+  }
+  if(!a||!started||PL.mode!=='fly'||photoMode){anomalyMkEl.style.display='none';return;}
+  camera.updateMatrixWorld();
+  _rvp.copy(a.pos).applyMatrix4(camera.matrixWorldInverse);
+  const behind=_rvp.z>0;
+  _rvp.applyMatrix4(camera.projectionMatrix);
+  let x=_rvp.x,y=_rvp.y;
+  if(behind){x=-x;y=-y;}
+  const off=behind||Math.abs(x)>0.95||Math.abs(y)>0.9;
+  if(off){const k=1/Math.max(Math.abs(x)/0.95,Math.abs(y)/0.88,1e-4);if(behind||k<1){x*=k;y*=k;}}
+  const d=Math.round(ship.group.position.distanceTo(a.pos));
+  anomalyMkEl.className='mk poi'+(off?' off':'');
+  anomalyMkEl.style.display='';
+  anomalyMkEl.style.transform=`translate(${((x*0.5+0.5)*innerWidth).toFixed(1)}px,${((-y*0.5+0.5)*innerHeight).toFixed(1)}px) translate(-50%,${off?'-50%':'-135%'})`;
+  anomalyMkEl.lastChild.textContent=a.scanned?`🌀 ANOMALY DATA SECURED`:`🌀 ANOMALY ${d}`;
 }
 
 /* ---- Interactive Ruins, Caves, Outposts, Wildlife & Solar Storms ---- */
@@ -5652,7 +6622,7 @@ function handleInteract(){
     toast('DRIVING NOMAD ROVER · [E] TO EXIT');
     return true;
   }
-  if(PL.nearInteract.kind==='poi')return handlePOI(PL.nearInteract.poi);
+  if(PL.nearInteract.kind==='poi'){const poi=PL.nearInteract.poi;const r=handlePOI(poi);if(poi&&poi.body)updatePlanetProgress(poi.body);return r;}
   if(PL.nearInteract.kind==='tame')return tameCreature(PL.body,PL.nearInteract.creature);
   if(PL.nearInteract.kind==='outpost'){
     const entry=PL.nearInteract.entry;
@@ -5675,6 +6645,8 @@ function handleInteract(){
       SFX.discover();earnGold(60,true);
       recordDiscovery('Ancient Puzzle',`${ruin.name} Unlocked`,PL.body.name,'Solved Precursor Monolith energy circuit and recovered exotic data.');
       advanceMission('ruin',1);
+      dynProgress('expedition',1,{ruin:true});
+      updatePlanetProgress(PL.body);
       saveGame(true);
       toast('MONOLITH UNLOCKED! +25 AE, +15 SO, +5 VD!');
     }
@@ -6018,7 +6990,7 @@ function updatePoiMarker(){
   poiMkEl.className='mk poi'+(off?' off':'');
   poiMkEl.style.display='';
   poiMkEl.style.transform=`translate(${((x*0.5+0.5)*w).toFixed(1)}px,${((-y*0.5+0.5)*h).toFixed(1)}px) translate(-50%,${off?'-50%':'-135%'})`;
-  const tag=best.kind==='cache'?'CACHE':best.kind==='glyph'?'GLYPH':best.kind==='vault'?'VAULT':best.kind==='wreck'?'WRECK':best.kind==='probe'?'PROBE':best.kind==='npc'?'SURVIVOR':'SITE';
+  const tag=best.kind==='cache'?'CACHE':best.kind==='glyph'?'GLYPH':best.kind==='vault'?'VAULT':best.kind==='wreck'?'WRECK':best.kind==='probe'?'PROBE':best.kind==='npc'?'SURVIVOR':best.kind==='settlement'?'SETTLEMENT':best.kind==='underground'?'UNDERGROUND':best.kind==='env'?'LANDMARK':'SITE';
   poiMkEl.lastChild.textContent=`✦ ${tag} ${Math.round(bd)}`;
 }
 /* ---- Surfaces: roads & bridges are walkable ---- */
@@ -6272,6 +7244,7 @@ function frame(dt){
     updateCoins(dt);
     updateRaiders(dt);
     updateNpcs(dt);
+    updateGalaxy(dt);
     updateMining(dt);
     updateEcosystemAndHazards(dt,simT);
   }
@@ -6300,7 +7273,7 @@ function frame(dt){
   skyGroup.position.copy(camera.position);
   const camAlt=PL.near?Math.max(0,camera.position.distanceTo(PL.near.center)-PL.near.R):1e3;
   camera.near=clamp(camAlt*0.03,0.14,2.5);camera.updateProjectionMatrix();
-  updateHUD(dt);updateMarkers(ref);updateRaiderMarkers();updateNpcMarkers();updatePoiMarker();
+  updateHUD(dt);updateMarkers(ref);updateRaiderMarkers();updateNpcMarkers();updateAnomalyMarker();updatePoiMarker();
   renderer.render(scene,camera);
 }
 function resize(){renderer.setSize(innerWidth,innerHeight,false);camera.aspect=innerWidth/innerHeight;baseFov=camera.aspect<1?76:62;camera.updateProjectionMatrix();}
@@ -6426,7 +7399,7 @@ $('importFile').addEventListener('change',e=>{
 if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)){
   addEventListener('load',()=>{navigator.serviceWorker.register('./sw.js',{updateViaCache:'none'}).then(r=>r.update()).catch(()=>{});});
 }
-window.__game={COINS,SKIN,earnGold,PL,bodies,INV,UPGRADES,MISSIONS,DISCOVERIES,ELYS,GAME,RAIDER,NPC,SFX,get ship(){return ship;},get astro(){return astro;},actLand,actExit,warpToBody,switchActiveSystem,triggerScan,handleInteract,keys,look,camera,frame,spawnStormCrystals,clearAllStormCrystals,openBase,openVaultCode,tameCreature,readTreasureMap,placeOutpostOnPlanet,startRaiderWave,endRaiderWave,damageRaider,canSpawnRaider,spawnRaiderBolt,raiderHitShip,spawnNpcConvoy,canSpawnNpc,fleeNpcs,nearestNpc,hailNpc,tutActive,CINE,dbg:()=>({started,modalOpen,photoMode,cine:CINE.open,tutStep,alt:PL.alt,mode:PL.mode})};
+window.__game={COINS,SKIN,earnGold,PL,bodies,INV,UPGRADES,MISSIONS,DISCOVERIES,ELYS,GAME,RAIDER,NPC,SFX,GALAXY,get ship(){return ship;},get astro(){return astro;},actLand,actExit,warpToBody,switchActiveSystem,triggerScan,handleInteract,keys,look,camera,frame,spawnStormCrystals,clearAllStormCrystals,openBase,openVaultCode,tameCreature,readTreasureMap,placeOutpostOnPlanet,startRaiderWave,endRaiderWave,damageRaider,canSpawnRaider,spawnRaiderBolt,raiderHitShip,spawnNpcConvoy,makeNpcHostile,canSpawnNpc,fleeNpcs,nearestNpc,hailNpc,spawnAnomaly,scanAnomaly,planetaryEvent,updateGalaxy,checkProgression,explorerScore,explorerRankIdx,spawnPOI,handlePOI,updatePlanetProgress,planetPoiTotals,ensureDynOffers,acceptDynMission,dynProgress,makeDynOffer,completeDynMission,startRescue,spawnEscortFleet,spawnDistressShip,renderJournalModal,setJournalTab:t=>{journalTab=t;},saveGame,loadGame,tutActive,CINE,dbg:()=>({started,modalOpen,photoMode,cine:CINE.open,tutStep,alt:PL.alt,mode:PL.mode})};
 </script>
 </body>
 </html>
