@@ -8868,8 +8868,8 @@ function hqInteriorDetail(Dk,T,trim,M,intR){
   Dk.push([hqBox(21,0.9,1.2),0xffc94d,Mx(0,10.6,-33)],[hqBox(2.2,1.2,2.2),0x3a4252,Mx(-3,9.7,-33)],[hqCyl(0.05,0.05,3.4,6),0x8a96aa,Mx(-3,7.4,-33)],[hqBox(1.2,0.5,0.4),0xffc94d,Mx(-3,5.5,-33)]);
   T.push([hqBox(0.3,0.1,0.3),0xff4d5e,Mx(-3,9.05,-33)]);
   for(const z of [-22.5,-18.8]){Dk.push([hqCyl(1.1,1.1,4,rs),0xdfe6f0,Mx(12.3,2,z)],[hqCyl(1.15,1.15,0.25,rs),0xff922b,Mx(12.3,1.2,z)],[hqCyl(1.15,1.15,0.25,rs),0xff922b,Mx(12.3,3,z)],[new THREE.SphereGeometry(1.1,rs,6,0,TAU,0,Math.PI/2),0xdfe6f0,Mx(12.3,4,z)],[hqCyl(0.12,0.12,7,6),pipeA,Mx(12.3,7.8,z)]);HQ.cols.push({x:12.3,z,r:1.2});}
-  Dk.push([hqCyl(0.9,1.1,0.6,rs),0x3a4252,Mx(-7,0.3,-34)],[hqCyl(0.35,0.35,3,10),0xffc94d,Mx(-7,1.9,-34,0,0,0.35)],[new THREE.SphereGeometry(0.45,10,8),0x3a4252,Mx(-7.5,3.3,-34)],[hqCyl(0.28,0.28,2.4,10),0xffc94d,Mx(-6.6,3.9,-34,0,0,-1.1)],[hqBox(0.5,0.5,0.7),0x3a4252,Mx(-5.6,4.4,-34)]);
-  T.push([hqBox(0.12,0.12,0.3),0xff4d5e,Mx(-5.3,4.4,-34)]);HQ.cols.push({x:-7,z:-34,r:1.2});
+  Dk.push([hqCyl(0.9,1.1,0.6,rs),0x3a4252,Mx(-5,0.3,-39.5)],[hqCyl(0.35,0.35,3,10),0xffc94d,Mx(-5,1.9,-39.5,0,0,0.35)],[new THREE.SphereGeometry(0.45,10,8),0x3a4252,Mx(-5.5,3.3,-39.5)],[hqCyl(0.28,0.28,2.4,10),0xffc94d,Mx(-4.6,3.9,-39.5,0,0,-1.1)],[hqBox(0.5,0.5,0.7),0x3a4252,Mx(-3.6,4.4,-39.5)]);
+  T.push([hqBox(0.12,0.12,0.3),0xff4d5e,Mx(-3.3,4.4,-39.5)]);HQ.cols.push({x:-5,z:-39.5,r:1.2});
   for(const s of [-1,1])for(const z of [-36,-24]){Dk.push([hqCyl(1.5,1.5,0.3,rs),0x1d2330,Mx(s*13.5,8,z,0,0,Math.PI/2)]);T.push([new THREE.TorusGeometry(1.5,0.08,4,rs),trim,Mx(s*13.33,8,z,0,Math.PI/2,0)]);
     for(let i=0;i<3;i++)Dk.push([hqBox(0.1,2.6,0.35),rib,Mx(s*13.3,8,z,i*Math.PI/3,0,0)]);}
   for(let i=0;i<24;i++){const a=i/24*TAU;T.push([hqBox(0.9,0.04,0.35),i%2?0xffd23f:0x151a24,Mx(Math.cos(a)*5.25,0.02,HQ_PAD_Z+Math.sin(a)*5.25,0,-a+Math.PI/2,0)]);}
@@ -9279,7 +9279,7 @@ function hqLevelUp(){
 .hqIcon{width:56px;height:56px;border-radius:14px;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at 40% 35%,rgba(95,243,255,.35),rgba(8,18,38,.9));border:1px solid rgba(95,243,255,.4);flex:0 0 auto}
 .hqIcon .ic{width:30px;height:30px;color:#9dfcff}.hqHead{display:flex;gap:10px;align-items:center}
 .hqTag{border-color:#5ff3ff!important;background:rgba(8,18,38,.88)!important;color:#c8f2ff!important}.hqTag .ic{width:14px;height:14px;margin-right:4px;vertical-align:-2px;color:#5ff3ff}.hqTag .mpArr{border-left-color:#5ff3ff!important}
-body.hqIn #markers>*{visibility:hidden!important}body.hqIn #bScan{display:none!important}
+body.hqIn #markers>*:not(.mpTag){visibility:hidden!important}body.hqIn #bScan{display:none!important}
 .hqList{font-family:var(--sans);font-size:12.5px;font-weight:700;line-height:1.7}.hqSw{display:inline-block;width:14px;height:14px;border-radius:4px;vertical-align:-2px;margin-right:6px;border:1px solid rgba(255,255,255,.4)}
 #hqName{font-family:var(--display);font-size:20px;letter-spacing:.06em;padding:6px 10px;border-radius:10px;border:1px solid rgba(95,243,255,.5);background:#0b1730;color:#dff4ff;width:min(320px,60vw)}`;
   document.head.appendChild(css);
@@ -9381,6 +9381,20 @@ function hqLoad(d){
   setTimeout(hqSyncMissions,0);
   if(HQ.built)hqRebuild();
   if(d.docked)setTimeout(()=>{if(started)hqPlaceDocked();},60);
+}
+const _hqMQ=new Q(),_hqMV=new V3(),HQ_GUEST=[[-9,-34],[9,-34],[-6,-19],[6,-19]];
+function hqGuestSlot(id){const ids=[...MP.peers.keys()];return HQ_GUEST[Math.max(0,ids.indexOf(id))%HQ_GUEST.length];}
+/* multiplayer: a friend aboard their HQ is shown inside YOUR station (same layout) — ship on a visitor pad, astronaut in the same room */
+function hqPeerPose(P,st){
+  if(!st.hq||!HQ.built||HQ.sys!==activeSystemId||!Array.isArray(st.hl)||!Array.isArray(st.hq4))return false;
+  const sl=hqGuestSlot(P.id),ys=HQ.steps.some(p=>Math.hypot(p.x-sl[0],p.z-sl[1])<1)?HQ_PAD_Y:1.05;
+  if(st.m==='hqlanded'||st.m==='hqwalk'){_hqMV.set(sl[0],ys,sl[1]);_hqMQ.identity();}
+  else{_hqMV.set(st.hl[0],st.hl[1],st.hl[2]);_hqMQ.set(st.hq4[0],st.hq4[1],st.hq4[2],st.hq4[3]);const f=sstep(-90,-31,_hqMV.z);_hqMV.x+=sl[0]*f;_hqMV.z+=(sl[1]-HQ_PAD_Z)*f;_hqMV.y+=(ys-HQ_PAD_Y)*f;}
+  _mpV.copy(_hqMV);HQ.group.localToWorld(_mpV);_mpQ.copy(HQ.group.quaternion).multiply(_hqMQ);return true;
+}
+function hqPeerAstro(st){
+  if(st.m!=='hqwalk'||!Array.isArray(st.ha)||!Array.isArray(st.haq))return false;
+  _mpV.set(st.ha[0],st.ha[1],st.ha[2]);HQ.group.localToWorld(_mpV);_hqMQ.set(st.haq[0],st.haq[1],st.haq[2],st.haq[3]);_mpQ.copy(HQ.group.quaternion).multiply(_hqMQ);return true;
 }
 HQ.api={dock:hqDock,launch:hqLaunch,exit:hqExitShip,buy:hqPurchase,levelUp:hqLevelUp,nav:hqStartNav,tpIn:hqTeleportIn,open:hqOpen,jumpTo:hqJumpTo,canDock:hqCanDock,save:saveGame,load:loadGame,teleportToOutpost,interact:hqInteract,rebuild:hqRebuild};
 // HQ-END
@@ -9849,6 +9863,9 @@ function mpState(){
     const ap=PL.mode==='rover'?rover.localPos:astro.group.position;
     st.a=r3(ap);st.aq=r4(PL.mode==='rover'?_mpQ.setFromRotationMatrix(setBasis(_m,_a.set(0,0,0),rover.face,rover.dir)):astro.group.quaternion);st.ab=bodies.indexOf(PL.body);
   }
+  if(window.__HQ&&hqIn()&&HQ.group){st.hq=1;st.loc='ABOARD '+HQ.name;
+    _mpV.copy(ship.group.position);HQ.group.worldToLocal(_mpV);st.hl=r3(_mpV);_mpQ.copy(HQ.group.quaternion).invert().multiply(ship.group.quaternion);st.hq4=r4(_mpQ);
+    if(PL.mode==='hqwalk'){st.ha=r3(astro.group.position);st.haq=r4(astro.group.quaternion);}}
   return st;
 }
 /* Quota saver: peers whose selected ICE pair is a TURN relay get 5 Hz instead of 10 Hz,
@@ -9987,6 +10004,10 @@ function mpFlyTo(id){
   const st=P.st,nm=mpClean(st.n),now=performance.now();
   if(now-mpFlyT<4000){toast('HYPERDRIVE COOLING DOWN…');return;}
   if(PL.mode==='landing'||PL.mode==='takeoff'){toast('WAIT UNTIL YOU ARE FLYING OR LANDED');return;}
+  if(st.hq&&window.__HQ){
+    if(hqIn()){toast(nm+' IS ABOARD TOO — FOLLOW THEIR TAG');closeModals();return;}
+    if(HQ.sys!==st.s){toast(nm+' IS ABOARD IN '+((SYSTEMS.find(x=>x.id===st.s)||{}).name||'ANOTHER SYSTEM')+' — MOVE YOUR HQ THERE TO MEET UP');return;}
+    mpFlyT=now;closeModals();hqJumpTo();toast(nm+' IS ABOARD — DOCK AT YOUR HQ TO MEET THEM');return;}
   const ref=bodies[st.b];if(!ref){toast('CAN\'T LOCATE '+nm);return;}
   if(st.s!==activeSystemId){
     const sys=SYSTEMS.find(x=>x.id===st.s);
@@ -10044,24 +10065,26 @@ function updateMP(dt){
     if(!show){P.ship.group.visible=false;P.astro.group.visible=false;P.tag.style.display='none';P.fresh=true;continue;}
     const b=bodies[st.b]||bodies[0];
     _mpV.set(st.p[0],st.p[1],st.p[2]).add(b.center);_mpQ.set(st.q[0],st.q[1],st.q[2],st.q[3]);
+    const hqv=!!(st.hq&&window.__HQ&&hqPeerPose(P,st));
     if(P.fresh||P.pos.distanceTo(_mpV)>250){P.pos.copy(_mpV);P.q.copy(_mpQ);}else{P.pos.lerp(_mpV,k);P.q.slerp(_mpQ,k);}
-    P.ship.group.position.copy(P.pos);P.ship.group.quaternion.copy(P.q);P.ship.group.visible=!(st.d&&st.m!=='landed'&&st.m!=='walk'&&st.m!=='rover');
-    const fl=st.m==='fly'||st.m==='takeoff'||st.m==='landing'?Math.max(0.15,st.f||0):0;
+    P.ship.group.position.copy(P.pos);P.ship.group.quaternion.copy(P.q);P.ship.group.visible=!(st.d&&st.m!=='landed'&&st.m!=='walk'&&st.m!=='rover')&&!(st.hq&&!hqv);
+    const fl=st.m==='fly'||st.m==='takeoff'||st.m==='landing'||st.m==='hqdock'||st.m==='hqlaunch'?Math.max(0.15,st.f||0):0;
     if(st.tr&&STYLE_ITEMS.some(x=>x.id===st.tr&&x.slot==='trail')&&st.m==='fly'&&P.ship.group.visible){P.trT=(P.trT||0)-dt;if(P.trT<=0){P.trT=0.05;emitTrail(st.tr,P.ship.group);}}
     P.ship.flame.visible=fl>0.03;P.ship.flame.scale.set(0.8+fl*0.3,0.8+fl*0.3,fl*(0.85+Math.random()*0.3));
     P.ship.gear.visible=st.m!=='fly';P.ship.gear.scale.y=st.m!=='fly'?1:0.01;
     let tagPos=P.pos,lift=2.6;
-    if(st.a&&bodies[st.ab]){
-      const ab=bodies[st.ab];_mpV.set(st.a[0],st.a[1],st.a[2]).add(ab.center);_mpQ.set(st.aq[0],st.aq[1],st.aq[2],st.aq[3]);
+    const hqA=hqv&&hqPeerAstro(st);
+    if(hqA||(st.a&&bodies[st.ab]&&!st.hq)){
+      if(!hqA){const ab=bodies[st.ab];_mpV.set(st.a[0],st.a[1],st.a[2]).add(ab.center);_mpQ.set(st.aq[0],st.aq[1],st.aq[2],st.aq[3]);}
       if(P.fresh||!P.astro.group.visible||P.apos.distanceTo(_mpV)>30){P.apos.copy(_mpV);P.aq.copy(_mpQ);}else{const moved=P.apos.distanceTo(_mpV);P.apos.lerp(_mpV,k);P.aq.slerp(_mpQ,k);P.phase+=Math.min(moved*6,0.6);}
-      P.astro.group.position.copy(P.apos);P.astro.group.quaternion.copy(P.aq);P.astro.group.visible=st.m==='walk'||st.m==='rover';
+      P.astro.group.position.copy(P.apos);P.astro.group.quaternion.copy(P.aq);P.astro.group.visible=st.m==='walk'||st.m==='rover'||st.m==='hqwalk';
       const sw=Math.sin(P.phase)*0.7;P.astro.legL.rotation.x=sw;P.astro.legR.rotation.x=-sw;P.astro.armL.rotation.x=-sw*0.8;P.astro.armR.rotation.x=sw*0.8;
       tagPos=P.apos;lift=1.5;
     }else P.astro.group.visible=false;
     P.fresh=false;
     if(P.emoT>0)P.emoT-=dt;
     _mpV.copy(tagPos);_mpV.y+=0;
-    const up=_a.copy(tagPos).sub(b.center).normalize();_mpV.addScaledVector(up,lift);
+    const up=hqv?_a.set(0,1,0).applyQuaternion(HQ.group.quaternion):_a.copy(tagPos).sub(b.center).normalize();_mpV.addScaledVector(up,lift);
     const dist=camera.position.distanceTo(tagPos);
     _mpV.project(camera);
     /* on screen: tag floats above the friend. Off screen or behind you: it sticks to the screen edge with an arrow pointing at them */
