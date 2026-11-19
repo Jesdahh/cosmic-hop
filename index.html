@@ -1242,6 +1242,7 @@ body.photoMode #ui{opacity:0!important}
           <div id="mpCodeBox" class="mpRow"><span class="mpCode" id="mpCodeShow"></span><button class="uBtn" id="mpCopy" style="width:auto"><svg class="ic"><use href="#i-copy"/></svg> COPY</button></div>
           <div class="uDesc" id="mpStatus">Connecting…</div>
           <div class="mpPeers" id="mpPeers"></div>
+          <div id="coopOps" class="coopOps"></div>
           <div class="mpRow"><span style="font-family:var(--display);font-size:18px">EMOTES</span><button class="mpEmo" data-emo="👋">👋</button><button class="mpEmo" data-emo="🚀">🚀</button><button class="mpEmo" data-emo="😂">😂</button><button class="mpEmo" data-emo="❤️">❤️</button><button class="mpEmo" data-emo="👍">👍</button></div>
           <div class="mpRow"><button class="uBtn buy" id="mpPlay" style="width:auto">▶ FLY!</button><button class="uBtn" id="mpLeave" style="width:auto;background:#ffb3c1">LEAVE</button></div>
         </div>
@@ -2003,6 +2004,7 @@ function updateMissionHUD(){
 }
 function recordDiscovery(cat,name,planet,detail,quiet){
   if(DISCOVERIES.some(d=>d.name===name&&d.planet===planet))return false;
+  if(window.__HQ)coopEvent('scan',1);
   const b=bodies.find(x=>x.name===planet);
   DISCOVERIES.unshift({cat,name,planet,sys:b?b.sys:'',detail,time:new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})});
   INV.rp=(INV.rp||0)+2;
@@ -4520,6 +4522,8 @@ const SHIP_SKINS=[
   {id:'twin',name:'TWIN-HULL RACER',price:18000,shape:'twin',body:0xff4d6d,acc:0xf2f6fa,str:0x2b2d42,glass:0x39c6ff,gEm:0x0a3a6a,f1:0x39c6ff,f2:0xffffff,bonus:'speed',desc:'Two hulls, one spoiler, zero patience. RACE TUNED: +15% top speed.'},
   {id:'retro',name:'ROCKETEER 1957',price:10000,shape:'retro',body:0xeceff4,acc:0xd62828,str:0xb8c0cc,glass:0x8eeaff,gEm:0x1b5a7a,f1:0xff9f1c,f2:0xffe066,bonus:'mining',desc:'Chrome, fins and a bubble porthole. TURBO DRILL: mines 30% faster from your ship.'},
   {id:'whale',name:'STAR WHALE',price:25000,shape:'whale',body:0x3a6ea5,acc:0x6fb4ff,str:0xe8f4ff,glass:0x5df2c0,gEm:0x0a6a50,f1:0x9ad1ff,f2:0xffffff,bonus:'regen',desc:'A gentle giant of the void. LIVING HULL: slowly heals you while flying.'},
+  {id:'manta',name:'NEBULA MANTA',price:0,locked:true,team:3,shape:'manta',body:0x1b2a4a,acc:0x2ec4b6,str:0xff6bd6,glass:0x9dfcff,gEm:0x0a6a7a,f1:0xff6bd6,f2:0x9dfcff,bonus:'speed',desc:'TEAM OPS TIER 3 EXCLUSIVE — a living ray of the nebula with curling wingtips, glowing belly stripes and a stinger tail. RACE TUNED: +15% top speed.'},
+  {id:'prism',name:'QUANTUM PRISM',price:0,locked:true,team:5,shape:'prism',body:0xc3b5ff,acc:0x5ff3ff,str:0xffd23f,glass:0xff4dd8,gEm:0x7a1060,f1:0xc77dff,f2:0x9dfcff,bonus:'magnet',desc:'TEAM OPS TIER 5 EXCLUSIVE — a faceted crystal starship with four orbiting shards and a golden quantum ring. TRACTOR FIELD: grabs coins from far away.'},
   {id:'vanguard',name:'VANGUARD MK-II',price:22000,model:'models/spaceship.glb',body:0x6b7280,acc:0x39d7ff,str:0xffd23f,glass:0x8eeaff,gEm:0x0a6a7a,f1:0x39d7ff,f2:0xffffff,flameZ:2.0,flameK:1.5,desc:'A hand-modeled strike fighter loaded straight into the game: glass canopy, eight wing cannons and glowing hull strips. Real 3D mesh hull.'},
 ];
 const ASTRO_SKINS=[
@@ -4534,6 +4538,8 @@ const ASTRO_SKINS=[
   {id:'robo',name:'ROBO-SCOUT',price:9000,shape:'robot',suit:0xb8c4d6,legs:0x8a96aa,chest:0x39c6ff,belt:0x4a4960,visor:0x5df2c0,vEm:0x1aff9c,limb:1.15,headY:0.84,bonus:'miner',desc:'A boxy explorer robot. AUTO-DRILL ARMS: mines 30% faster on foot.'},
   {id:'zorp',name:'ZORP THE ALIEN',price:11000,shape:'alien',suit:0x7b2cbf,legs:0x8ee86e,chest:0x5a2ca0,belt:0xffd23f,visor:0x111118,vEm:0x000000,limb:0.85,headY:1.0,bonus:'jump',desc:'Big head, bigger jumps. LOW-GRAVITY LEGS: jump higher and jetpack fuel lasts longer.'},
   {id:'diver',name:'DEEP DIVER 1890',price:8000,shape:'diver',suit:0x8c6a46,legs:0x6e5236,chest:0xd9a441,belt:0x9c7420,visor:0x9ad1ff,vEm:0x1b5a7a,limb:1.25,headY:0.92,bonus:'swim',desc:'Brass helmet with portholes. DEEP-SEA SUIT: swim at full speed and lava burns half as much.'},
+  {id:'comet',name:'COMET RUNNER',price:0,locked:true,team:2,shape:'runner',suit:0xf2f6fa,legs:0x2b2d42,chest:0xff4d6d,belt:0xffd23f,visor:0x39c6ff,vEm:0x0a3a6a,limb:1.0,headY:0.9,bonus:'speed',desc:'TEAM OPS TIER 2 EXCLUSIVE — an aerodynamic racing suit with a finned helmet, wraparound visor and twin back boosters. SPRINTER: runs 25% faster.'},
+  {id:'samurai',name:'ORBIT SAMURAI',price:0,locked:true,team:4,shape:'samurai',suit:0x2b2d6e,legs:0x1a1a3e,chest:0xd62828,belt:0xffd23f,visor:0xff2a6d,vEm:0x8a0030,limb:1.1,headY:0.92,bonus:'armor',desc:'TEAM OPS TIER 4 EXCLUSIVE — layered crimson armor, a golden crescent kabuto and a star-katana on the back. ARMORED: takes less damage.'},
   {id:'knight',name:'STAR KNIGHT',price:13000,shape:'knight',suit:0xc7ccd6,legs:0x9aa1ad,chest:0xe8ecf2,belt:0xd62828,visor:0x39c6ff,vEm:0x1b5a7a,limb:1.12,headY:1.0,bonus:'armor',desc:'Shining armor and a red plume. KNIGHT PLATE: takes 30% less damage on foot.'},
   {id:'mech',name:'MINI MECH',price:16000,shape:'mech',suit:0xffb703,legs:0x2b2d42,chest:0x3d405b,belt:0xd62828,visor:0xff4d6d,vEm:0x8a0020,limb:1.55,headY:0.86,bonus:'speed',desc:'A walking tank. SERVO LEGS: run 25% faster.'},
 ];
@@ -5196,7 +5202,7 @@ function openModal(id){
 }
 function closeModals(){
   modalOpen=false;
-  ['upgradeModal','craftModal','journalModal','mapModal','settingsModal','shopModal','helpModal','confirmModal','codeModal','baseModal','photoModal','alienModal','mpModal','hqModal'].forEach(id=>$(id).classList.remove('open'));
+  ['upgradeModal','craftModal','journalModal','mapModal','settingsModal','shopModal','helpModal','confirmModal','codeModal','baseModal','photoModal','alienModal','mpModal','hqModal','coopModal'].forEach(id=>$(id).classList.remove('open'));
   clearTimeout(baseTimer);
 }
 function askConfirm(title,msg,btns){
@@ -5502,15 +5508,15 @@ function renderShop(){
     const tkey=(isShip&&k.model)?'':(isShip?'ship:':'astro:')+k.id;
     const card=document.createElement('div');card.className='uCard'+(eq?' equipped':'');
     card.innerHTML=`<div><div class="shopPrev" data-thumb="${tkey}">${isShip?shipPrev(k):astroSvg(k)}</div>
-      <div class="uTitle" style="margin-top:8px"><span>${k.name}</span><span class="uLvl">${locked?'REWARD':k.price?k.price+' 🪙':'FREE'}</span></div>
+      <div class="uTitle" style="margin-top:8px"><span>${k.name}</span><span class="uLvl">${k.team?'TEAM ONLY':locked?'REWARD':k.price?k.price+' 🪙':'FREE'}</span></div>
       <div class="uDesc" style="margin-top:4px">${k.desc}</div></div>
-      <button class="uBtn${has?'':' buy'}" data-skin="${k.id}" ${eq||(!has&&(!afford||locked))?'disabled':''}>${eq?'★ EQUIPPED':locked?'ETERNAL BLOOM REWARD':has?'EQUIP':afford?'BUY · '+k.price+' <svg class="ic"><use href="#i-coin"/></svg>':'NEED '+(k.price-gold)+' MORE <svg class="ic"><use href="#i-coin"/></svg>'}</button>`;
+      <button class="uBtn${has?'':' buy'}" data-skin="${k.id}" ${eq||(!has&&(!afford||locked))?'disabled':''}>${eq?'★ EQUIPPED':locked?(k.team?'TEAM OPS TIER '+k.team+' REWARD':'ETERNAL BLOOM REWARD'):has?'EQUIP':afford?'BUY · '+k.price+' <svg class="ic"><use href="#i-coin"/></svg>':'NEED '+(k.price-gold)+' MORE <svg class="ic"><use href="#i-coin"/></svg>'}</button>`;
     grid.appendChild(card);
   }
   thumbAttach(grid);
   grid.querySelectorAll('[data-skin]').forEach(b=>b.addEventListener('click',()=>{
     const id=b.dataset.skin,k=list.find(s=>s.id===id);
-    if(k.locked&&!owned.includes(id)){toast(k.id==='goldenbloom'?'RESTORE THE ETERNAL BLOOM TO EARN THE GOLDEN BLOOM SKIN':'REACH EXPLORER RANK III TO EARN THE VOIDLIGHT ENVOY SKIN');return;}
+    if(k.locked&&!owned.includes(id)){toast(k.team?`TEAM-ONLY: CLEAR TEAM OPS TIER ${k.team} IN MULTIPLAYER TO UNLOCK ${k.name}`:k.id==='goldenbloom'?'RESTORE THE ETERNAL BLOOM TO EARN THE GOLDEN BLOOM SKIN':'REACH EXPLORER RANK III TO EARN THE VOIDLIGHT ENVOY SKIN');return;}
     if(!owned.includes(id)){if((INV.gold||0)<k.price)return;INV.gold-=k.price;owned.push(id);toast(`PURCHASED ${k.name}!`);SFX.coin();}
     if(isShip){SKIN.ship=id;dressShip(ship.model,ship.flame,id);}else{SKIN.astro=id;dressAstro(astro,id);}
     SFX.upgrade();updateResHUD();saveGame(true);renderShop();
@@ -6333,7 +6339,7 @@ function updateMining(dt){
       }else{
       const yieldAmt=1+Math.floor((UPGRADES.tool.lvl-1)*0.75);
       const meta=RES_META[bestTarget.type];
-      INV[bestTarget.type]+=yieldAmt;
+      INV[bestTarget.type]+=yieldAmt;if(window.__HQ)coopEvent('mine',yieldAmt);
       if(bestTarget.type==='so')advanceMission('solarite',yieldAmt);
       if(bestTarget.type==='lum')advanceMission('lumCrystal',yieldAmt);
       const gEarn=yieldAmt*(GOLD_RATE[bestTarget.type]||1)*(dblOn()?2:1);tutFlags.mine=1;
@@ -6514,7 +6520,7 @@ function damageRaider(r,n){
 }
 function destroyRaider(r){
   if(r.dead)return;
-  r.dead=true;
+  r.dead=true;if(window.__HQ)coopEvent('raider',1);
   if(r.mk){r.mk.remove();r.mk=null;}
   r.group.visible=false;
   boom(r.group.position,0xffb27a,1.1);
@@ -8266,6 +8272,7 @@ function frame(dt){
   updateMP(dt);
   if(started)updateCapsule(dt);
   if(started)updateShop2(dt);
+  if(window.__HQ)updateCoop(dt);
   look.x=look.y=0;
 
   let tint=0;
@@ -9355,6 +9362,25 @@ function hqLevelUp(){
 .hqCost .ok{color:#7dffc4}.hqCost .no{color:#ff9db2}.hqCost{font-family:var(--sans);font-size:12px;font-weight:800;line-height:1.6}
 .hqIcon{width:56px;height:56px;border-radius:14px;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at 40% 35%,rgba(95,243,255,.35),rgba(8,18,38,.9));border:1px solid rgba(95,243,255,.4);flex:0 0 auto}
 .hqIcon .ic{width:30px;height:30px;color:#9dfcff}.hqHead{display:flex;gap:10px;align-items:center}
+.coopOps{margin-top:4px}
+#coopModal{z-index:34}#coopModal .mBody{max-height:min(70vh,560px);overflow:auto}
+.coopTabs{display:flex;gap:5px;margin-bottom:8px}.coopTab{flex:1;font-family:var(--display);font-size:15px;padding:5px 0;border-radius:9px;border:2px solid rgba(23,15,36,.25);background:rgba(255,255,255,.08);color:inherit;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:3px}
+.coopTab .ic{width:12px;height:12px}.coopTab.on{border-color:#c77dff;background:rgba(199,125,255,.22)}.coopTab.done{color:#2b7a5b}.coopTab.lock{opacity:.6}
+.coopRw{display:flex;align-items:center;gap:8px;padding:7px 9px;margin-bottom:6px;border-radius:10px;background:linear-gradient(90deg,rgba(199,125,255,.22),rgba(255,210,63,.18));border:1px solid rgba(199,125,255,.5)}
+.coopRw>.ic{width:22px;height:22px;color:#c77dff;flex:0 0 auto}.coopRw div{flex:1;min-width:0}.coopRw small{display:block;font-size:10px;font-weight:800;opacity:.7;letter-spacing:.06em}
+.coopRw b{font-family:var(--display);font-size:15px}.coopRw em{font-style:normal;font-size:10px;font-weight:900;padding:1px 5px;border-radius:5px;background:rgba(23,15,36,.15);margin-left:2px}
+.coopRw>span{font-size:10px;font-weight:900;letter-spacing:.05em;white-space:nowrap}.coopRw.done>span{color:#2b7a5b}.coopRw.lock{filter:grayscale(.5);opacity:.75}
+.coopRow.lk{opacity:.5}
+.coopTier{font-family:var(--display);font-size:16px;letter-spacing:.06em;margin:2px 0 6px;color:#c77dff}
+.coopRw em.ex{background:linear-gradient(90deg,#ffd23f,#ff6bd6);color:#170f24}
+#teamCount{min-width:16px;padding:0 4px;border-radius:8px;background:#c77dff;color:#fff;font-size:10px;font-family:var(--sans);font-weight:800;margin-left:3px}
+.coopRow{display:flex;align-items:center;gap:8px;padding:4px 2px;border-bottom:1px solid rgba(23,15,36,.08)}
+.coopRow>.ic{width:22px;height:22px;flex:0 0 auto;color:#7b2cbf}.coopRow .cpTx{flex:1;min-width:0}.coopRow b{font-family:var(--display);font-size:13.5px;display:block}
+.coopRow small{display:block;font-size:10px;font-weight:700;opacity:.75;line-height:1.25}.coopRow i{display:block;height:6px;border-radius:4px;margin-top:4px;background:linear-gradient(90deg,#c77dff var(--p),rgba(23,15,36,.12) var(--p))}
+.coopRow .cpV{font-family:var(--sans);font-weight:900;font-size:12px;text-align:right;white-space:nowrap}.coopRow .cpV em{display:block;font-style:normal;font-size:10px;opacity:.7}
+.coopRow.dn{opacity:.55}.coopRow.dn .cpV{color:#2b7a5b}
+#coopChip{position:fixed;left:50%;top:96px;transform:translateX(-50%);z-index:8;pointer-events:none;display:none;font-family:var(--sans);font-weight:800;font-size:11px;letter-spacing:.05em;color:#f3e6ff;background:rgba(40,12,70,.72);border:1px solid rgba(199,125,255,.7);border-radius:10px;padding:3px 10px;white-space:nowrap}
+#coopChip .ic{width:13px;height:13px;vertical-align:-2px;margin-right:5px;color:#c77dff}
 .hqTag2{position:absolute;left:0;top:0;pointer-events:none;white-space:nowrap;font-family:var(--sans);font-weight:800;font-size:10px;letter-spacing:.06em;color:#c8f2ff;background:rgba(8,18,38,.55);border:1px solid rgba(95,243,255,.45);border-radius:8px;padding:1px 6px;display:none;will-change:transform}
 .hqTag2.near{background:rgba(8,18,38,.4);border-color:rgba(95,243,255,.3);letter-spacing:.12em}
 .hqTag2 .ic{width:11px;height:11px;vertical-align:-2px;margin-right:3px;color:#5ff3ff}
@@ -9450,7 +9476,7 @@ $('hqGrid').addEventListener('click',e=>{const b=e.target.closest('[data-act]');
 $('btnHQ').addEventListener('click',e=>{e.stopPropagation();if(!started)return;hqOpen('over',{});});
 
 /* ---------- 11. SAVE / LOAD ---------- */
-function hqSaveData(){return {name:HQ.name,level:HQ.level,sys:HQ.sys,anchor:HQ.anchor,modules:HQ.modules.slice(),deco:Object.assign({},HQ.deco),energy:Math.round(HQ.energy),health:Math.round(HQ.health),log:HQ.log.slice(-30),vault:Object.assign({},HQ.vault),gardenAt:HQ.gardenAt,researchAt:HQ.researchAt,yaw:HQ.yaw,docked:hqIn(),met:HQ.met.slice(),seen:HQ.seen.slice()};}
+function hqSaveData(){return {name:HQ.name,level:HQ.level,sys:HQ.sys,anchor:HQ.anchor,modules:HQ.modules.slice(),deco:Object.assign({},HQ.deco),energy:Math.round(HQ.energy),health:Math.round(HQ.health),log:HQ.log.slice(-30),vault:Object.assign({},HQ.vault),gardenAt:HQ.gardenAt,researchAt:HQ.researchAt,yaw:HQ.yaw,docked:hqIn(),met:HQ.met.slice(),seen:HQ.seen.slice(),coop:{v:2,tier:COOP.tier,prog:Object.assign({},COOP.prog),done:COOP.done.slice(),worlds:COOP.worlds.slice(),systems:COOP.systems.slice(),claimed:COOP.claimed.slice(),max:COOP.max}};}
 function hqLoad(d){
   if(!d||typeof d!=='object')return;
   HQ.name=String(d.name||'FRONTIER COMMANDER').slice(0,24);HQ.level=clamp(+d.level||1,1,5);
@@ -9459,6 +9485,9 @@ function hqLoad(d){
   HQ.deco=Object.assign({lights:'cyan',hull:'white',theme:'standard'},d.deco||{});if(!HQ_LIGHTS[HQ.deco.lights])HQ.deco.lights='cyan';if(!HQ_HULLS[HQ.deco.hull])HQ.deco.hull='white';if(!HQ_THEMES[HQ.deco.theme])HQ.deco.theme='standard';
   HQ.energy=clamp(+d.energy||0,0,150);HQ.health=clamp(d.health===undefined?100:+d.health,0,100);HQ.log=Array.isArray(d.log)?d.log.slice(-30):[];HQ.vault=d.vault&&typeof d.vault==='object'?d.vault:{};
   HQ.gardenAt=+d.gardenAt||Date.now();HQ.researchAt=+d.researchAt||Date.now();HQ.yaw=+d.yaw||0;HQ.lastGold=null;HQ.met=Array.isArray(d.met)?d.met.slice(0,20):[];HQ.seen=Array.isArray(d.seen)?d.seen.slice(0,20):[];
+  if(d.coop&&typeof d.coop==='object'&&d.coop.v===2){COOP.tier=clamp(+d.coop.tier||1,1,COOP_MAX);COOP.claimed=Array.isArray(d.coop.claimed)?d.coop.claimed.filter(t=>t>=1&&t<=COOP_MAX):[];COOP.max=!!d.coop.max;
+    const ids=coopOps().map(o=>o.id);COOP.prog={};for(const id of ids){const v=+((d.coop.prog||{})[id])||0;if(v>0)COOP.prog[id]=v;}COOP.done=Array.isArray(d.coop.done)?d.coop.done.filter(id=>ids.includes(id)):[];
+    COOP.worlds=Array.isArray(d.coop.worlds)?d.coop.worlds.slice(0,20):[];COOP.systems=Array.isArray(d.coop.systems)?d.coop.systems.slice(0,8):[];}
   setTimeout(hqSyncMissions,0);
   if(HQ.built)hqRebuild();
   if(d.docked)setTimeout(()=>{if(started)hqPlaceDocked();},60);
@@ -9478,6 +9507,127 @@ function hqPeerAstro(st){
   _mpV.set(st.ha[0],st.ha[1],st.ha[2]);HQ.group.localToWorld(_mpV);_hqMQ.set(st.haq[0],st.haq[1],st.haq[2],st.haq[3]);_mpQ.copy(HQ.group.quaternion).multiply(_hqMQ);return true;
 }
 HQ.api={dock:hqDock,launch:hqLaunch,exit:hqExitShip,buy:hqPurchase,levelUp:hqLevelUp,nav:hqStartNav,tpIn:hqTeleportIn,open:hqOpen,jumpTo:hqJumpTo,canDock:hqCanDock,save:saveGame,load:loadGame,teleportToOutpost,interact:hqInteract,rebuild:hqRebuild};
+
+/* ===================== TEAM OPS — 5 tiers of co-op operations, only progress with a friend in your lobby ===================== */
+const COOP_TIERS=[null,
+  {name:'ROOKIE CREW',ops:[
+    {id:'t1fly',name:'FLY TOGETHER',icon:'i-launch',type:'near_fly',range:60,goal:20,unit:'s',desc:'Fly within 60m of a teammate.',gold:400,res:{fe:15,ae:10}},
+    {id:'t1hi',name:'SAY HELLO',icon:'i-crew',type:'ev',ev:'social',goal:3,unit:'msgs',desc:'Send emotes or chat while a teammate is in your system.',gold:300,res:{ae:10}},
+    {id:'t1dock',name:'SQUADRON DOCKED',icon:'i-station',type:'docked',goal:4,unit:'s',desc:'Both ships docked at the HQ at the same time.',gold:500,res:{fe:20,ae:15}},
+    {id:'t1mine',name:'MINING BUDDIES',icon:'i-supplies',type:'ev',ev:'mine',range:90,goal:10,unit:'ore',desc:'Mine ore while a teammate is within 90m.',gold:500,res:{fe:20,ae:20}}]},
+  {name:'FIELD EXPLORERS',ops:[
+    {id:'t2walk',name:'SURFACE TEAM',icon:'i-crew',type:'near_walk',range:25,goal:25,unit:'s',desc:'Walk on the same planet within 25m of a teammate.',gold:700,res:{ae:20,so:5}},
+    {id:'t2worlds',name:'WORLD HOPPERS',icon:'i-orbit',type:'worlds',goal:2,unit:'worlds',desc:'Land on 2 different planets together.',gold:900,res:{fe:30,so:10}},
+    {id:'t2scan',name:'SCIENCE TEAM',icon:'i-research',type:'ev',ev:'scan',range:150,goal:4,unit:'finds',desc:'Log new discoveries while a teammate is within 150m.',gold:900,res:{ae:25,so:10}},
+    {id:'t2meet',name:'HQ MEETUP',icon:'i-station',type:'hq_near',range:6,goal:12,unit:'s',desc:'Walk aboard the HQ within 6m of a teammate.',gold:700,res:{fe:20,ae:20}}]},
+  {name:'WINGMEN',ops:[
+    {id:'t3tight',name:'TIGHT FORMATION',icon:'i-launch',type:'near_fly',range:25,minSpeed:30,goal:40,unit:'s',desc:'Fly within 25m of a teammate at speed (30+).',gold:1400,res:{fe:40,ae:30,so:10}},
+    {id:'t3raid',name:'RAID DEFENSE',icon:'i-target',type:'ev',ev:'raid',goal:5,unit:'raiders',desc:'Destroy raiders while a teammate is in the same system.',gold:1600,res:{so:20,vd:5}},
+    {id:'t3mine',name:'ORE CONVOY',icon:'i-supplies',type:'ev',ev:'mine',range:90,goal:40,unit:'ore',desc:'Mine 40 ore while a teammate is within 90m.',gold:1300,res:{fe:50,ae:40}},
+    {id:'t3deep',name:'DEEP-SPACE RENDEZVOUS',icon:'i-orbit',type:'sys_near',notSys:'solara',range:80,goal:20,unit:'s',desc:'Meet within 80m of a teammate outside the Solara system.',gold:1800,res:{so:25,vd:10}}]},
+  {name:'VETERAN SQUAD',ops:[
+    {id:'t4race',name:'HYPER RACE',icon:'i-bolt',type:'near_fly',range:80,boost:true,minSpeed:120,goal:30,unit:'s',desc:'Boost at full speed (120+) within 80m of a teammate.',gold:2400,res:{fe:60,ae:50,so:20}},
+    {id:'t4worlds',name:'GRAND SURVEY',icon:'i-orbit',type:'worlds',goal:4,unit:'worlds',desc:'Land on 4 different planets together.',gold:2600,res:{fe:60,so:30,vd:10}},
+    {id:'t4scan',name:'XENO ARCHIVE',icon:'i-research',type:'ev',ev:'scan',range:150,goal:10,unit:'finds',desc:'Log 10 new discoveries while a teammate is within 150m.',gold:2400,res:{ae:60,so:30}},
+    {id:'t4stars',name:'STARGAZERS',icon:'i-target',type:'hq_near',range:8,room:'obs',goal:20,unit:'s',desc:'Stand together in the HQ Observatory.',gold:2000,res:{fe:40,ae:40,vd:10}},
+    {id:'t4raid',name:'STATION GUARD',icon:'i-target',type:'ev',ev:'raid',goal:8,unit:'raiders',desc:'Destroy 8 raiders with a teammate in the system.',gold:2800,res:{so:40,vd:15}}]},
+  {name:'GALACTIC LEGENDS',ops:[
+    {id:'t5tour',name:'GALAXY TOUR',icon:'i-galaxy',type:'systems',range:120,goal:3,unit:'systems',desc:'Meet a teammate in 3 different star systems.',gold:4500,res:{so:60,vd:30}},
+    {id:'t5abyss',name:'ABYSS DIVE',icon:'i-orbit',type:'sys_near',sys:'gargantua',range:70,goal:30,unit:'s',desc:'Fly together within 70m in the Gargantua Abyss.',gold:5000,res:{vd:50,so:40}},
+    {id:'t5raid',name:'LEGENDARY DEFENSE',icon:'i-target',type:'ev',ev:'raid',goal:15,unit:'raiders',desc:'Destroy 15 raiders with a teammate in the system.',gold:5000,res:{so:60,vd:30}},
+    {id:'t5mine',name:'MOTHERLODE',icon:'i-supplies',type:'ev',ev:'mine',range:90,goal:100,unit:'ore',desc:'Mine 100 ore while a teammate is within 90m.',gold:4000,res:{fe:120,ae:100,so:40}},
+    {id:'t5wing',name:'ACE WINGMEN',icon:'i-launch',type:'near_fly',range:18,minSpeed:60,goal:60,unit:'s',desc:'Hold an 18m formation at speed (60+) for a full minute.',gold:6000,res:{fe:100,ae:100,vd:30}}]}
+];
+const COOP_MAX=5;
+const COOP={tier:1,prog:{},done:[],worlds:[],systems:[],chipT:0,chipTxt:'',claimed:[],max:false,view:1};
+const COOP_REWARDS=[null,
+  [{kind:'style',id:'hearts',type:'TRAIL'}],
+  [{kind:'astro',id:'comet',type:'EXCLUSIVE SUIT'}],
+  [{kind:'ship',id:'manta',type:'EXCLUSIVE ROCKET'}],
+  [{kind:'astro',id:'samurai',type:'EXCLUSIVE SUIT'},{kind:'pet',id:'slime',type:'PET'}],
+  [{kind:'ship',id:'prism',type:'EXCLUSIVE ROCKET'},{kind:'pet',id:'whale',type:'PET'},{kind:'style',id:'halo',type:'HAT'}]];
+function coopOps(t){return COOP_TIERS[t||COOP.tier].ops;}
+function coopRewardItem(rw){return rw.kind==='pet'?PET_ITEMS.find(x=>x.id===rw.id):rw.kind==='ship'?SHIP_SKINS.find(x=>x.id===rw.id):rw.kind==='astro'?ASTRO_SKINS.find(x=>x.id===rw.id):STYLE_ITEMS.find(x=>x.id===rw.id);}
+function coopOwns(rw){return rw.kind==='ship'?SKIN.ownedShip.includes(rw.id):rw.kind==='astro'?SKIN.ownedAstro.includes(rw.id):SHOP2.own.includes(rw.kind==='pet'?'pet_'+rw.id:rw.id);}
+function coopGrant(rw){const it=coopRewardItem(rw);if(!it)return '';
+  if(coopOwns(rw)){const g=Math.round((it.price||6000)/2);earnGold(g,true);return `${it.name} (OWNED → +${g} 🪙)`;}
+  if(rw.kind==='ship')SKIN.ownedShip.push(rw.id);else if(rw.kind==='astro')SKIN.ownedAstro.push(rw.id);else SHOP2.own.push(rw.kind==='pet'?'pet_'+rw.id:rw.id);return it.name;}
+const _cpA=new V3(),_cpB=new V3();
+function coopMyPos(out){if((PL.mode==='walk'||PL.mode==='hqwalk')&&astro)return astro.group.getWorldPosition(out);if(PL.mode==='rover'&&PL.body)return out.copy(rover.localPos).add(PL.body.center);return out.copy(ship.group.position);}
+function coopPeers(){const now=performance.now(),out=[];if(!MP.room)return out;for(const P of MP.peers.values()){if(P.st&&P.st.s===activeSystemId&&now-P.t<6000&&!P.st.d)out.push(P);}return out;}
+function coopPeerPos(P,out){return out.copy(P.astro.group.visible?P.astro.group.position:P.pos);}
+function coopNearest(){const ps=coopPeers();if(!ps.length)return null;coopMyPos(_cpA);let best=null,bd=1e9;for(const P of ps){const d=coopPeerPos(P,_cpB).distanceTo(_cpA);if(d<bd){bd=d;best=P;}}return {P:best,d:bd,all:ps};}
+function coopAdd(id,amt){
+  if(COOP.max)return;const o=coopOps().find(x=>x.id===id);if(!o||COOP.done.includes(id))return;
+  const v=Math.min(o.goal,(COOP.prog[id]||0)+amt);COOP.prog[id]=v;
+  COOP.chipT=3;COOP.chipTxt=`T${COOP.tier} ${o.name} · ${o.unit==='s'?Math.floor(v):v}/${o.goal}${o.unit==='s'?'s':' '+o.unit}`;
+  if(v<o.goal)return;
+  COOP.done.push(id);const gold=o.gold;earnGold(gold,true);for(const k in o.res)INV[k]=(INV[k]||0)+o.res[k];updateResHUD();
+  SFX.discover();comicPop('TEAM OP COMPLETE!','#c77dff',50,34);toast(`TEAM OP: ${o.name} COMPLETE! +${gold} 🪙`);
+  if(COOP.done.length>=coopOps().length&&!COOP.claimed.includes(COOP.tier)){const t=COOP.tier;COOP.claimed.push(t);
+    const got=COOP_REWARDS[t].map(coopGrant).filter(Boolean).join(' + ');
+    setTimeout(()=>{comicPop(`TIER ${t} CLEARED!`,'#ffd23f',50,34);toast(`TEAM OPS TIER ${t} REWARD: ${got} — EQUIP IN THE SHOP`);SFX.upgrade();},1600);
+    if(t<COOP_MAX){COOP.tier++;COOP.done=[];COOP.prog={};COOP.worlds=[];COOP.systems=[];COOP.view=COOP.tier;setTimeout(()=>toast(`TIER ${COOP.tier} UNLOCKED: ${COOP_TIERS[COOP.tier].name}`),4400);}
+    else COOP.max=true;}
+  saveGame(true);if(typeof mpRenderPanel==='function')mpRenderPanel();
+}
+function coopEvent(kind,amt){
+  if(!MP.room||!started||COOP.max)return;const n=coopNearest();if(!n)return;
+  for(const o of coopOps())if(o.type==='ev'&&o.ev===kind&&(!o.range||n.d<o.range))coopAdd(o.id,amt);
+}
+function coopPeerRoom(st){return Array.isArray(st.ha)&&typeof hqRoomAt==='function'?((hqRoomAt(st.ha[0],st.ha[2])||{}).id||''):'';}
+let coopChipEl=null;
+function updateCoop(dt){
+  if(!coopChipEl){coopChipEl=document.createElement('div');coopChipEl.id='coopChip';coopChipEl.innerHTML='<svg class="ic"><use href="#i-target"/></svg><span></span>';document.body.appendChild(coopChipEl);}
+  {const bt=$('btnTeam');if(bt){const on=!!MP.room&&started;if((bt.style.display!=='none')!==on)bt.style.display=on?'':'none';
+    const tc=$('teamCount'),tx=COOP.max?'✓':`T${COOP.tier} ${COOP.done.length}/${coopOps().length}`;if(tc.textContent!==tx)tc.textContent=tx;}}
+  if(!MP.room||!started||modalOpen){coopChipEl.style.display='none';return;}
+  const n=coopNearest();
+  if(n&&dt>0&&!COOP.max){const m=PL.mode,P=n.P,st=P.st;
+    for(const o of coopOps()){if(COOP.done.includes(o.id))continue;
+      if(o.type==='near_fly'){if(m==='fly'&&st.m==='fly'&&n.d<o.range&&(!o.minSpeed||PL.speed>=o.minSpeed)&&(!o.boost||input.boost))coopAdd(o.id,dt);}
+      else if(o.type==='near_walk'){if(m==='walk'&&st.m==='walk'&&PL.body&&st.ab===bodies.indexOf(PL.body)&&n.d<o.range)coopAdd(o.id,dt);}
+      else if(o.type==='docked'){if((m==='hqlanded'||m==='hqwalk')&&n.all.some(q=>q.st.hq&&(q.st.m==='hqlanded'||q.st.m==='hqwalk')))coopAdd(o.id,dt);}
+      else if(o.type==='hq_near'){if(m==='hqwalk'&&st.m==='hqwalk'&&n.d<o.range&&(!o.room||((hqRoomAt(HQ.walk.pos.x,HQ.walk.pos.z)||{}).id===o.room&&coopPeerRoom(st)===o.room)))coopAdd(o.id,dt);}
+      else if(o.type==='sys_near'){if(n.d<o.range&&(o.sys?activeSystemId===o.sys:activeSystemId!==o.notSys))coopAdd(o.id,dt);}
+      else if(o.type==='systems'){if(n.d<o.range&&!COOP.systems.includes(activeSystemId)){COOP.systems.push(activeSystemId);coopAdd(o.id,1);toast(`TEAM OP: GALAXY TOUR — ${(SYSTEMS.find(x=>x.id===activeSystemId)||{name:''}).name} LOGGED`);}}
+      else if(o.type==='worlds'){if((m==='walk'||m==='landed'||m==='rover')&&PL.body){const bi=bodies.indexOf(PL.body);
+        if(n.all.some(q=>(q.st.m==='walk'||q.st.m==='landed'||q.st.m==='rover')&&q.st.b===bi)&&!COOP.worlds.includes(PL.body.name)){COOP.worlds.push(PL.body.name);coopAdd(o.id,1);toast(`TEAM OP: ${o.name} — ${PL.body.name} LOGGED`);}}}
+    }}
+  if(COOP.chipT>0){COOP.chipT-=dt;const sp=coopChipEl.lastChild;if(sp.textContent!==COOP.chipTxt)sp.textContent=COOP.chipTxt;
+    if(touchUI){const rt=document.getElementById('resTray');coopChipEl.style.top=((rt?rt.getBoundingClientRect().bottom:200)+8)+'px';}else coopChipEl.style.top='';
+    coopChipEl.style.display='block';}else coopChipEl.style.display='none';
+}
+HQ.api.coop=()=>COOP;HQ.api.coopEvent=(k,n)=>coopEvent(k,n);HQ.api.coopAdd=(i,n)=>coopAdd(i,n);HQ.api.coopRender=()=>coopRender();
+function coopPanelHTML(){
+  return `<button class="uBtn" id="coopOpen" style="width:100%;margin-top:8px;display:flex;align-items:center;justify-content:center;gap:6px"><svg class="ic"><use href="#i-target"/></svg> TEAM OPS · ${COOP.max?'ALL 5 TIERS DONE':`TIER ${COOP.tier} · ${COOP.done.length}/${coopOps().length}`} ›</button>`;
+}
+function coopRender(){
+  const v=clamp(COOP.view||COOP.tier,1,COOP_MAX),ps=coopPeers().length;
+  const state=t=>COOP.claimed.includes(t)?'done':(t===COOP.tier&&!COOP.max?'cur':'lock');
+  $('coopTabs').innerHTML=[1,2,3,4,5].map(t=>{const st=state(t);return `<button class="coopTab ${st}${t===v?' on':''}" data-ct="${t}">${st==='lock'?'<svg class="ic"><use href="#i-lock"/></svg>':st==='done'?'✓':''}T${t}</button>`;}).join('');
+  const st=state(v),rws=COOP_REWARDS[v];
+  let h=`<div class="coopTier">TIER ${v} · ${COOP_TIERS[v].name}</div>`;
+  h+=`<div class="coopRw ${st}"><svg class="ic"><use href="#i-shop"/></svg><div><small>TIER ${v} REWARD${rws.some(r=>r.kind==='ship'||r.kind==='astro')?' · TEAM-ONLY — NOT SOLD IN THE SHOP':''}</small><b>${rws.map(r=>{const it=coopRewardItem(r);return `${it?it.name:''} <em class="${r.kind==='ship'||r.kind==='astro'?'ex':''}">${r.type}</em>`;}).join(' + ')}</b></div><span>${st==='done'?'CLAIMED':st==='lock'?'LOCKED':ps?'ACTIVE':'NEED TEAMMATE'}</span></div>`;
+  h+=COOP_TIERS[v].ops.map(o=>{const dn=st==='done'||(st==='cur'&&COOP.done.includes(o.id)),val=st==='cur'?(COOP.prog[o.id]||0):0,pct=dn?100:Math.round(val/o.goal*100);
+    return `<div class="coopRow${dn?' dn':''}${st==='lock'?' lk':''}"><svg class="ic"><use href="#${o.icon}"/></svg><div class="cpTx"><b>${o.name}</b><small>${o.desc}</small><i style="--p:${pct}%"></i></div><span class="cpV">${dn?'✓':(o.unit==='s'?Math.floor(val):val)+'/'+o.goal}<em>+${o.gold} 🪙</em></span></div>`;}).join('');
+  $('coopBody').innerHTML=h;
+  $('coopSub').textContent=ps?'Teammate in your system — progress is ON':'Progress only counts with a teammate in your star system';
+}
+function coopOpen(){if(!MP.room){toast('JOIN A MULTIPLAYER LOBBY TO DO TEAM OPS');return;}closeModals();COOP.view=COOP.max?COOP_MAX:COOP.tier;coopRender();openModal('coopModal');}
+(function(){
+  const m=document.createElement('div');m.id='coopModal';m.className='modal';
+  m.innerHTML=`<div class="mCard" style="width:min(480px,94vw)"><div class="mHead"><h2 style="font-size:22px"><svg class="ic"><use href="#i-target"/></svg> TEAM OPS</h2><button class="hudBtn" id="coopClose" style="background:var(--pop);color:#fff" aria-label="Close"><svg class="ic"><use href="#i-close"/></svg></button></div>
+  <div class="mBody" style="padding-top:4px"><div class="uDesc" id="coopSub" style="margin-bottom:6px"></div><div class="coopTabs" id="coopTabs"></div><div id="coopBody"></div></div></div>`;
+  document.body.appendChild(m);
+  $('coopClose').addEventListener('click',e=>{e.stopPropagation();closeModals();});
+  $('coopTabs').addEventListener('click',e=>{const b=e.target.closest('[data-ct]');if(!b)return;COOP.view=+b.dataset.ct;coopRender();SFX.ui();});
+  document.addEventListener('click',e=>{if(e.target.closest&&e.target.closest('#coopOpen')){e.stopPropagation();coopOpen();}});
+  const hb=document.createElement('button');hb.className='hudBtn void';hb.id='btnTeam';hb.title='Team Ops';hb.setAttribute('aria-label','Team Ops');hb.style.display='none';
+  hb.innerHTML='<svg class="ic"><use href="#i-target"/></svg><span class="lbl">TEAM</span><span id="teamCount"></span>';
+  const mp=$('btnMP');mp.parentNode.insertBefore(hb,mp.nextSibling);
+  hb.addEventListener('click',e=>{e.stopPropagation();if(!started)return;coopOpen();});
+})();
 // HQ-END
 
 // SHOP2-BEGIN
@@ -9496,7 +9646,30 @@ function buildShapeShip(sk){
   const mirror=pts=>pts.map(([x,y])=>[-x,y]).reverse();
   const nozzle=(x=0,z=1.8,r=0.42)=>{P.push([new THREE.CylinderGeometry(r,r*0.75,0.45,14,1,true),0x4a4960,Mx(x,0,z,Math.PI/2,0,0)]);P.push([new THREE.CylinderGeometry(r*0.75,r*0.75,0.05,14),0x221a2e,Mx(x,0,z-0.12,Math.PI/2,0,0)]);};
   const SPH=(r,w=16,h=10)=>new THREE.SphereGeometry(r,w,h);
-  if(sk.shape==='ufo'){
+  if(sk.shape==='manta'){
+    P.push([SPH(1,20,12),sk.body,Mx(0,0,-0.1,0,0,0,0.95,0.36,1.9)]);
+    const wing=[[0.55,-1.25],[1.7,-0.75],[2.75,-0.05],[3.15,0.55],[2.7,0.8],[1.6,0.55],[0.6,1.05]];
+    P.push(hfin(wing,-0.04));P.push(hfin(mirror(wing),-0.04));
+    for(const sx of [-1,1]){P.push([shipWing([[-0.35,0],[0.45,0],[0.15,0.75]]),sk.acc,new M4().makeTranslation(sx*3.0,0.02,0.55).multiply(new M4().makeRotationZ(sx*-0.35)).multiply(new M4().makeRotationY(-Math.PI/2))]);
+      P.push([new THREE.ConeGeometry(0.13,0.75,8),sk.acc,Mx(sx*0.42,-0.05,-1.95,-Math.PI/2,0,0)]);
+      P.push([SPH(0.09,8,6),sk.str,Mx(sx*0.62,0.12,-1.35)]);
+      P.push([new THREE.BoxGeometry(1.5,0.03,0.07),sk.str,Mx(sx*1.55,0.03,0.2+sx*0,0,sx*0.25,0)]);}
+    for(const z of [-0.7,-0.1,0.5])P.push([new THREE.BoxGeometry(1.1,0.04,0.12),sk.str,Mx(0,-0.35,z)]);
+    P.push([new THREE.CylinderGeometry(0.03,0.09,2.0,8),sk.body,Mx(0,0.05,2.55,Math.PI/2,0,0)],[new THREE.OctahedronGeometry(0.16,0),sk.str,Mx(0,0.05,3.6)]);
+    nozzle(0.5,1.55,0.22);nozzle(-0.5,1.55,0.22);
+    gp=[0,0.3,-0.85];gs=[0.75,0.42,1.0];
+  }else if(sk.shape==='prism'){
+    P.push([new THREE.OctahedronGeometry(1,0),sk.body,Mx(0,0,-0.1,0,0,0,0.78,0.62,2.3)]);
+    P.push([new THREE.OctahedronGeometry(1,0),sk.acc,Mx(0,0.02,-0.1,0,0,0,0.5,0.66,1.5)]);
+    for(const [x,y,z,rz] of [[1.45,0.35,0.35,-0.4],[-1.45,0.35,0.35,0.4],[1.25,-0.42,0.7,0.35],[-1.25,-0.42,0.7,-0.35]])
+      P.push([new THREE.OctahedronGeometry(1,0),sk.acc,Mx(x,y,z,0,0,rz,0.22,0.22,1.05)]);
+    P.push([new THREE.TorusGeometry(1.3,0.07,8,40),sk.str,Mx(0,0.1,0.55,0,0,0,1,0.7,1)],[new THREE.TorusGeometry(1.05,0.03,6,40),sk.str,Mx(0,0.1,0.95,0,0,0,1,0.7,1)]);
+    for(let i=0;i<6;i++){const a=i/6*TAU;P.push([new THREE.OctahedronGeometry(0.08,0),sk.str,Mx(Math.cos(a)*1.3,0.1+Math.sin(a)*0.91,0.55)]);}
+    P.push(vfin([[1.0,0.3],[1.9,0.3],[2.2,1.05]]));
+    P.push([new THREE.OctahedronGeometry(0.18,0),0xffffff,Mx(0,0,-2.45)]);
+    nozzle(0,2.05,0.3);
+    gp=[0,0.42,-0.45];gs=[0.5,0.32,0.85];
+  }else if(sk.shape==='ufo'){
     P.push([new THREE.LatheGeometry([[0.001,-0.34],[1.2,-0.3],[2.05,-0.08],[2.25,0],[2.05,0.1],[1.25,0.32],[0.001,0.36]].map(p=>new THREE.Vector2(p[0],p[1])),36),sk.body,new M4()]);
     P.push([new THREE.TorusGeometry(2.2,0.09,8,48),sk.str,Mx(0,0,0,Math.PI/2,0,0)]);
     for(let i=0;i<8;i++){const a=i/8*TAU;P.push([SPH(0.13,8,6),i%2?sk.acc:sk.str,Mx(Math.cos(a)*1.55,-0.3,Math.sin(a)*1.55)]);}
@@ -9551,7 +9724,20 @@ function buildShapeShip(sk){
 function buildShapeAstro(sk){
   const cap=(r,l)=>new THREE.CapsuleGeometry(r,l,4,10),P=[];let vg=null,vp=[0,0.68,-0.085],vs=[1,0.8,0.8],vr=0;
   const S=(r,w=14,h=10)=>new THREE.SphereGeometry(r,w,h),B=(x,y,z)=>new THREE.BoxGeometry(x,y,z);
-  if(sk.shape==='robot'){
+  if(sk.shape==='runner'){
+    P.push([cap(0.14,0.16),sk.suit,Mx(0,0.38,0)],[S(0.19),sk.suit,Mx(0,0.69,0.03,0,0,0,1,0.95,1.25)],[B(0.02,0.14,0.26),sk.chest,Mx(0,0.86,0.12)],
+      [B(0.04,0.26,0.02),sk.belt,Mx(0,0.4,-0.145)],[B(0.3,0.04,0.2),sk.chest,Mx(0,0.28,0)]);
+    for(const sx of [-1,1]){P.push([new THREE.CylinderGeometry(0.045,0.06,0.26,10),sk.chest,Mx(sx*0.09,0.42,0.17)],[new THREE.ConeGeometry(0.06,0.09,10),sk.belt,Mx(sx*0.09,0.25,0.17,Math.PI,0,0)],
+      [B(0.03,0.16,0.02),sk.belt,Mx(sx*0.135,0.48,-0.1,0,0,sx*0.2)],[B(0.015,0.09,0.12),sk.chest,Mx(sx*0.16,0.72,0.1,0,0,sx*0.4)]);}
+    vg=new THREE.SphereGeometry(0.15,16,10);vp=[0,0.7,-0.1];vs=[1.18,0.62,0.85];
+  }else if(sk.shape==='samurai'){
+    P.push([cap(0.15,0.17),sk.suit,Mx(0,0.38,0)],[B(0.3,0.28,0.18),sk.chest,Mx(0,0.44,-0.02)],[B(0.36,0.06,0.26),sk.belt,Mx(0,0.28,0)],[B(0.38,0.07,0.28),sk.chest,Mx(0,0.22,0)],
+      [S(0.19),sk.suit,Mx(0,0.69,0)],[new THREE.CylinderGeometry(0.23,0.27,0.035,18),sk.chest,Mx(0,0.765,0)],[new THREE.CylinderGeometry(0.16,0.2,0.07,18),sk.suit,Mx(0,0.8,0)],
+      [new THREE.TorusGeometry(0.15,0.02,6,18,Math.PI),sk.belt,Mx(0,0.86,-0.15)],[S(0.035,8,6),sk.belt,Mx(0,0.86,-0.17)],
+      [new THREE.CylinderGeometry(0.014,0.014,0.62,6),0xd9dde6,Mx(0.07,0.52,0.18,0,0,0.5)],[new THREE.TorusGeometry(0.04,0.012,6,12),sk.belt,Mx(0.155,0.665,0.18,0,Math.PI/2,0)],[new THREE.CylinderGeometry(0.018,0.018,0.16,6),sk.chest,Mx(0.2,0.74,0.18,0,0,0.5)]);
+    for(const sx of [-1,1])P.push([B(0.12,0.17,0.22),sk.chest,Mx(sx*0.22,0.53,0,0,0,sx*0.35)],[B(0.125,0.03,0.225),sk.belt,Mx(sx*0.23,0.46,0,0,0,sx*0.35)]);
+    vg=B(0.2,0.04,0.03);vp=[0,0.69,-0.18];vs=[1,1,1];
+  }else if(sk.shape==='robot'){
     P.push([B(0.32,0.34,0.22),sk.suit,Mx(0,0.4,0)],[B(0.3,0.26,0.27),sk.suit,Mx(0,0.71,0)],[B(0.2,0.12,0.04),sk.chest,Mx(0,0.43,-0.12)],
       [B(0.34,0.05,0.24),sk.belt,Mx(0,0.25,0)],[new THREE.CylinderGeometry(0.012,0.012,0.18,4),0x8a889c,Mx(0,0.92,0)],[S(0.04),sk.belt,Mx(0,1.02,0)],
       [B(0.06,0.1,0.1),sk.chest,Mx(0.18,0.72,0)],[B(0.06,0.1,0.1),sk.chest,Mx(-0.18,0.72,0)]);
@@ -9885,6 +10071,11 @@ function renderShop2(grid,gold){
   thumbAttach(grid);
 }
 function shapeSvg(k){const c=hexCss;
+  if(k.shape==='manta')return `<svg viewBox="0 0 100 60"><path d="M50 8 Q62 14 66 26 L94 38 L86 44 L64 40 Q56 48 50 50 Q44 48 36 40 L14 44 L6 38 L34 26 Q38 14 50 8Z" fill="${c(k.acc)}" stroke="#170f24" stroke-width="3"/><ellipse cx="50" cy="30" rx="10" ry="18" fill="${c(k.body)}" stroke="#170f24" stroke-width="3"/><path d="M50 48 L50 59" stroke="${c(k.body)}" stroke-width="3"/><circle cx="50" cy="22" r="5" fill="${c(k.glass)}" stroke="#170f24" stroke-width="2"/><path d="M42 36 h16" stroke="${c(k.str)}" stroke-width="3"/></svg>`;
+  if(k.shape==='prism')return `<svg viewBox="0 0 100 60"><circle cx="50" cy="34" r="20" fill="none" stroke="${c(k.str)}" stroke-width="4"/><path d="M50 4 L62 30 L50 56 L38 30Z" fill="${c(k.body)}" stroke="#170f24" stroke-width="3"/><path d="M20 22 L26 30 L20 38 L14 30Z M80 22 L86 30 L80 38 L74 30Z" fill="${c(k.acc)}" stroke="#170f24" stroke-width="2"/><path d="M50 18 L55 30 L50 36 L45 30Z" fill="${c(k.glass)}"/></svg>`;
+  if(k.shape==='runner'||k.shape==='samurai'){const b=`<rect x="20" y="44" width="20" height="30" rx="9" fill="${c(k.suit)}" stroke="#170f24" stroke-width="3"/><rect x="22" y="74" width="7" height="18" rx="3" fill="${c(k.legs)}" stroke="#170f24" stroke-width="2"/><rect x="31" y="74" width="7" height="18" rx="3" fill="${c(k.legs)}" stroke="#170f24" stroke-width="2"/>`;
+    if(k.shape==='runner')return `<svg viewBox="0 0 60 100">${b}<ellipse cx="30" cy="28" rx="18" ry="16" fill="${c(k.suit)}" stroke="#170f24" stroke-width="3"/><path d="M30 8 L34 14 L30 14Z" fill="${c(k.chest)}" stroke="#170f24" stroke-width="2"/><rect x="14" y="24" width="32" height="9" rx="4" fill="${c(k.visor)}" stroke="#170f24" stroke-width="2"/><rect x="28" y="48" width="4" height="22" fill="${c(k.belt)}"/></svg>`;
+    return `<svg viewBox="0 0 60 100">${b}<rect x="16" y="44" width="28" height="20" rx="3" fill="${c(k.chest)}" stroke="#170f24" stroke-width="3"/><circle cx="30" cy="30" r="15" fill="${c(k.suit)}" stroke="#170f24" stroke-width="3"/><path d="M10 22 L50 22" stroke="${c(k.chest)}" stroke-width="5"/><path d="M18 10 Q30 22 42 10" fill="none" stroke="${c(k.belt)}" stroke-width="3"/><rect x="21" y="29" width="18" height="4" fill="${c(k.visor)}"/></svg>`;}
   if(k.shape==='ufo')return `<svg viewBox="0 0 100 60"><ellipse cx="50" cy="26" rx="18" ry="14" fill="${c(k.glass)}" stroke="#170f24" stroke-width="3"/><ellipse cx="50" cy="34" rx="44" ry="11" fill="${c(k.body)}" stroke="#170f24" stroke-width="3"/><ellipse cx="50" cy="34" rx="44" ry="3" fill="${c(k.str)}"/>${[22,36,50,64,78].map(x=>`<circle cx="${x}" cy="40" r="3" fill="${c(k.acc)}"/>`).join('')}</svg>`;
   if(k.shape==='shark')return `<svg viewBox="0 0 100 60"><path d="M6 32 Q30 14 70 22 L92 10 L86 30 L94 48 L70 38 Q30 46 6 32Z" fill="${c(k.body)}" stroke="#170f24" stroke-width="3"/><path d="M40 20 L50 4 L56 22Z" fill="${c(k.acc)}" stroke="#170f24" stroke-width="2"/><path d="M8 33 Q30 42 60 38" fill="${c(k.str)}"/><path d="M10 35 L13 39 L16 35 L19 39 L22 35" fill="none" stroke="#fff" stroke-width="2"/><circle cx="20" cy="28" r="2.5" fill="#111"/></svg>`;
   if(k.shape==='twin')return `<svg viewBox="0 0 100 60"><rect x="18" y="24" width="64" height="10" fill="${c(k.acc)}" stroke="#170f24" stroke-width="2"/><rect x="8" y="12" width="84" height="5" fill="${c(k.acc)}"/>${[22,72].map(x=>`<rect x="${x}" y="8" width="10" height="46" rx="5" fill="${c(k.body)}" stroke="#170f24" stroke-width="3"/>`).join('')}<ellipse cx="50" cy="28" rx="7" ry="9" fill="${c(k.glass)}" stroke="#170f24" stroke-width="2"/></svg>`;
@@ -10032,10 +10223,10 @@ function mpChatOpen(){if(!MP.room||!started)return;$('mpChatBar').classList.add(
 function mpChatClose(){$('mpChatBar').classList.remove('on');$('mpChatIn').value='';$('mpChatIn').blur();canvas.focus&&canvas.focus();}
 function mpChatSend(){
   const t=mpCleanMsg($('mpChatIn').value);
-  if(t&&MP.sendChat){const now=performance.now();if(now-mpLastSend<800){toast('SLOW DOWN, PILOT!');return;}mpLastSend=now;MP.sendChat({t}).catch(()=>{});mpLogLine(mpClean($('mpName').value||mpName()),t,true);}
+  if(t&&MP.sendChat){const now=performance.now();if(now-mpLastSend<800){toast('SLOW DOWN, PILOT!');return;}mpLastSend=now;MP.sendChat({t}).catch(()=>{});if(window.__HQ)coopEvent('social',1);mpLogLine(mpClean($('mpName').value||mpName()),t,true);}
   mpChatClose();
 }
-function mpEmote(e){if(!MP.room||!MP.sendEmo)return;MP.sendEmo(e).catch(()=>{});comicPop(e,'#c77dff',50,40);}
+function mpEmote(e){if(!MP.room||!MP.sendEmo)return;MP.sendEmo(e).catch(()=>{});if(window.__HQ)coopEvent('social',1);comicPop(e,'#c77dff',50,40);}
 async function mpJoin(kind,code){
   if(MP.joining)return;MP.joining=true;
   try{
@@ -10078,6 +10269,7 @@ function mpRenderPanel(){
   const html=[...MP.peers.entries()].filter(([,P])=>P.st).map(([id,P])=>{const st=P.st,same=st.s===activeSystemId;const nm=mpClean(st.n).replace(/[<>&]/g,'');const lc=String(st.loc||'').replace(/[^A-Z0-9 \-]/gi,'').slice(0,20);const sys=SYSTEMS.find(x=>x.id===st.s);const can=same||(sys&&UPGRADES.ship.lvl>=sys.reqHyper);
     return `<div class="mpPeerRow">• <b>${nm}</b>&nbsp;— ${same?(lc||'nearby'):'in '+(sys?sys.name:'another system')}<button class="mpFly" data-fly="${String(id).replace(/[^A-Za-z0-9_-]/g,'')}" ${can&&started?'':'disabled'}><svg class="ic" style="width:14px;height:14px"><use href="#i-launch"/></svg>FLY TO</button></div>`;}).join('');
   if($('mpPeers')._h!==html){$('mpPeers')._h=html;$('mpPeers').innerHTML=html;}
+  if(typeof coopPanelHTML==='function'){const ch=coopPanelHTML();if($('coopOps')._h!==ch){$('coopOps')._h=ch;$('coopOps').innerHTML=ch;}}
 }
 let mpFlyT=0;
 function mpFlyTo(id){
