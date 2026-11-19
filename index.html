@@ -8586,6 +8586,18 @@ function hqBuildExterior(M){
   const spH=(L>=5?20:14),spB=23.2+5.4*tw;
   D.push([hqCyl(0.14,0.6,spH,8),trimC,Mx(0,spB+spH/2,2)],[hqCyl(1.2,1.6,1.2,12),darkC,Mx(0,spB+0.4,2)]);
   for(let i=0;i<3;i++)G.push([new THREE.TorusGeometry(0.9-i*0.18,0.08,4,16),glow,Mx(0,spB+3+i*3.4,2,Math.PI/2,0,0)]);
+  /* gyroscope rings spinning around the spire */
+  {const gy=new THREE.Group();gy.position.set(0,spB+5.2,2);ext.add(gy);
+    const a=new THREE.Group(),b=new THREE.Group();gy.add(a);gy.add(b);
+    const ra=new THREE.Mesh(merge([[new THREE.TorusGeometry(4.6,0.24,8,rs*2),trimC,new M4()]]),M.metal),rag=new THREE.Mesh(merge([[new THREE.TorusGeometry(4.86,0.07,4,rs*2),glow,new M4()]]),M.glowV);a.add(ra);a.add(rag);a.rotation.x=1.1;
+    const rb=new THREE.Mesh(merge([[new THREE.TorusGeometry(3.7,0.2,8,rs*2),trimC,new M4()]]),M.metal),rbg=new THREE.Mesh(merge([[new THREE.TorusGeometry(3.92,0.06,4,rs*2),L>=5?gold:glow,new M4()]]),M.glowV);b.add(rb);b.add(rbg);b.rotation.z=1.2;
+    HQ.spin.push({g:gy,ax:'y',s:0.55},{g:a,ax:'z',s:1.1},{g:b,ax:'x',s:-0.9});}
+  /* rotating radar dish on the deck front */
+  {const rd=new THREE.Group();rd.position.set(0,20.4,-5);ext.add(rd);
+    rd.add(new THREE.Mesh(merge([[hqCyl(0.35,0.6,3,10),trimC,Mx(0,1.5,0)],[hqBox(4.6,0.25,0.4),slate,Mx(0,3.1,0)]]),M.metal));
+    const dg=new THREE.SphereGeometry(2,rs,8,0,TAU,0,Math.PI*0.3);dg.rotateX(-Math.PI/2.2);
+    rd.add(new THREE.Mesh(merge([[dg,0xeef2f8,Mx(0,3.6,-0.6)]]),M.metal));rd.add(glowMesh(new THREE.SphereGeometry(0.22,8,6),0,4.2,-2.2,M.glow));
+    HQ.spin.push({g:rd,ax:'y',s:0.9});}
   /* dorsal fins with blinking tips */
   {const fin=new THREE.Shape();fin.moveTo(0,0);fin.lineTo(14,0);fin.lineTo(12.5,3);fin.lineTo(9,11);fin.lineTo(6.5,11.4);fin.closePath();
     const finG=new THREE.ExtrudeGeometry(fin,{depth:0.7,bevelEnabled:true,bevelThickness:0.2,bevelSize:0.2,bevelSegments:1});finG.translate(0,0,-0.35);finG.rotateY(-Math.PI/2);
@@ -8600,13 +8612,16 @@ function hqBuildExterior(M){
     ext.add(glowMesh(new THREE.CircleGeometry(2.6,rs),x,4,39.6,0x9fe8ff));cone(x,4,49.5,3.3,10);}
   const nac=(x,y,z,r,len)=>{P.push([new THREE.CapsuleGeometry(r,len,6,rs),hullC,Mx(x,y,z,Math.PI/2,0,0)]);
     G.push([new THREE.TorusGeometry(r*0.92,r*0.12,6,rs),glow,Mx(x,y,z-len/2-r*0.35)],[hqBox(r*0.16,r*0.1,len*0.75),glow,Mx(x,y+r*0.99,z)],[hqBox(r*0.16,r*0.1,len*0.75),glow,Mx(x,y-r*0.99,z)]);
-    D.push([new THREE.TorusGeometry(r*0.95,r*0.22,8,rs),darkC,Mx(x,y,z+len/2+r*0.5)],[hqBox(r*2.08,r*0.25,len*0.5),slate,Mx(x,y,z+len*0.1)]);cone(x,y,z+len/2+r+4.5,r*0.78,9);};
+    D.push([new THREE.TorusGeometry(r*0.95,r*0.22,8,rs),darkC,Mx(x,y,z+len/2+r*0.5)],[hqBox(r*2.08,r*0.25,len*0.5),slate,Mx(x,y,z+len*0.1)]);cone(x,y,z+len/2+r+4.5,r*0.78,9);
+    const fan=new THREE.Group();fan.position.set(x,y,z-len/2-r*0.55);const fp=[[hqCyl(r*0.22,r*0.22,0.3,12),darkC,Mx(0,0,0,Math.PI/2,0,0)]];
+    for(let i=0;i<7;i++)fp.push([hqBox(r*0.16,r*0.78,0.08),0xc7d0dd,Mx(0,0,0,0,0,i/7*TAU).multiply(new M4().makeTranslation(0,r*0.42,0))]);
+    fan.add(new THREE.Mesh(merge(fp),M.metal));ext.add(fan);HQ.spin.push({g:fan,ax:'z',s:4.5});};
   for(const s of [-1,1]){nac(s*55,3,16,3.4,26);D.push([hqBox(8,1.4,9),slate,Mx(s*49.5,3,14)]);G.push([hqBox(8,0.15,0.3),glow,Mx(s*49.5,3.76,14)]);
     if(L>=4){nac(s*36,-10.5,22,2.6,18);D.push([hqBox(1.4,4.5,7),slate,Mx(s*36,-7.5,22)]);}}
   /* underside anti-grav emitter */
   D.push([hqCyl(9,9,0.6,rs),0x1a2030,Mx(0,-11.1,14)]);G.push([new THREE.TorusGeometry(8,0.35,8,rs),glow,Mx(0,-11.25,14,Math.PI/2,0,0)],[new THREE.TorusGeometry(5,0.25,8,rs),glow,Mx(0,-11.25,14,Math.PI/2,0,0)]);
   /* === halo ring: fixed pylons + rotating habitat band === */
-  const halo=new THREE.Group();halo.position.set(0,-2,-4);ext.add(halo);const spinG=new THREE.Group();halo.add(spinG);HQ.spin.push({g:spinG,ax:'y',s:L>=5?0.06:0.04});
+  const halo=new THREE.Group();halo.position.set(0,-2,-4);ext.add(halo);const spinG=new THREE.Group();halo.add(spinG);HQ.spin.push({g:spinG,ax:'y',s:L>=5?0.24:0.18});
   const hp=[[new THREE.TorusGeometry(66,2,[8,10,14,16][q],[64,96,140,180][q]),hullC,Mx(0,0,0,Math.PI/2,0,0)],[new THREE.TorusGeometry(66,2.2,4,[64,96,140,180][q]),darkC,Mx(0,0,0,Math.PI/2,0,0,1,1,0.32)]];
   const hg=[[new THREE.TorusGeometry(68.4,0.2,4,[64,96,140,180][q]),glow,Mx(0,0,0,Math.PI/2,0,0)],[new THREE.TorusGeometry(63.6,0.2,4,[64,96,140,180][q]),glow,Mx(0,0,0,Math.PI/2,0,0)]];
   if(L>=2)for(const a of [Math.PI/4,Math.PI*0.75,Math.PI*1.25,Math.PI*1.75]){const c=Math.cos(a),s=Math.sin(a);hp.push([new THREE.CapsuleGeometry(2.2,5,4,12),slate,Mx(c*71,0,s*71,0,-a,Math.PI/2)]);hg.push([new THREE.TorusGeometry(2.25,0.25,6,20),glow,Mx(c*74.6,0,s*74.6,0,-a+Math.PI/2,0)]);}
@@ -8617,7 +8632,7 @@ function hqBuildExterior(M){
   for(const [x0,x1,z0,z1] of [[47,64.3,-4,-4],[-47,-64.3,-4,-4],[0,0,40,61.8]]){const len=Math.hypot(x1-x0,z1-z0),mx=(x0+x1)/2,mz=(z0+z1)/2,ang=Math.atan2(-(z1-z0),x1-x0);
     D.push([hqBox(len,1.6,2.4),slate,Mx(mx,-2,mz,0,ang,0)]);G.push([hqBox(len,0.12,0.3),glow,Mx(mx,-1.15,mz,0,ang,0)]);}
   if(L>=5){const r3=new THREE.Group();r3.position.set(0,-2,-4);r3.rotation.z=-0.2;ext.add(r3);const inner=new THREE.Group();r3.add(inner);
-    inner.add(hqMesh([[new THREE.TorusGeometry(74,0.9,6,[64,96,140,180][q]),trimC,Mx(0,0,0,Math.PI/2,0,0)]],M.metal));inner.add(hqMesh([[new THREE.TorusGeometry(74,1.05,4,[64,96,140,180][q]),gold,Mx(0,0,0,Math.PI/2,0,0,1,1,0.2)]],M.glowV));HQ.spin.push({g:inner,ax:'y',s:-0.05});}
+    inner.add(hqMesh([[new THREE.TorusGeometry(74,0.9,6,[64,96,140,180][q]),trimC,Mx(0,0,0,Math.PI/2,0,0)]],M.metal));inner.add(hqMesh([[new THREE.TorusGeometry(74,1.05,4,[64,96,140,180][q]),gold,Mx(0,0,0,Math.PI/2,0,0,1,1,0.2)]],M.glowV));HQ.spin.push({g:inner,ax:'y',s:-0.1});}
   /* === LEVEL 3+: comms dishes on the prongs === */
   if(L>=3)for(const s of [-1,1]){D.push([hqCyl(0.3,0.5,5,8),trimC,Mx(s*24,18.5,-26)]);const dg=new THREE.SphereGeometry(2.8,rs,8,0,TAU,0,Math.PI*0.32);dg.rotateX(-Math.PI/2.3);P.push([dg,0xeef2f8,Mx(s*24,21.4,-26.5)]);G.push([new THREE.SphereGeometry(0.3,8,6),glow,Mx(s*24,22.2,-28.6)]);}
   /* === LEVEL 4+: grand observatory glass dome === */
@@ -8639,7 +8654,7 @@ function hqBuildExterior(M){
   if(hqHas('telescope')){D.push([hqCyl(3.4,3.6,1,rs),0x5a6478,Mx(31,16.5,-20)]);P.push([hqCyl(2.6,3.2,16,rs),0xeef2f8,Mx(31,22,-22,-0.7,0,0)]);G.push([new THREE.TorusGeometry(2.65,0.2,6,rs),glow,Mx(31,27.9,-27.1,-0.7+Math.PI/2,0,0)]);}
   if(hqHas('ring2')){const r2=new THREE.Group();r2.position.set(0,-2,-4);r2.rotation.z=0.35;ext.add(r2);const inner=new THREE.Group();r2.add(inner);
     inner.add(hqMesh([[new THREE.TorusGeometry(82,1.8,q>=2?12:8,q>=2?160:80),hullC,Mx(0,0,0,Math.PI/2,0,0)],[new THREE.CapsuleGeometry(2,6,4,12),slate,Mx(82,0,0,0,0,Math.PI/2)],[new THREE.CapsuleGeometry(2,6,4,12),slate,Mx(-82,0,0,0,0,Math.PI/2)]],M.metal,q>=1));
-    inner.add(hqMesh([[new THREE.TorusGeometry(84.1,0.2,4,q>=2?160:80),glow,Mx(0,0,0,Math.PI/2,0,0)]],M.glowV));HQ.spin.push({g:inner,ax:'y',s:-0.07});}
+    inner.add(hqMesh([[new THREE.TorusGeometry(84.1,0.2,4,q>=2?160:80),glow,Mx(0,0,0,Math.PI/2,0,0)]],M.glowV));HQ.spin.push({g:inner,ax:'y',s:-0.15});}
   /* floating approach guidance lights (chase-blink) */
   for(let i=0;i<12;i++)for(const s of [-1,1]){const l=glowMesh(new THREE.SphereGeometry(0.45,8,6),s*16,3,-56-i*7,M.glow);detail.add(l);HQ.blink.push({m:l,i});}
   const beacon=glowMesh(new THREE.SphereGeometry(0.6,8,6),0,spB+spH+0.4,2,0xff4d5e);ext.add(beacon);HQ.blink.push({m:beacon,i:-1});
@@ -8966,6 +8981,7 @@ function hqSolidPush(p){
   for(let it=0;it<2;it++){
     if(!hqInBay(p))hit=hqBoxPush(p,-47-m,47+m,-11.5-m,16.5+m,-51-m,41+m)||hit;
     hit=hqBoxPush(p,-22-m,22+m,15,31.5+m,-9.5-m,31.5+m)||hit;
+    hit=hqBoxPush(p,-5.4-m,5.4+m,28,35.5+m,-3.4-m,7.4+m)||hit;
     hit=hqBoxPush(p,-1.6-m,1.6+m,28,(L>=5?52:46),0.4-m,3.6+m)||hit;
     for(const sx of [-1,1]){hit=hqBoxPush(p,sx*55-3.8-m,sx*55+3.8+m,-0.8-m,6.8+m,-1-m,34+m)||hit;
       hit=hqBoxPush(p,Math.min(sx*45,sx*54)-0.5,Math.max(sx*45,sx*54)+0.5,1.6-m,4.4+m,9.5-m,18.5+m)||hit;
@@ -9116,13 +9132,23 @@ function hqAct(kind){
   return true;
 }
 let hqTagEl=null;
+const _hqTagV=new V3();
 function hqUpdateTag(){
-  if(!hqTagEl){hqTagEl=document.createElement('div');hqTagEl.className='capTag hqTag';hqTagEl.innerHTML='<b class="mpArr"></b><svg class="ic"><use href="#i-station"/></svg><span></span>';markersEl.appendChild(hqTagEl);}
+  if(!hqTagEl){hqTagEl=document.createElement('div');hqTagEl.className='hqTag2';hqTagEl.innerHTML='<svg class="ic"><use href="#i-station"/></svg><span></span>';markersEl.appendChild(hqTagEl);}
   const show=started&&HQ.built&&PL.mode==='fly'&&HQ.sys===activeSystemId&&!modalOpen;
-  if(!show){hqTagEl.style.display='none';return;}
-  const d=ship.group.position.distanceTo(HQ.group.position);if(d<160){hqTagEl.style.display='none';return;}
-  const t=HQ.name+' '+(d>=1000?(d/1000).toFixed(1)+'k':Math.round(d)+'m');const sp=hqTagEl.querySelector('span');if(sp.textContent!==t)sp.textContent=t;
-  placeScreenTag(hqTagEl,_hqV.copy(HQ.group.position).add(_hqT.set(0,40,0)));
+  const d=show?ship.group.position.distanceTo(HQ.group.position):0;
+  if(!show||d<55){if(hqTagEl.style.display!=='none')hqTagEl.style.display='none';return;}
+  const near=d<400;
+  /* only label the station when it is actually on screen — no edge arrows */
+  _hqTagV.copy(HQ.group.position).add(_hqT.set(0,near?24:34,0).applyQuaternion(HQ.group.quaternion)).project(camera);
+  const w=innerWidth,h=innerHeight,x=(_hqTagV.x+1)/2*w;let y=(1-_hqTagV.y)/2*h;
+  let hb=70;{const rb=document.getElementById('resTray');if(touchUI)hb=Math.max(h*0.29,rb?rb.getBoundingClientRect().bottom+22:0);}
+  if(_hqTagV.z>1||x<24||x>w-24||y<-60||y>h-(touchUI?260:120)){if(hqTagEl.style.display!=='none')hqTagEl.style.display='none';return;}
+  y=Math.max(y,hb);
+  const dist=d>=1000?(d/1000).toFixed(1)+'k':Math.round(d)+'m',t=near?HQ.name:(d<900?HQ.name:'HQ')+' · '+dist;
+  const sp=hqTagEl.firstElementChild.nextElementSibling;if(sp.textContent!==t)sp.textContent=t;
+  hqTagEl.style.opacity=d>2500?'0.55':d>1200?'0.75':'0.95';hqTagEl.classList.toggle('near',near);
+  hqTagEl.style.transform=`translate(-50%,-100%) translate(${x.toFixed(1)}px,${y.toFixed(1)}px)`;hqTagEl.style.display='block';
 }
 
 /* ---------- 7. PER-FRAME ---------- */
@@ -9329,6 +9355,10 @@ function hqLevelUp(){
 .hqCost .ok{color:#7dffc4}.hqCost .no{color:#ff9db2}.hqCost{font-family:var(--sans);font-size:12px;font-weight:800;line-height:1.6}
 .hqIcon{width:56px;height:56px;border-radius:14px;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at 40% 35%,rgba(95,243,255,.35),rgba(8,18,38,.9));border:1px solid rgba(95,243,255,.4);flex:0 0 auto}
 .hqIcon .ic{width:30px;height:30px;color:#9dfcff}.hqHead{display:flex;gap:10px;align-items:center}
+.hqTag2{position:absolute;left:0;top:0;pointer-events:none;white-space:nowrap;font-family:var(--sans);font-weight:800;font-size:10px;letter-spacing:.06em;color:#c8f2ff;background:rgba(8,18,38,.55);border:1px solid rgba(95,243,255,.45);border-radius:8px;padding:1px 6px;display:none;will-change:transform}
+.hqTag2.near{background:rgba(8,18,38,.4);border-color:rgba(95,243,255,.3);letter-spacing:.12em}
+.hqTag2 .ic{width:11px;height:11px;vertical-align:-2px;margin-right:3px;color:#5ff3ff}
+.touch .hqTag2,body.touchUI .hqTag2{font-size:9px}
 .hqTag{border-color:#5ff3ff!important;background:rgba(8,18,38,.88)!important;color:#c8f2ff!important}.hqTag .ic{width:14px;height:14px;margin-right:4px;vertical-align:-2px;color:#5ff3ff}.hqTag .mpArr{border-left-color:#5ff3ff!important}
 body.hqIn #markers>*:not(.mpTag){visibility:hidden!important}body.hqIn #bScan{display:none!important}
 .hqList{font-family:var(--sans);font-size:12.5px;font-weight:700;line-height:1.7}.hqSw{display:inline-block;width:14px;height:14px;border-radius:4px;vertical-align:-2px;margin-right:6px;border:1px solid rgba(255,255,255,.4)}
