@@ -1949,7 +1949,7 @@ const MISSIONS=[
   {id:'m8',title:'THE LOST NETWORK',desc:'Find and reactivate 3 of the 5 lost Energy Network nodes.',type:'elysianNode',goal:3,prog:0,done:false,gold:100,reward:{fe:20,ae:20,lum:8,bp:2,so:0,vd:0}},
   {id:'m9',title:'CRYSTAL HARVEST',desc:'Mine 10 rare Lumina Crystals from the floating islands, oceans and crystal peaks.',type:'lumCrystal',goal:10,prog:0,done:false,gold:100,reward:{fe:0,ae:20,lum:10,bp:3,so:0,vd:0}},
   {id:'m10',title:'ETERNAL BLOOM',desc:'Restore THE ETERNAL BLOOM: activate all 5 Energy Network nodes and scan 10 Elysian species, then stabilize the Bloom.',type:'bloom',goal:1,prog:0,done:false,gold:500,reward:{fe:50,ae:50,lum:20,bp:10,vw:10,seed:2,so:20,vd:10}},
-  {id:'m11',title:'BRONZE CROWN',desc:'Enter the Khepri Dominion and destroy 2 SETHARI orbital defense platforms (they engage at HOSTILE alert while you fly near their worlds).',type:'civPlat',goal:2,prog:0,done:false,gold:600,reward:{fe:60,ae:50,so:40,vd:20},skin:{kind:'astro',id:'dawnbearer'}},
+  {id:'m11',title:'BRONZE CROWN',desc:'Enter the Khepri Dominion and destroy 2 SETHARI orbital defense platforms (they engage at HOSTILE alert while you fly near their worlds).',type:'civPlatK',goal:2,prog:0,done:false,gold:600,reward:{fe:60,ae:50,so:40,vd:20},skin:{kind:'astro',id:'dawnbearer'}},
   {id:'m12',title:'COLD CHOIR',desc:'Provoke the VESK CHOIR to HUNTED and destroy one of their TITAN warships in the Vesk Hollow.',type:'civTitan',goal:1,prog:0,done:false,gold:800,reward:{ae:60,so:50,vd:40,lum:15},skin:{kind:'ship',id:'hollowsong'}},
   {id:'m13',title:'PATTERN BREAKER',desc:'Destroy 6 orbital defense platforms belonging to the civilizations of systems 5–7.',type:'civPlat',goal:6,prog:0,done:false,gold:1200,reward:{so:60,vd:60,lum:30,bp:6},skin:{kind:'astro',id:'frayed'}}
   ,{id:'hq1',hq:true,title:'WELCOME HOME',desc:'Fly to your orbital HQ FRONTIER COMMANDER and dock your ship in its hangar [L].',type:'hqDock',goal:1,prog:0,done:false,gold:300,reward:{fe:20,ae:10}},
@@ -4975,9 +4975,9 @@ function civTick(dt){
     c.rr+=(Math.min(13,Math.max(7,cd*0.55))-c.rr)*Math.min(1,dt*2);
     c.fireT-=dt;
     if(c.fireT<=0){
-      c.fireT=2.1+Math.random()*0.8;
+      c.fireT=(C.tier>=7?2.1:C.tier>=5?2.4:2.8)+Math.random()*0.8;
       const start=cLoc.clone();
-      const miss=Math.random()<0.3;
+      const miss=Math.random()<(C.tier>=7?0.2:C.tier>=5?0.3:0.4);
       const end=miss?pos.clone().add(new V3((Math.random()-.5)*7,(Math.random()-.5)*3,(Math.random()-.5)*7)):pos.clone();
       const dirv=end.sub(start),len=dirv.length()||1;
       const beam=new THREE.Mesh(new THREE.CylinderGeometry(0.08,0.08,1,6,1,true),new THREE.MeshBasicMaterial({color:C.bolt,transparent:true,opacity:0.85,blending:THREE.AdditiveBlending,depthWrite:false}));
@@ -4986,15 +4986,16 @@ function civTick(dt){
       beam.scale.y=len;
       b.group.add(beam);CIVFX.push({mesh:beam,t:0});
       if(!miss){
-        hurt(1.5+C.tier*0.75,null,true,`${C.name} CITIZEN ZAP`);
+        hurt(1+C.tier*0.7,null,true,`${C.name} CITIZEN ZAP`);
         camShake=Math.max(camShake,0.18);
       }
       SFX.raiderShot();
     }
   }
+  if(civAlert(C.sys)<2)return;
   b.colony.zapT-=dt;
   if(b.colony.zapT>0)return;
-  b.colony.zapT=2.4;
+  b.colony.zapT=3.4;
   const top=b.colony.localPos.clone().normalize().multiplyScalar(b.colony.localPos.length()+11);
   const dirv=pos.clone().sub(top),len=dirv.length()||1;
   const beam=new THREE.Mesh(new THREE.CylinderGeometry(0.14,0.14,1,6,1,true),new THREE.MeshBasicMaterial({color:C.bolt,transparent:true,opacity:0.85,blending:THREE.AdditiveBlending,depthWrite:false}));
@@ -5002,7 +5003,7 @@ function civTick(dt){
   beam.quaternion.setFromUnitVectors(AY,dirv.clone().multiplyScalar(1/len));
   beam.scale.y=len;
   b.group.add(beam);CIVFX.push({mesh:beam,t:0});
-  hurt(3+C.tier*0.9,`${C.name} DEFENSE BEAM — CEASE TRESPASS`,'','CIV DEFENSE BEAM');
+  hurt(2+C.tier*0.8,`${C.name} DEFENSE BEAM — CEASE TRESPASS`,'','CIV DEFENSE BEAM');
   SFX.raiderShot();camShake=Math.max(camShake,0.25);
 }
 const _cv0=new V3(),_cv1=new V3();
@@ -5062,6 +5063,7 @@ function destroyCivDef(b,d){
   INV.rp=(INV.rp||0)+2;updateResHUD();
   comicPop('DEFENSE PLATFORM DOWN','#'+C.color.toString(16).padStart(6,'0'),50,36);
   advanceMission('civPlat',1);
+  if(C.sys==='khepri')advanceMission('civPlatK',1);
   if(window.__HQ)coopEvent('raider',1);
   const left=b.civDef.filter(x=>!x.dead).length;
   toast(left?`⚔ ORBITAL PLATFORM DESTROYED — ${left} STILL ACTIVE`:`⚔ ${C.name} ORBITAL GRID NEUTRALIZED OVER ${b.name}`);
@@ -10950,7 +10952,12 @@ function shapeSvg(k){const c=hexCss;
   if(k.shape==='twin')return `<svg viewBox="0 0 100 60"><rect x="18" y="24" width="64" height="10" fill="${c(k.acc)}" stroke="#170f24" stroke-width="2"/><rect x="8" y="12" width="84" height="5" fill="${c(k.acc)}"/>${[22,72].map(x=>`<rect x="${x}" y="8" width="10" height="46" rx="5" fill="${c(k.body)}" stroke="#170f24" stroke-width="3"/>`).join('')}<ellipse cx="50" cy="28" rx="7" ry="9" fill="${c(k.glass)}" stroke="#170f24" stroke-width="2"/></svg>`;
   if(k.shape==='retro')return `<svg viewBox="0 0 100 60"><path d="M50 4 C64 14 66 34 62 50 L38 50 C34 34 36 14 50 4Z" fill="${c(k.body)}" stroke="#170f24" stroke-width="3"/><path d="M38 36 L24 56 L38 50Z M62 36 L76 56 L62 50Z" fill="${c(k.acc)}" stroke="#170f24" stroke-width="2"/><circle cx="50" cy="26" r="7" fill="${c(k.glass)}" stroke="${c(k.str)}" stroke-width="3"/><path d="M50 4 C55 8 57 11 58 14 L42 14 C43 11 45 8 50 4Z" fill="${c(k.acc)}"/></svg>`;
   if(k.shape==='whale')return `<svg viewBox="0 0 100 60"><ellipse cx="44" cy="32" rx="34" ry="20" fill="${c(k.body)}" stroke="#170f24" stroke-width="3"/><ellipse cx="44" cy="40" rx="28" ry="10" fill="${c(k.str)}"/><path d="M76 30 L94 18 L90 32 L94 46Z" fill="${c(k.acc)}" stroke="#170f24" stroke-width="2"/><circle cx="22" cy="30" r="3" fill="#111"/></svg>`;
+  if(k.shape==='synod')return `<svg viewBox="0 0 100 60"><path d="M14 12 L34 20 L34 44 L14 50Z M86 12 L66 20 L66 44 L86 50Z" fill="${c(k.str)}" stroke="#170f24" stroke-width="2"/><path d="M36 54 L64 54 L60 40 L40 40Z M40 40 L60 40 L57 28 L43 28Z M43 28 L57 28 L54 16 L46 16Z" fill="${c(k.body)}" stroke="#170f24" stroke-width="2.5"/><path d="M46 16 L50 6 L54 16Z" fill="${c(k.acc)}" stroke="#170f24" stroke-width="2"/><ellipse cx="50" cy="10" rx="13" ry="3.5" fill="none" stroke="${c(k.f1)}" stroke-width="2.5"/><circle cx="50" cy="34" r="4" fill="${c(k.glass)}"/></svg>`;
+  if(k.shape==='choir')return `<svg viewBox="0 0 100 60"><path d="M48 4 L52 4 L53 56 L47 56Z" fill="${c(k.body)}" stroke="#170f24" stroke-width="2"/>${[[14,30,7],[30,26,6],[46,22,5]].map(([y,rx,ry])=>`<ellipse cx="50" cy="${y}" rx="${rx}" ry="${ry}" fill="none" stroke="${c(k.str)}" stroke-width="3"/>`).join('')}<path d="M44 50 L50 58 L56 50Z" fill="${c(k.acc)}" stroke="#170f24" stroke-width="2"/><circle cx="50" cy="30" r="4.5" fill="${c(k.glass)}" stroke="#170f24" stroke-width="2"/></svg>`;
+  if(k.shape==='loom')return `<svg viewBox="0 0 100 60"><path d="M50 8 C78 8 82 40 56 46 C34 52 18 28 40 18 C58 10 74 32 54 40 C40 46 32 30 46 26" fill="none" stroke="${c(k.body)}" stroke-width="8" stroke-linecap="round"/><path d="M50 8 C78 8 82 40 56 46 C34 52 18 28 40 18 C58 10 74 32 54 40 C40 46 32 30 46 26" fill="none" stroke="${c(k.str)}" stroke-width="2.5" stroke-linecap="round"/><path d="M20 44 Q12 52 6 58 M80 46 Q88 52 94 56" stroke="${c(k.acc)}" stroke-width="3" fill="none"/><circle cx="50" cy="30" r="4" fill="${c(k.glass)}"/></svg>`;
   /* astronaut shapes */
+  if(k.shape==='sunwarden')return `<svg viewBox="0 0 60 100">${[...Array(9)].map((_,i)=>{const a=Math.PI*(0.1+i*0.1);return `<line x1="30" y1="28" x2="${(30-Math.cos(a)*24).toFixed(1)}" y2="${(28-Math.sin(a)*24).toFixed(1)}" stroke="${c(k.chest)}" stroke-width="3"/>`;}).join('')}<rect x="18" y="44" width="24" height="30" rx="4" fill="${c(k.suit)}" stroke="#170f24" stroke-width="3"/><path d="M14 44 L22 40 L22 54 L12 54Z M46 44 L38 40 L38 54 L48 54Z" fill="${c(k.legs)}" stroke="#170f24" stroke-width="2"/><rect x="21" y="74" width="7" height="18" rx="2" fill="${c(k.legs)}" stroke="#170f24" stroke-width="2"/><rect x="32" y="74" width="7" height="18" rx="2" fill="${c(k.legs)}" stroke="#170f24" stroke-width="2"/><circle cx="30" cy="28" r="13" fill="${c(k.suit)}" stroke="#170f24" stroke-width="3"/><rect x="20" y="26" width="20" height="5" fill="${c(k.visor)}"/><circle cx="30" cy="56" r="4" fill="${c(k.belt)}"/></svg>`;
+  if(k.shape==='unmade')return `<svg viewBox="0 0 60 100"><path d="M20 44 L42 42 L40 74 L18 72Z" fill="${c(k.suit)}" stroke="#170f24" stroke-width="3"/><path d="M22 74 L20 92 M30 74 L34 90 M38 73 L40 86" stroke="${c(k.legs)}" stroke-width="6" stroke-linecap="round"/><path d="M42 46 Q54 54 50 70 M18 48 Q8 60 12 74" stroke="${c(k.belt)}" stroke-width="3" fill="none"/><path d="M16 30 Q18 12 32 12 Q46 14 44 30 Q40 42 28 42 Q16 40 16 30Z" fill="${c(k.legs)}" stroke="#170f24" stroke-width="3"/><path d="M22 24 Q30 32 40 22" stroke="${c(k.visor)}" stroke-width="4" fill="none"/><path d="M24 50 L36 64 M36 50 L26 66" stroke="${c(k.chest)}" stroke-width="2.5"/></svg>`;
   const b=`<rect x="20" y="44" width="20" height="30" rx="${k.shape==='robot'||k.shape==='mech'?3:9}" fill="${c(k.suit)}" stroke="#170f24" stroke-width="3"/>`;
   if(k.shape==='robot')return `<svg viewBox="0 0 60 100">${b}<rect x="16" y="18" width="28" height="24" rx="3" fill="${c(k.suit)}" stroke="#170f24" stroke-width="3"/><rect x="20" y="26" width="20" height="6" fill="${c(k.visor)}"/><line x1="30" y1="18" x2="30" y2="8" stroke="#8a889c" stroke-width="2"/><circle cx="30" cy="7" r="3" fill="${c(k.belt)}"/></svg>`;
   if(k.shape==='alien')return `<svg viewBox="0 0 60 100">${b}<ellipse cx="30" cy="28" rx="20" ry="22" fill="${c(k.legs)}" stroke="#170f24" stroke-width="3"/><ellipse cx="22" cy="30" rx="6" ry="9" fill="#111"/><ellipse cx="38" cy="30" rx="6" ry="9" fill="#111"/><circle cx="30" cy="16" r="3" fill="#fff"/><path d="M22 8 L18 0 M38 8 L42 0" stroke="${c(k.legs)}" stroke-width="2"/></svg>`;
