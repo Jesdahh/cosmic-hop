@@ -4524,6 +4524,8 @@ const SHIP_SKINS=[
   {id:'whale',name:'STAR WHALE',price:25000,shape:'whale',body:0x3a6ea5,acc:0x6fb4ff,str:0xe8f4ff,glass:0x5df2c0,gEm:0x0a6a50,f1:0x9ad1ff,f2:0xffffff,bonus:'regen',desc:'A gentle giant of the void. LIVING HULL: slowly heals you while flying.'},
   {id:'manta',name:'NEBULA MANTA',price:0,locked:true,team:3,shape:'manta',body:0x1b2a4a,acc:0x2ec4b6,str:0xff6bd6,glass:0x9dfcff,gEm:0x0a6a7a,f1:0xff6bd6,f2:0x9dfcff,bonus:'speed',desc:'TEAM OPS TIER 3 EXCLUSIVE — a living ray of the nebula with curling wingtips, glowing belly stripes and a stinger tail. RACE TUNED: +15% top speed.'},
   {id:'prism',name:'QUANTUM PRISM',price:0,locked:true,team:5,shape:'prism',body:0xc3b5ff,acc:0x5ff3ff,str:0xffd23f,glass:0xff4dd8,gEm:0x7a1060,f1:0xc77dff,f2:0x9dfcff,bonus:'magnet',desc:'TEAM OPS TIER 5 EXCLUSIVE — a faceted crystal starship with four orbiting shards and a golden quantum ring. TRACTOR FIELD: grabs coins from far away.'},
+  {id:'luminarch',name:'VESPERA LUMINARCH',price:0,locked:true,wreck:'VESPERA',shape:'lumen',body:0x2a1650,acc:0x39c6ff,str:0xff6bd6,glass:0x9dfcff,gEm:0x0a6a7a,f1:0x39c6ff,f2:0xff6bd6,bonus:'regen',desc:'SALVAGED ON VESPERA (NYX) — a living bioluminescent bell-ship with crystal spines and glowing tendrils. LIVING HULL: slowly heals you.'},
+  {id:'horizon',name:'EREBUS HORIZON',price:0,locked:true,wreck:'EREBUS-9',shape:'horizon',body:0x0d0b16,acc:0x2b2340,str:0xff7a1e,glass:0xffb347,gEm:0x7a2a00,f1:0xff7a1e,f2:0xffe066,bonus:'armor',desc:'SALVAGED ON EREBUS-9 (GARGANTUA) — a dark-matter monolith with its own blazing accretion disc. EVENT SHIELD: takes 25% less damage.'},
   {id:'vanguard',name:'VANGUARD MK-II',price:22000,model:'models/spaceship.glb',body:0x6b7280,acc:0x39d7ff,str:0xffd23f,glass:0x8eeaff,gEm:0x0a6a7a,f1:0x39d7ff,f2:0xffffff,flameZ:2.0,flameK:1.5,desc:'A hand-modeled strike fighter loaded straight into the game: glass canopy, eight wing cannons and glowing hull strips. Real 3D mesh hull.'},
 ];
 const ASTRO_SKINS=[
@@ -4540,6 +4542,8 @@ const ASTRO_SKINS=[
   {id:'diver',name:'DEEP DIVER 1890',price:8000,shape:'diver',suit:0x8c6a46,legs:0x6e5236,chest:0xd9a441,belt:0x9c7420,visor:0x9ad1ff,vEm:0x1b5a7a,limb:1.25,headY:0.92,bonus:'swim',desc:'Brass helmet with portholes. DEEP-SEA SUIT: swim at full speed and lava burns half as much.'},
   {id:'comet',name:'COMET RUNNER',price:0,locked:true,team:2,shape:'runner',suit:0xf2f6fa,legs:0x2b2d42,chest:0xff4d6d,belt:0xffd23f,visor:0x39c6ff,vEm:0x0a3a6a,limb:1.0,headY:0.9,bonus:'speed',desc:'TEAM OPS TIER 2 EXCLUSIVE — an aerodynamic racing suit with a finned helmet, wraparound visor and twin back boosters. SPRINTER: runs 25% faster.'},
   {id:'samurai',name:'ORBIT SAMURAI',price:0,locked:true,team:4,shape:'samurai',suit:0x2b2d6e,legs:0x1a1a3e,chest:0xd62828,belt:0xffd23f,visor:0xff2a6d,vEm:0x8a0030,limb:1.1,headY:0.92,bonus:'armor',desc:'TEAM OPS TIER 4 EXCLUSIVE — layered crimson armor, a golden crescent kabuto and a star-katana on the back. ARMORED: takes less damage.'},
+  {id:'biolume',name:'VESPERA BIOLUME DIVER',price:0,locked:true,wreck:'VESPERA',shape:'biolume',suit:0x3a1f6e,legs:0x24124a,chest:0x39c6ff,belt:0xff6bd6,visor:0x9dfcff,vEm:0x0a8a9a,limb:1.0,headY:0.92,bonus:'swim',desc:'SALVAGED ON VESPERA — a glass bell helmet with glowing tendrils. DEEP-SEA SUIT: swim at full speed.'},
+  {id:'warden',name:'EREBUS VOID WARDEN',price:0,locked:true,wreck:'EREBUS-9',shape:'warden',suit:0x14111f,legs:0x0d0b16,chest:0x2b2340,belt:0xff7a1e,visor:0xffb347,vEm:0x8a3a00,limb:1.12,headY:0.92,bonus:'armor',desc:'SALVAGED ON EREBUS-9 — monolith armor with a blazing halo ring. ARMORED: takes less damage.'},
   {id:'knight',name:'STAR KNIGHT',price:13000,shape:'knight',suit:0xc7ccd6,legs:0x9aa1ad,chest:0xe8ecf2,belt:0xd62828,visor:0x39c6ff,vEm:0x1b5a7a,limb:1.12,headY:1.0,bonus:'armor',desc:'Shining armor and a red plume. KNIGHT PLATE: takes 30% less damage on foot.'},
   {id:'mech',name:'MINI MECH',price:16000,shape:'mech',suit:0xffb703,legs:0x2b2d42,chest:0x3d405b,belt:0xd62828,visor:0xff4d6d,vEm:0x8a0020,limb:1.55,headY:0.86,bonus:'speed',desc:'A walking tank. SERVO LEGS: run 25% faster.'},
 ];
@@ -5504,19 +5508,19 @@ function renderShop(){
   }
   const isShip=shopTab==='ship',list=isShip?SHIP_SKINS:ASTRO_SKINS,owned=isShip?SKIN.ownedShip:SKIN.ownedAstro,cur=isShip?SKIN.ship:SKIN.astro;
   for(const k of list){
-    const has=owned.includes(k.id),eq=cur===k.id,afford=gold>=k.price,locked=!!k.locked&&!has;
-    const tkey=(isShip&&k.model)?'':(isShip?'ship:':'astro:')+k.id;
+    const has=owned.includes(k.id),eq=cur===k.id,afford=gold>=k.price,locked=!!k.locked&&!has,hid=!!k.wreck&&!has;
+    const tkey=(isShip&&k.model)||hid?'':(isShip?'ship:':'astro:')+k.id;
     const card=document.createElement('div');card.className='uCard'+(eq?' equipped':'');
-    card.innerHTML=`<div><div class="shopPrev" data-thumb="${tkey}">${isShip?shipPrev(k):astroSvg(k)}</div>
-      <div class="uTitle" style="margin-top:8px"><span>${k.name}</span><span class="uLvl">${k.team?'TEAM ONLY':locked?'REWARD':k.price?k.price+' 🪙':'FREE'}</span></div>
-      <div class="uDesc" style="margin-top:4px">${k.desc}</div></div>
-      <button class="uBtn${has?'':' buy'}" data-skin="${k.id}" ${eq||(!has&&(!afford||locked))?'disabled':''}>${eq?'★ EQUIPPED':locked?(k.team?'TEAM OPS TIER '+k.team+' REWARD':'ETERNAL BLOOM REWARD'):has?'EQUIP':afford?'BUY · '+k.price+' <svg class="ic"><use href="#i-coin"/></svg>':'NEED '+(k.price-gold)+' MORE <svg class="ic"><use href="#i-coin"/></svg>'}</button>`;
+    card.innerHTML=`<div><div class="shopPrev" data-thumb="${tkey}">${hid?'<svg viewBox="0 0 100 60"><text x="50" y="44" text-anchor="middle" font-size="40" font-weight="900" fill="#5a5a7a">?</text></svg>':isShip?shipPrev(k):astroSvg(k)}</div>
+      <div class="uTitle" style="margin-top:8px"><span>${hid?(isShip?'??? LOST ROCKET':'??? LOST SUIT'):k.name}</span><span class="uLvl">${k.wreck?(hid?'???':'SALVAGED'):k.team?'TEAM ONLY':locked?'REWARD':k.price?k.price+' 🪙':'FREE'}</span></div>
+      <div class="uDesc" style="margin-top:4px">${hid?'Something is lost out there. It cannot be bought.':k.desc}</div></div>
+      <button class="uBtn${has?'':' buy'}" data-skin="${k.id}" ${eq||(!has&&(!afford||locked))?'disabled':''}>${eq?'★ EQUIPPED':locked?(k.wreck?'UNDISCOVERED':k.team?'TEAM OPS TIER '+k.team+' REWARD':'ETERNAL BLOOM REWARD'):has?'EQUIP':afford?'BUY · '+k.price+' <svg class="ic"><use href="#i-coin"/></svg>':'NEED '+(k.price-gold)+' MORE <svg class="ic"><use href="#i-coin"/></svg>'}</button>`;
     grid.appendChild(card);
   }
   thumbAttach(grid);
   grid.querySelectorAll('[data-skin]').forEach(b=>b.addEventListener('click',()=>{
     const id=b.dataset.skin,k=list.find(s=>s.id===id);
-    if(k.locked&&!owned.includes(id)){toast(k.team?`TEAM-ONLY: CLEAR TEAM OPS TIER ${k.team} IN MULTIPLAYER TO UNLOCK ${k.name}`:k.id==='goldenbloom'?'RESTORE THE ETERNAL BLOOM TO EARN THE GOLDEN BLOOM SKIN':'REACH EXPLORER RANK III TO EARN THE VOIDLIGHT ENVOY SKIN');return;}
+    if(k.locked&&!owned.includes(id)){toast(k.wreck?'SOMETHING IS LOST OUT THERE…':k.team?`TEAM-ONLY: CLEAR TEAM OPS TIER ${k.team} IN MULTIPLAYER TO UNLOCK ${k.name}`:k.id==='goldenbloom'?'RESTORE THE ETERNAL BLOOM TO EARN THE GOLDEN BLOOM SKIN':'REACH EXPLORER RANK III TO EARN THE VOIDLIGHT ENVOY SKIN');return;}
     if(!owned.includes(id)){if((INV.gold||0)<k.price)return;INV.gold-=k.price;owned.push(id);toast(`PURCHASED ${k.name}!`);SFX.coin();}
     if(isShip){SKIN.ship=id;dressShip(ship.model,ship.flame,id);}else{SKIN.astro=id;dressAstro(astro,id);}
     SFX.upgrade();updateResHUD();saveGame(true);renderShop();
@@ -7344,6 +7348,7 @@ function updateEcosystemAndHazards(dt,t){
         }
       }
     }
+    if(PL.mode==='walk'&&window.__HQ){const W=wreckNear(b,localPos);if(W)PL.nearInteract={kind:'wreck',W,label:wreckLabel(W)};}
     if(rover.deployed && rover.body===b && PL.mode==='walk' && localPos.distanceTo(rover.localPos)<3.5){
       PL.nearInteract={kind:'rover',label:'DRIVE NOMAD ROVER'};
     }
@@ -7491,6 +7496,7 @@ function updateEcosystemAndHazards(dt,t){
 
 function handleInteract(){
   if(!PL.nearInteract)return false;
+  if(PL.nearInteract.kind==='wreck'){wreckRepair(PL.nearInteract.W);return true;}
   if(PL.nearInteract.kind==='rover'){
     PL.mode='rover';rover.active=true;astro.group.visible=false;
     toast('DRIVING NOMAD ROVER · [E] TO EXIT');
@@ -8272,7 +8278,7 @@ function frame(dt){
   updateMP(dt);
   if(started)updateCapsule(dt);
   if(started)updateShop2(dt);
-  if(window.__HQ)updateCoop(dt);
+  if(window.__HQ){updateCoop(dt);if(started)wreckTick();}
   look.x=look.y=0;
 
   let tint=0;
@@ -9628,6 +9634,45 @@ function coopOpen(){if(!MP.room){toast('JOIN A MULTIPLAYER LOBBY TO DO TEAM OPS'
   const mp=$('btnMP');mp.parentNode.insertBefore(hb,mp.nextSibling);
   hb.addEventListener('click',e=>{e.stopPropagation();if(!started)return;coopOpen();});
 })();
+
+/* ===================== STRANDED WRECKS — salvage-only rockets and suits ===================== */
+const WRECKS=[{body:'VESPERA',ship:'luminarch',suit:'biolume',cost:{fe:120,ae:80,so:40},beam:0x39c6ff},
+  {body:'EREBUS-9',ship:'horizon',suit:'warden',cost:{fe:200,ae:150,so:80,vd:40},beam:0xff7a1e}];
+HQ.wrecks=[];
+function wreckFor(b){return WRECKS.find(w=>w.body===b.name);}
+function wreckSpawn(b,w){
+  let dir=null;for(let i=0;i<120&&!dir;i++){const y=1-(i+0.5)/120*2,rr=Math.sqrt(1-y*y),t=i*2.399963;const d=new V3(Math.cos(t)*rr,y,Math.sin(t)*rr);if(b.heightAt(d.x,d.y,d.z)>0.12)dir=d;}
+  dir=dir||new V3(0,1,0);const gr=b.groundR(dir.x,dir.y,dir.z);
+  const g=new THREE.Group();g.matrixAutoUpdate=false;g.matrix.copy(placeM(dir,gr,0.7,1));
+  const sh=buildShip();dressShip(sh.model,sh.flame,w.ship);sh.flame.visible=false;sh.gear.visible=false;sh.group.position.set(0,0.55,0);sh.group.rotation.set(0.32,0.4,0.42);g.add(sh.group);
+  const as=buildAstro();dressAstro(as,w.suit);as.group.visible=true;if(as.tool)as.tool.visible=false;as.group.position.set(3.2,0,1.4);as.group.rotation.set(0,-0.9,0);as.S.rotation.x=-0.25;g.add(as.group);
+  const pod=new THREE.Mesh(new THREE.CylinderGeometry(0.75,0.75,1.9,16,1,true),new THREE.MeshBasicMaterial({color:w.beam,transparent:true,opacity:0.18,depthWrite:false,side:THREE.DoubleSide}));pod.position.set(3.2,0.95,1.4);g.add(pod);
+  const beam=new THREE.Mesh(new THREE.CylinderGeometry(0.35,0.9,70,10,1,true),new THREE.MeshBasicMaterial({color:w.beam,transparent:true,opacity:0.32,depthWrite:false,blending:THREE.AdditiveBlending}));beam.position.set(0,35,0);g.add(beam);
+  const lamp=new THREE.Mesh(new THREE.SphereGeometry(0.25,8,6),new THREE.MeshBasicMaterial({color:0xff4d5e}));lamp.position.set(0.3,1.6,0);g.add(lamp);
+  for(let i=0;i<9;i++){const rk=new THREE.Mesh(new THREE.DodecahedronGeometry(0.25+Math.random()*0.35,0),toon(0x4a4960));rk.position.set(-2.5+Math.random()*5,0.1,-2+Math.random()*4);g.add(rk);}
+  (b.detail||b.group).add(g);const lp=dir.clone().multiplyScalar(gr);
+  const W={b,w,g,beam,lamp,localPos:lp,dir};HQ.wrecks.push(W);
+  b.updaters.push((dt,t)=>{if(!W.g.parent)return;lamp.visible=Math.sin(t*5)>0;beam.material.opacity=0.24+Math.sin(t*2)*0.08;});
+  b.colliders.push({p:lp.clone().addScaledVector(dir,0.6),r:1.8});
+  return W;
+}
+function wreckClaimed(w){return SKIN.ownedShip.includes(w.ship);}
+function wreckTick(){
+  const b=PL.near||PL.body;if(!b||!b.name)return;const w=wreckFor(b);if(!w||wreckClaimed(w))return;
+  if(!HQ.wrecks.some(W=>W.w===w))wreckSpawn(b,w);
+  const W=HQ.wrecks.find(x=>x.w===w);
+  if(PL.mode==='landed'&&PL.body===b&&!W.told){W.told=true;toast('A FAINT DISTRESS SIGNAL CRACKLES ON THIS WORLD…');}
+}
+function wreckNear(b,localPos){const W=HQ.wrecks.find(x=>x.b===b&&x.g.parent);if(!W||wreckClaimed(W.w))return null;return localPos.distanceTo(W.localPos)<7?W:null;}
+function wreckLabel(W){const c=W.w.cost,sk=SHIP_SKINS.find(s=>s.id===W.w.ship);return `REPAIR ${sk.name} · ${Object.entries(c).map(([k,v])=>v+' '+k.toUpperCase()).join(' ')}`;}
+function wreckRepair(W){
+  const c=W.w.cost;for(const k in c)if((INV[k]||0)<c[k]){toast(`NEED ${Object.entries(c).map(([k,v])=>v+' '+k.toUpperCase()).join(', ')} TO REPAIR THIS WRECK`);SFX.ui();return;}
+  for(const k in c)INV[k]-=c[k];updateResHUD();
+  if(!SKIN.ownedShip.includes(W.w.ship))SKIN.ownedShip.push(W.w.ship);if(!SKIN.ownedAstro.includes(W.w.suit))SKIN.ownedAstro.push(W.w.suit);
+  W.g.parent.remove(W.g);const sk=SHIP_SKINS.find(s=>s.id===W.w.ship),su=ASTRO_SKINS.find(s=>s.id===W.w.suit);
+  SFX.discover();comicPop('SALVAGED!','#ffd23f',50,34);toast(`${sk.name} + ${su.name} RESTORED — THEY ARE YOURS! EQUIP THEM IN THE SHOP`);saveGame(true);
+}
+HQ.api.wreckTick=wreckTick;HQ.api.wrecks=()=>HQ.wrecks;
 // HQ-END
 
 // SHOP2-BEGIN
@@ -9646,7 +9691,21 @@ function buildShapeShip(sk){
   const mirror=pts=>pts.map(([x,y])=>[-x,y]).reverse();
   const nozzle=(x=0,z=1.8,r=0.42)=>{P.push([new THREE.CylinderGeometry(r,r*0.75,0.45,14,1,true),0x4a4960,Mx(x,0,z,Math.PI/2,0,0)]);P.push([new THREE.CylinderGeometry(r*0.75,r*0.75,0.05,14),0x221a2e,Mx(x,0,z-0.12,Math.PI/2,0,0)]);};
   const SPH=(r,w=16,h=10)=>new THREE.SphereGeometry(r,w,h);
-  if(sk.shape==='manta'){
+  if(sk.shape==='lumen'){
+    P.push([new THREE.SphereGeometry(1,20,12,0,TAU,0,Math.PI*0.62),sk.body,Mx(0,0,-0.2,-Math.PI/2,0,0,1.05,1.9,0.85)]);
+    P.push([new THREE.TorusGeometry(1.0,0.09,8,36),sk.acc,Mx(0,0,0.55,0,0,0,1.05,0.85,1)],[new THREE.TorusGeometry(0.7,0.05,6,30),sk.str,Mx(0,0,-0.6,0,0,0,1,0.8,1)]);
+    for(let i=0;i<7;i++){const a=i/7*TAU,x=Math.cos(a)*0.75,y=Math.sin(a)*0.6;
+      P.push([new THREE.CylinderGeometry(0.035,0.012,1.6+(i%3)*0.4,6),i%2?sk.acc:sk.str,Mx(x*1.1,y*1.1,1.55+(i%3)*0.2,Math.PI/2+y*0.25,0,-x*0.25)]);
+      P.push([SPH(0.07,8,6),sk.str,Mx(x*1.2,y*1.2,2.4+(i%3)*0.4)]);}
+    for(const [x,z,h] of [[0,-0.9,0.8],[0.35,-0.4,0.6],[-0.35,-0.4,0.6],[0,0.15,0.5]])P.push([new THREE.ConeGeometry(0.12,h,5),sk.acc,Mx(x,0.62+h*0.4,z)]);
+    nozzle(0,1.0,0.3);gp=[0,0.2,-1.15];gs=[0.8,0.6,0.7];
+  }else if(sk.shape==='horizon'){
+    P.push([new THREE.CylinderGeometry(0.22,0.72,3.6,4),sk.body,Mx(0,0,-0.1,-Math.PI/2,Math.PI/4,0,1,1,0.75)]);
+    P.push([new THREE.CylinderGeometry(1.95,1.95,0.05,40),sk.acc,Mx(0,0,0.3,0.2,0,0)],[new THREE.TorusGeometry(1.95,0.1,8,48),sk.str,Mx(0,0,0.3,Math.PI/2+0.2,0,0)],[new THREE.TorusGeometry(1.45,0.05,6,44),sk.str,Mx(0,0,0.3,Math.PI/2+0.2,0,0)],[new THREE.TorusGeometry(1.1,0.035,6,40),0xffe066,Mx(0,0,0.3,Math.PI/2+0.2,0,0)]);
+    for(const sx of [-1,1])P.push([new THREE.BoxGeometry(0.08,1.3,1.6),sk.body,Mx(sx*0.55,0.15,0.9,0,0,sx*0.25)],[new THREE.BoxGeometry(0.09,0.06,1.5),sk.str,Mx(sx*0.67,0.78,0.9,0,0,sx*0.25)]);
+    P.push([SPH(0.32,14,10),sk.str,Mx(0,0,0.3)],[new THREE.BoxGeometry(0.06,0.06,3.0),sk.str,Mx(0,0.47,-0.2)]);
+    nozzle(0,1.85,0.34);gp=[0,0.38,-0.9];gs=[0.42,0.3,0.8];
+  }else if(sk.shape==='manta'){
     P.push([SPH(1,20,12),sk.body,Mx(0,0,-0.1,0,0,0,0.95,0.36,1.9)]);
     const wing=[[0.55,-1.25],[1.7,-0.75],[2.75,-0.05],[3.15,0.55],[2.7,0.8],[1.6,0.55],[0.6,1.05]];
     P.push(hfin(wing,-0.04));P.push(hfin(mirror(wing),-0.04));
@@ -9724,7 +9783,18 @@ function buildShapeShip(sk){
 function buildShapeAstro(sk){
   const cap=(r,l)=>new THREE.CapsuleGeometry(r,l,4,10),P=[];let vg=null,vp=[0,0.68,-0.085],vs=[1,0.8,0.8],vr=0;
   const S=(r,w=14,h=10)=>new THREE.SphereGeometry(r,w,h),B=(x,y,z)=>new THREE.BoxGeometry(x,y,z);
-  if(sk.shape==='runner'){
+  if(sk.shape==='biolume'){
+    P.push([cap(0.15,0.17),sk.suit,Mx(0,0.38,0)],[B(0.24,0.26,0.12),sk.chest,Mx(0,0.42,-0.1)],[new THREE.TorusGeometry(0.16,0.03,6,18),sk.belt,Mx(0,0.3,0,Math.PI/2,0,0)],
+      [new THREE.SphereGeometry(0.24,16,10,0,TAU,0,Math.PI*0.6),sk.chest,Mx(0,0.62,0)],[new THREE.TorusGeometry(0.2,0.025,6,20),sk.belt,Mx(0,0.6,0,Math.PI/2,0,0)]);
+    for(let i=0;i<6;i++){const a=i/6*TAU;P.push([new THREE.CylinderGeometry(0.012,0.006,0.3,5),i%2?sk.belt:sk.chest,Mx(Math.cos(a)*0.19,0.45,Math.sin(a)*0.19)],[S(0.025,6,4),sk.belt,Mx(Math.cos(a)*0.19,0.3,Math.sin(a)*0.19)]);}
+    P.push([new THREE.ConeGeometry(0.035,0.12,5),sk.chest,Mx(0,0.9,0)]);
+    vg=new THREE.SphereGeometry(0.15,14,10);vp=[0,0.68,-0.07];vs=[1,0.85,0.8];
+  }else if(sk.shape==='warden'){
+    P.push([cap(0.16,0.16),sk.suit,Mx(0,0.38,0)],[B(0.3,0.3,0.2),sk.chest,Mx(0,0.44,0)],[B(0.04,0.22,0.02),sk.belt,Mx(0,0.44,-0.105)],[B(0.34,0.05,0.24),sk.belt,Mx(0,0.27,0)],
+      [B(0.26,0.26,0.26),sk.suit,Mx(0,0.7,0,0,Math.PI/4,0)],[new THREE.TorusGeometry(0.27,0.025,6,28),sk.belt,Mx(0,0.72,0,1.25,0,0.2)],[new THREE.TorusGeometry(0.21,0.012,6,24),0xffe066,Mx(0,0.72,0,1.25,0,0.2)]);
+    for(const sx of [-1,1])P.push([B(0.09,0.3,0.12),sk.suit,Mx(sx*0.22,0.58,0,0,0,sx*0.15)],[B(0.095,0.04,0.125),sk.belt,Mx(sx*0.225,0.7,0,0,0,sx*0.15)]);
+    vg=B(0.2,0.05,0.03);vp=[0,0.71,-0.185];vs=[1,1,1];
+  }else if(sk.shape==='runner'){
     P.push([cap(0.14,0.16),sk.suit,Mx(0,0.38,0)],[S(0.19),sk.suit,Mx(0,0.69,0.03,0,0,0,1,0.95,1.25)],[B(0.02,0.14,0.26),sk.chest,Mx(0,0.86,0.12)],
       [B(0.04,0.26,0.02),sk.belt,Mx(0,0.4,-0.145)],[B(0.3,0.04,0.2),sk.chest,Mx(0,0.28,0)]);
     for(const sx of [-1,1]){P.push([new THREE.CylinderGeometry(0.045,0.06,0.26,10),sk.chest,Mx(sx*0.09,0.42,0.17)],[new THREE.ConeGeometry(0.06,0.09,10),sk.belt,Mx(sx*0.09,0.25,0.17,Math.PI,0,0)],
@@ -10071,6 +10141,11 @@ function renderShop2(grid,gold){
   thumbAttach(grid);
 }
 function shapeSvg(k){const c=hexCss;
+  if(k.shape==='lumen')return `<svg viewBox="0 0 100 60"><path d="M22 34 Q24 8 50 8 Q76 8 78 34Z" fill="${c(k.body)}" stroke="#170f24" stroke-width="3"/><path d="M28 34 Q26 50 20 58 M40 34 Q40 50 36 58 M60 34 Q60 50 64 58 M72 34 Q74 50 80 58" stroke="${c(k.acc)}" stroke-width="3" fill="none"/><ellipse cx="50" cy="34" rx="28" ry="5" fill="${c(k.str)}" stroke="#170f24" stroke-width="2"/><circle cx="50" cy="20" r="6" fill="${c(k.glass)}"/></svg>`;
+  if(k.shape==='horizon')return `<svg viewBox="0 0 100 60"><ellipse cx="50" cy="32" rx="44" ry="10" fill="${c(k.acc)}" stroke="${c(k.str)}" stroke-width="4"/><path d="M50 4 L60 30 L50 58 L40 30Z" fill="${c(k.body)}" stroke="#170f24" stroke-width="3"/><circle cx="50" cy="32" r="5" fill="${c(k.str)}"/></svg>`;
+  if(k.shape==='biolume'||k.shape==='warden'){const b=`<rect x="20" y="44" width="20" height="30" rx="8" fill="${c(k.suit)}" stroke="#170f24" stroke-width="3"/><rect x="22" y="74" width="7" height="18" rx="3" fill="${c(k.legs)}" stroke="#170f24" stroke-width="2"/><rect x="31" y="74" width="7" height="18" rx="3" fill="${c(k.legs)}" stroke="#170f24" stroke-width="2"/>`;
+    return k.shape==='biolume'?`<svg viewBox="0 0 60 100">${b}<path d="M10 40 Q10 10 30 10 Q50 10 50 40Z" fill="${c(k.chest)}" stroke="#170f24" stroke-width="3"/><circle cx="30" cy="28" r="9" fill="${c(k.visor)}"/><path d="M14 40 v12 M24 40 v14 M36 40 v14 M46 40 v12" stroke="${c(k.belt)}" stroke-width="3"/></svg>`
+      :`<svg viewBox="0 0 60 100">${b}<rect x="17" y="16" width="26" height="26" fill="${c(k.suit)}" stroke="#170f24" stroke-width="3" transform="rotate(45 30 29)"/><ellipse cx="30" cy="29" rx="24" ry="8" fill="none" stroke="${c(k.belt)}" stroke-width="3"/><rect x="21" y="27" width="18" height="4" fill="${c(k.visor)}"/></svg>`;}
   if(k.shape==='manta')return `<svg viewBox="0 0 100 60"><path d="M50 8 Q62 14 66 26 L94 38 L86 44 L64 40 Q56 48 50 50 Q44 48 36 40 L14 44 L6 38 L34 26 Q38 14 50 8Z" fill="${c(k.acc)}" stroke="#170f24" stroke-width="3"/><ellipse cx="50" cy="30" rx="10" ry="18" fill="${c(k.body)}" stroke="#170f24" stroke-width="3"/><path d="M50 48 L50 59" stroke="${c(k.body)}" stroke-width="3"/><circle cx="50" cy="22" r="5" fill="${c(k.glass)}" stroke="#170f24" stroke-width="2"/><path d="M42 36 h16" stroke="${c(k.str)}" stroke-width="3"/></svg>`;
   if(k.shape==='prism')return `<svg viewBox="0 0 100 60"><circle cx="50" cy="34" r="20" fill="none" stroke="${c(k.str)}" stroke-width="4"/><path d="M50 4 L62 30 L50 56 L38 30Z" fill="${c(k.body)}" stroke="#170f24" stroke-width="3"/><path d="M20 22 L26 30 L20 38 L14 30Z M80 22 L86 30 L80 38 L74 30Z" fill="${c(k.acc)}" stroke="#170f24" stroke-width="2"/><path d="M50 18 L55 30 L50 36 L45 30Z" fill="${c(k.glass)}"/></svg>`;
   if(k.shape==='runner'||k.shape==='samurai'){const b=`<rect x="20" y="44" width="20" height="30" rx="9" fill="${c(k.suit)}" stroke="#170f24" stroke-width="3"/><rect x="22" y="74" width="7" height="18" rx="3" fill="${c(k.legs)}" stroke="#170f24" stroke-width="2"/><rect x="31" y="74" width="7" height="18" rx="3" fill="${c(k.legs)}" stroke="#170f24" stroke-width="2"/>`;
