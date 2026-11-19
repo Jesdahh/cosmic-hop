@@ -4526,6 +4526,7 @@ const SHIP_SKINS=[
   {id:'prism',name:'QUANTUM PRISM',price:0,locked:true,team:5,shape:'prism',body:0xc3b5ff,acc:0x5ff3ff,str:0xffd23f,glass:0xff4dd8,gEm:0x7a1060,f1:0xc77dff,f2:0x9dfcff,bonus:'magnet',desc:'TEAM OPS TIER 5 EXCLUSIVE — a faceted crystal starship with four orbiting shards and a golden quantum ring. TRACTOR FIELD: grabs coins from far away.'},
   {id:'luminarch',name:'VESPERA LUMINARCH',price:0,locked:true,wreck:'VESPERA',shape:'lumen',body:0x2a1650,acc:0x39c6ff,str:0xff6bd6,glass:0x9dfcff,gEm:0x0a6a7a,f1:0x39c6ff,f2:0xff6bd6,bonus:'regen',desc:'SALVAGED ON VESPERA (NYX) — a living bioluminescent bell-ship with crystal spines and glowing tendrils. LIVING HULL: slowly heals you.'},
   {id:'horizon',name:'EREBUS HORIZON',price:0,locked:true,wreck:'EREBUS-9',shape:'horizon',body:0x0d0b16,acc:0x2b2340,str:0xff7a1e,glass:0xffb347,gEm:0x7a2a00,f1:0xff7a1e,f2:0xffe066,bonus:'armor',desc:'SALVAGED ON EREBUS-9 (GARGANTUA) — a dark-matter monolith with its own blazing accretion disc. EVENT SHIELD: takes 25% less damage.'},
+  {id:'singularity',name:'SINGULARITY ARK · TYPE VII',price:0,locked:true,wreck:'GARGANTUA',shape:'ark',body:0xeef2f8,acc:0x14182a,str:0x7fe9ff,glass:0x0b1a2e,gEm:0x39c6ff,f1:0x9dfcff,f2:0xffffff,bonus:'speed',desc:'ADRIFT AT THE EDGE OF GARGANTUA — a Type VII civilization starship: pearl-chrome tri-blade hull, a warp-halo drive ring and a captive singularity core. WARP HULL: +15% top speed.'},
   {id:'vanguard',name:'VANGUARD MK-II',price:22000,model:'models/spaceship.glb',body:0x6b7280,acc:0x39d7ff,str:0xffd23f,glass:0x8eeaff,gEm:0x0a6a7a,f1:0x39d7ff,f2:0xffffff,flameZ:2.0,flameK:1.5,desc:'A hand-modeled strike fighter loaded straight into the game: glass canopy, eight wing cannons and glowing hull strips. Real 3D mesh hull.'},
 ];
 const ASTRO_SKINS=[
@@ -8175,6 +8176,7 @@ function updateHUD(dt){
     setBtn(bMine,RAIDER.active?'FIRE':'MINE',false,!RAIDER.active&&!PL.targetNode,!!RAIDER.active||!!PL.targetNode);
     if(RAIDER.active&&RAIDER.warnT>0)setPrompt(boss?`DREADNOUGHT INBOUND — ENGAGE IN ${Math.ceil(RAIDER.warnT)}s`:`ALIEN RAIDERS INBOUND — ENGAGE IN ${Math.ceil(RAIDER.warnT)}s`);
     else if(RAIDER.active)setPrompt(boss?`${key('F')}HOLD FIRE · DREADNOUGHT ${Math.max(0,Math.ceil(boss.hp))}/${boss.maxHp} HP · ${Math.ceil(RAIDER.fightT)}s`:`${key('F')}HOLD FIRE · ${foes} RAIDER${foes===1?'':'S'} · ${Math.ceil(RAIDER.fightT)}s`);
+    else if(window.__HQ&&derelictNear()){setPrompt(`${key('E')}SALVAGE THE ANCIENT VESSEL · ${Object.entries(DERELICT.cost).map(([k,v])=>v+' '+k.toUpperCase()).join(' ')}`);setBtn(bExit,'SALVAGE',false,false,true);}
     else if(npcNear)setPrompt(`${key('E')}HAIL ${npcNear.species} VESSEL — ${npcNear.origin}`);
     else if(PL.targetNode)setPrompt(`${key('F')}HOLD TO MINE ${RES_META[PL.targetNode.type].label}`);
     else if(window.__HQ&&hqCanDock()){setPrompt(`${key('L')}REQUEST DOCKING · ${HQ.name}`);setBtn(bLand,'DOCK',false,false,true);}
@@ -8212,6 +8214,7 @@ function actLand(){if(PL.dead)return;if(window.__HQ&&hqAct('land'))return;if(PL.
 function actExit(){
   if(PL.dead)return;
   if(window.__HQ&&hqAct('exit'))return;
+  if(PL.mode==='fly'&&window.__HQ&&derelictNear()){derelictClaim();return;}
   if(PL.mode==='fly')hailNpc();
   else if(PL.mode==='landed')exitShip();
   else if(PL.mode==='rover')exitRover();
@@ -8278,7 +8281,7 @@ function frame(dt){
   updateMP(dt);
   if(started)updateCapsule(dt);
   if(started)updateShop2(dt);
-  if(window.__HQ){updateCoop(dt);if(started)wreckTick();}
+  if(window.__HQ){updateCoop(dt);if(started){wreckTick();derelictTick();}}
   look.x=look.y=0;
 
   let tint=0;
@@ -9672,6 +9675,29 @@ function wreckRepair(W){
   W.g.parent.remove(W.g);const sk=SHIP_SKINS.find(s=>s.id===W.w.ship),su=ASTRO_SKINS.find(s=>s.id===W.w.suit);
   SFX.discover();comicPop('SALVAGED!','#ffd23f',50,34);toast(`${sk.name} + ${su.name} RESTORED — THEY ARE YOURS! EQUIP THEM IN THE SHOP`);saveGame(true);
 }
+
+/* ---- SINGULARITY ARK: a Type VII derelict drifting at the edge of Gargantua (salvage-only) ---- */
+const DERELICT={id:'singularity',cost:{fe:400,ae:300,so:200,vd:120},g:null,ang:0};
+function derelictBH(){return bodies.find(b=>b.kind==='blackhole'&&b.sys===activeSystemId);}
+function derelictTick(){
+  const bh=derelictBH(),own=SKIN.ownedShip.includes(DERELICT.id);
+  if(!bh||own){if(DERELICT.g)DERELICT.g.visible=false;return;}
+  if(!DERELICT.g){const g=new THREE.Group();const sh=buildShip();dressShip(sh.model,sh.flame,DERELICT.id);sh.flame.visible=false;sh.gear.visible=false;sh.group.scale.setScalar(1.6);g.add(sh.group);
+    const aura=new THREE.Mesh(new THREE.SphereGeometry(7,20,14),new THREE.MeshBasicMaterial({color:0x7fe9ff,transparent:true,opacity:0.08,depthWrite:false,blending:THREE.AdditiveBlending}));g.add(aura);
+    const bl=new THREE.Mesh(new THREE.SphereGeometry(0.4,8,6),new THREE.MeshBasicMaterial({color:0x9dfcff}));bl.position.set(0,1.6,0);g.add(bl);
+    DERELICT.g=g;DERELICT.ship=sh;DERELICT.aura=aura;DERELICT.blink=bl;scene.add(g);}
+  const g=DERELICT.g,t=uTime.value;g.visible=true;DERELICT.ang=t*0.012;
+  const R=bh.R*2.6+120;g.position.set(bh.center.x+Math.cos(DERELICT.ang)*R,bh.center.y+18+Math.sin(t*0.4)*3,bh.center.z+Math.sin(DERELICT.ang)*R);
+  DERELICT.ship.group.rotation.set(0.25+Math.sin(t*0.3)*0.1,t*0.05,0.35);
+  DERELICT.aura.material.opacity=0.06+Math.sin(t*1.5)*0.03;DERELICT.blink.visible=Math.sin(t*3)>0.2;
+}
+function derelictNear(){return !!(DERELICT.g&&DERELICT.g.visible&&PL.mode==='fly'&&ship.group.position.distanceTo(DERELICT.g.position)<30);}
+function derelictClaim(){
+  const c=DERELICT.cost;for(const k in c)if((INV[k]||0)<c[k]){toast(`THE ARK'S SYSTEMS ARE DEAD — NEED ${Object.entries(c).map(([k,v])=>v+' '+k.toUpperCase()).join(', ')} TO RESTORE IT`);SFX.ui();return;}
+  for(const k in c)INV[k]-=c[k];updateResHUD();SKIN.ownedShip.push(DERELICT.id);DERELICT.g.visible=false;
+  SFX.discover();comicPop('TYPE VII RESTORED!','#7fe9ff',50,34);toast('SINGULARITY ARK · TYPE VII IS YOURS — EQUIP IT IN THE SHOP');saveGame(true);
+}
+HQ.api.derelict=()=>DERELICT;
 HQ.api.wreckTick=wreckTick;HQ.api.wrecks=()=>HQ.wrecks;
 // HQ-END
 
@@ -9691,7 +9717,20 @@ function buildShapeShip(sk){
   const mirror=pts=>pts.map(([x,y])=>[-x,y]).reverse();
   const nozzle=(x=0,z=1.8,r=0.42)=>{P.push([new THREE.CylinderGeometry(r,r*0.75,0.45,14,1,true),0x4a4960,Mx(x,0,z,Math.PI/2,0,0)]);P.push([new THREE.CylinderGeometry(r*0.75,r*0.75,0.05,14),0x221a2e,Mx(x,0,z-0.12,Math.PI/2,0,0)]);};
   const SPH=(r,w=16,h=10)=>new THREE.SphereGeometry(r,w,h);
-  if(sk.shape==='lumen'){
+  if(sk.shape==='ark'){
+    P.push([shipLathe([[0.001,-2.9],[0.12,-2.5],[0.38,-1.6],[0.52,-0.5],[0.5,0.6],[0.38,1.5],[0.3,1.95]]),sk.body,new M4().makeScale(1,0.8,1)]);
+    P.push([shipLathe([[0.53,-0.9],[0.55,-0.3]]),sk.acc,new M4().makeScale(1,0.8,1)],[shipLathe([[0.515,0.15],[0.52,0.35]]),sk.str,new M4().makeScale(1,0.8,1)]);
+    for(let i=0;i<3;i++){const a=i/3*TAU+Math.PI/2,rot=new M4().makeRotationZ(a-Math.PI/2);
+      P.push([shipWing([[0.4,-0.6],[2.6,0.9],[2.75,1.25],[0.4,0.85]]),sk.body,rot.clone().multiply(new M4().makeRotationX(Math.PI/2))]);
+      P.push([new THREE.BoxGeometry(0.05,0.05,1.6),sk.str,rot.clone().multiply(Mx(2.62,0,1.0,0,-0.95,0))]);
+      P.push([new THREE.CylinderGeometry(0.09,0.09,1.0,10),sk.acc,rot.clone().multiply(Mx(2.72,0,1.15,Math.PI/2,0,0))]);
+      P.push([new THREE.OctahedronGeometry(0.16,0),sk.str,rot.clone().multiply(Mx(1.55,0.38,0.2))]);}
+    P.push([new THREE.TorusGeometry(1.45,0.06,10,56),sk.body,Mx(0,0,0.45)],[new THREE.TorusGeometry(1.45,0.025,6,56),sk.str,Mx(0,0,0.32)],[new THREE.TorusGeometry(1.45,0.025,6,56),sk.str,Mx(0,0,0.58)],
+      [new THREE.TorusGeometry(1.1,0.03,8,48),sk.acc,Mx(0,0,1.25)]);
+    for(let i=0;i<6;i++){const a=i/6*TAU;P.push([new THREE.CylinderGeometry(0.018,0.018,0.95,5),sk.body,Mx(Math.cos(a)*0.97,Math.sin(a)*0.97,0.45,0,0,a+Math.PI/2)]);}
+    P.push([SPH(0.36,16,12),sk.str,Mx(0,0,1.25)],[new THREE.CylinderGeometry(0.008,0.008,1.2,4),sk.str,Mx(0,0,-3.4,Math.PI/2,0,0)]);
+    nozzle(0,2.05,0.28);gp=[0,0.32,-1.45];gs=[0.42,0.26,1.15];
+  }else if(sk.shape==='lumen'){
     P.push([new THREE.SphereGeometry(1,20,12,0,TAU,0,Math.PI*0.62),sk.body,Mx(0,0,-0.2,-Math.PI/2,0,0,1.05,1.9,0.85)]);
     P.push([new THREE.TorusGeometry(1.0,0.09,8,36),sk.acc,Mx(0,0,0.55,0,0,0,1.05,0.85,1)],[new THREE.TorusGeometry(0.7,0.05,6,30),sk.str,Mx(0,0,-0.6,0,0,0,1,0.8,1)]);
     for(let i=0;i<7;i++){const a=i/7*TAU,x=Math.cos(a)*0.75,y=Math.sin(a)*0.6;
@@ -10141,6 +10180,7 @@ function renderShop2(grid,gold){
   thumbAttach(grid);
 }
 function shapeSvg(k){const c=hexCss;
+  if(k.shape==='ark')return `<svg viewBox="0 0 100 60"><ellipse cx="50" cy="32" rx="22" ry="22" fill="none" stroke="${c(k.str)}" stroke-width="3"/><path d="M50 2 L57 30 L54 58 L46 58 L43 30Z" fill="${c(k.body)}" stroke="#170f24" stroke-width="3"/><path d="M46 36 L12 50 L46 44Z M54 36 L88 50 L54 44Z" fill="${c(k.body)}" stroke="#170f24" stroke-width="2"/><circle cx="50" cy="46" r="4" fill="${c(k.str)}"/></svg>`;
   if(k.shape==='lumen')return `<svg viewBox="0 0 100 60"><path d="M22 34 Q24 8 50 8 Q76 8 78 34Z" fill="${c(k.body)}" stroke="#170f24" stroke-width="3"/><path d="M28 34 Q26 50 20 58 M40 34 Q40 50 36 58 M60 34 Q60 50 64 58 M72 34 Q74 50 80 58" stroke="${c(k.acc)}" stroke-width="3" fill="none"/><ellipse cx="50" cy="34" rx="28" ry="5" fill="${c(k.str)}" stroke="#170f24" stroke-width="2"/><circle cx="50" cy="20" r="6" fill="${c(k.glass)}"/></svg>`;
   if(k.shape==='horizon')return `<svg viewBox="0 0 100 60"><ellipse cx="50" cy="32" rx="44" ry="10" fill="${c(k.acc)}" stroke="${c(k.str)}" stroke-width="4"/><path d="M50 4 L60 30 L50 58 L40 30Z" fill="${c(k.body)}" stroke="#170f24" stroke-width="3"/><circle cx="50" cy="32" r="5" fill="${c(k.str)}"/></svg>`;
   if(k.shape==='biolume'||k.shape==='warden'){const b=`<rect x="20" y="44" width="20" height="30" rx="8" fill="${c(k.suit)}" stroke="#170f24" stroke-width="3"/><rect x="22" y="74" width="7" height="18" rx="3" fill="${c(k.legs)}" stroke="#170f24" stroke-width="2"/><rect x="31" y="74" width="7" height="18" rx="3" fill="${c(k.legs)}" stroke="#170f24" stroke-width="2"/>`;
