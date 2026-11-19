@@ -1255,7 +1255,7 @@ body.photoMode #ui{opacity:0!important}
 <div id="start">
   <h1>COSMIC HOP</h1>
   <div class="subTitle">★ GALACTIC FRONTIER ★</div>
-  <p id="tag">Explore 4 Star Systems, scan alien wildlife &amp; ancient ruins, solve monolith puzzles, brave gentle Solar Storms, build planetary outposts, restore the Eternal Bloom — and orbit the Gargantua Black Hole!</p>
+  <p id="tag">Explore 7 Star Systems, scan alien wildlife &amp; ancient ruins, hail fledgling and godlike civilizations, solve monolith puzzles, brave gentle Solar Storms, build planetary outposts, restore the Eternal Bloom — and orbit the Gargantua Black Hole!</p>
   <div class="startBtns">
     <button id="play" type="button" disabled><svg class="ic"><use href="#i-launch"/></svg> BUILDING GALAXY…</button>
     <button id="contBtn" type="button" hidden><svg class="ic"><use href="#i-save"/></svg> CONTINUE SAVE</button>
@@ -1801,7 +1801,10 @@ const SYSTEMS=[
   {id:'solara',name:'SOLARA SYSTEM',starType:'G-Type Yellow Star',reqHyper:1,origin:new V3(0,0,0),tint:0x6fc3ff,desc:'Starter planetary system with 8 diverse worlds, moons & orbital cities.'},
   {id:'nyx',name:'NYX BINARY RIFT',starType:'Blue-Violet Giant',reqHyper:2,origin:new V3(6800,340,-4400),tint:0xb5179e,desc:'Mysterious violet rift containing bioluminescent Vespera, spore-world Xylos & shattered Chronos.'},
   {id:'gargantua',name:'GARGANTUA ABYSS',starType:'Supermassive Black Hole',reqHyper:3,origin:new V3(-6200,-420,-9800),tint:0xff922b,desc:'Endgame deep-space abyss dominated by the Gargantua Black Hole & dark-matter worlds.'},
-  {id:'elysian',name:'ELYSIAN VEIL',starType:'Living Bloom Nebula',reqHyper:4,origin:new V3(6400,2200,6600),tint:0x7dffc4,desc:'System 04 — a living crystal organism, floating islands, glowing oceans and the five-node Energy Network. Restore the Eternal Bloom.'}
+  {id:'elysian',name:'ELYSIAN VEIL',starType:'Living Bloom Nebula',reqHyper:4,origin:new V3(6400,2200,6600),tint:0x7dffc4,desc:'System 04 — a living crystal organism, floating islands, glowing oceans and the five-node Energy Network. Restore the Eternal Bloom.'},
+  {id:'khepri',name:'KHEPRI DOMINION',starType:'Bronze Dwarf · Forge Sun',reqHyper:5,origin:new V3(-9200,3400,5200),tint:0xffb066,desc:'System 05 — the SETHARI SYNOD, a bronze industrial theocracy. Forge cities, sun temples and a crown fleet watch every intruder.'},
+  {id:'vesk',name:'VESK HOLLOW',starType:'Neutron Halo · Dead Star',reqHyper:6,origin:new V3(10600,-4800,1600),tint:0x66ffd5,desc:'System 06 — the VESK CHOIR. Hollow lattice worlds, singing ice and machine cathedrals that answer trespass with cold harmonics.'},
+  {id:'weaving',name:'THE WEAVING',starType:'Folded Spacetime Filament',reqHyper:7,origin:new V3(-2400,10200,-8800),tint:0xff5ce1,desc:'System 07 — THE UNMADE. Reality here is a loom. Woven spires, unsewn worlds and a civilization that edits the rules of trespass.'}
 ];
 
 const skyGroup=new THREE.Group();scene.add(skyGroup);
@@ -1900,15 +1903,15 @@ const UPGRADES={
     costs:[null,{fe:25,ae:10,so:0,vd:0},{fe:45,ae:25,so:10,vd:0},{fe:75,ae:45,so:25,vd:5},{fe:120,ae:80,so:50,vd:20}]},
   suit:{name:'EXOSUIT & JETPACK',lvl:1,max:5,desc:'Upgrades Jetpack thruster burn time & recharge, and reinforces Hazard/Thermal Shielding against Solar Storms.',
     costs:[null,{fe:20,ae:12,so:0,vd:0},{fe:40,ae:28,so:12,vd:0},{fe:70,ae:50,so:28,vd:5},{fe:110,ae:85,so:55,vd:20}]},
-  ship:{name:'STARSHIP & HYPERDRIVE',lvl:1,max:5,desc:'Hyperdrive Class (Lv.2: Nyx Rift, Lv.3: Gargantua Abyss, Lv.4: Elysian Veil), increases boost speed & Black Hole gravity escape thrust.',
-    costs:[null,{fe:30,ae:15,so:5,vd:0},{fe:55,ae:35,so:20,vd:5},{fe:90,ae:60,so:40,vd:15},{fe:140,ae:95,so:70,vd:35}]}
+  ship:{name:'STARSHIP & HYPERDRIVE',lvl:1,max:7,desc:'Hyperdrive Class (Lv.2: Nyx Rift, Lv.3: Gargantua Abyss, Lv.4: Elysian Veil, Lv.5: Khepri Dominion, Lv.6: Vesk Hollow, Lv.7: The Weaving), increases boost speed & Black Hole gravity escape thrust.',
+    costs:[null,{fe:30,ae:15,so:5,vd:0},{fe:55,ae:35,so:20,vd:5},{fe:90,ae:60,so:40,vd:15},{fe:140,ae:95,so:70,vd:35},{fe:210,ae:150,so:110,vd:60},{fe:320,ae:240,so:180,vd:110}]}
 };
-const SYS_SHORT={solara:'SOLARA',nyx:'NYX',gargantua:'GARGANTUA',elysian:'ELYSIAN'};
+const SYS_SHORT={solara:'SOLARA',nyx:'NYX',gargantua:'GARGANTUA',elysian:'ELYSIAN',khepri:'KHEPRI',vesk:'VESK',weaving:'WEAVING'};
 const RES_SOURCES={
   fe:[{sys:'solara',where:'Cinder, Dune, Terra · moons LUNA/MOSS · asteroid belt'},{sys:'elysian',where:'Aurelia, Pelagia, Prismara, Mycelora'}],
   ae:[{sys:'solara',where:'Terra, Azura, Fungara, Glacia · moons · belt'},{sys:'nyx',where:'Vespera, Xylos · belt'},{sys:'elysian',where:'Aurelia, Pelagia, Mycelora'}],
-  so:[{sys:'solara',where:'Cinder, Dune, Azura, Fungara, Glacia · moons · belt'},{sys:'nyx',where:'Vespera, Xylos, Chronos · belt'},{sys:'gargantua',where:'Erebus-9, Tartarus · belt'},{sys:'elysian',where:'Prismara'}],
-  vd:[{sys:'nyx',where:'Xylos, Chronos · belt'},{sys:'gargantua',where:'Black-hole ring · Erebus-9, Tartarus'},{sys:'elysian',where:'Prismara · ECHO moon'}]
+  so:[{sys:'solara',where:'Cinder, Dune, Azura, Fungara, Glacia · moons · belt'},{sys:'nyx',where:'Vespera, Xylos, Chronos · belt'},{sys:'gargantua',where:'Erebus-9, Tartarus · belt'},{sys:'elysian',where:'Prismara'},{sys:'khepri',where:'Sethis, Ammon · belt'},{sys:'vesk',where:'Vesk-01 · belt'},{sys:'weaving',where:'The Unsewn'}],
+  vd:[{sys:'nyx',where:'Xylos, Chronos · belt'},{sys:'gargantua',where:'Black-hole ring · Erebus-9, Tartarus'},{sys:'elysian',where:'Prismara · ECHO moon'},{sys:'khepri',where:'Talon · Ammon'},{sys:'vesk',where:'Vesk-01, Canticle · Nullweave'},{sys:'weaving',where:'Loomspire, The Unsewn · Thread'}]
 };
 const RES_ALIAS={FE:'fe',AE:'ae',SO:'so',VD:'vd',LUMINA:'lum','BIO-PEARL':'bp',VOIDWOOD:'vw','AETHER SEED':'seed'};
 (function(){const tray=document.getElementById('resTray');if(!tray||document.getElementById('resMain'))return;
@@ -2028,7 +2031,7 @@ const GAME={title:'',achievements:[],milestones:[],contracts:[],contractSeed:0,o
   rep:{guild:0,veilkeepers:0,cartographers:0},factionContracts:[],factionSeed:{day:0,week:0},tamed:[],photoLog:[],catReward:{},poiState:{},treasure:[],crew:0,raiderKills:0,contacts:[],
   civRep:{},civMet:{},civTrades:{},shipSeen:{},legendSeen:[],missionOffers:[],dynMissions:[],missionHistory:[],missionCompletions:{},missionDay:0,
   galaxySeen:[],anomalyLog:[],rescues:0,escorts:0,escapes:0,diplomacy:0,titles:[],equippedTitle:'',cosmetics:[],equippedCosmetic:'',planetComplete:{},planetLooted:{},
-  strangerWrecks:0,rareFinds:0};
+  strangerWrecks:0,rareFinds:0,civAlert:{}};
 const SAVE_EXTRA={},GAME_EXTRA={};
 const ELYS={nodes:[],beams:[],bloom:null,core:null,petals:[],plantMats:[],restored:false,beamGroup:null};
 const CINE={open:false,t:0};
@@ -2036,7 +2039,7 @@ const ELYS_NODE_COST={fe:15,ae:5,lum:3};
 const ACH_LIST=[
   {id:'contact',name:'FIRST CONTACT',desc:'Log your first field discovery.'},
   {id:'builder',name:'FRONTIER BUILDER',desc:'Construct a permanent frontier outpost.'},
-  {id:'hopper',name:'SYSTEM HOPPER',desc:'Visit all four star systems.'},
+  {id:'hopper',name:'SYSTEM HOPPER',desc:'Visit all seven star systems.'},
   {id:'grid',name:'POWER GRID',desc:'Bring all 5 Energy Network nodes online.'},
   {id:'biologist',name:'VEIL BIOLOGIST',desc:'Catalogue all 25 Elysian species.'},
   {id:'explorer',name:'GALACTIC EXPLORER',desc:'Complete every expedition mission.'},
@@ -2044,7 +2047,7 @@ const ACH_LIST=[
   {id:'raider',name:'VOID HUNTER',desc:'Destroy an alien raider in ship-to-ship combat.'},
   {id:'envoy',name:'XENO-ENVOY',desc:'Hail an unknown species starship.'},
   {id:'dreadnought',name:'DREADSLAYER',desc:'Destroy an alien dreadnought in systems 3 or 4.'},
-  {id:'civ6',name:'GALACTIC CHORUS',desc:'Make first contact with all six alien civilizations.'},
+  {id:'civ6',name:'GALACTIC CHORUS',desc:'Make first contact with all nine alien civilizations.'},
   {id:'mothership',name:'TITAN PARLEY',desc:'Hail an alien mothership and survive the audience.'},
   {id:'legend',name:'LEGEND HUNTER',desc:'Scan a legendary creature on a planetary surface.'},
   {id:'mission_rescue',name:'GUARDIAN ANGEL',desc:'Complete a Distress Rescue operation.'},
@@ -2074,7 +2077,7 @@ function grantAch(id){
 function checkAchievements(){
   if(DISCOVERIES.length>=1)grantAch('contact');
   if(GAME.outposts.length>=1)grantAch('builder');
-  if(GAME.sysVisited.length>=4)grantAch('hopper');
+  if(GAME.sysVisited.length>=7)grantAch('hopper');
   if(ELYS.nodes.length>=5&&ELYS.nodes.every(n=>n.activated))grantAch('grid');
   if(elysSpeciesCount()>=25)grantAch('biologist');
   if(MISSIONS.filter(m=>!m.hq).every(m=>m.done))grantAch('explorer');
@@ -4076,7 +4079,7 @@ function elyGlowMat(hex,glow){
 
 function buildWorld(){
   const steps=[];
-  const S0=SYSTEMS[0].origin, S1=SYSTEMS[1].origin, S2=SYSTEMS[2].origin, S3=SYSTEMS[3].origin;
+  const S0=SYSTEMS[0].origin, S1=SYSTEMS[1].origin, S2=SYSTEMS[2].origin, S3=SYSTEMS[3].origin, S4=SYSTEMS[4].origin, S5=SYSTEMS[5].origin, S6=SYSTEMS[6].origin;
 
   // ================= SYSTEM 1: SOLARA =================
   steps.push(['IGNITING SOL',()=>{
@@ -4499,9 +4502,443 @@ function buildWorld(){
     applyBloomState();
   }]);
 
+  // ================= SYSTEM 5: KHEPRI DOMINION =================
+  steps.push(['IGNITING KHEPRI',()=>{
+    const sun=makeBody({name:'KHEPRI',sys:'khepri',kind:'sun',R:72,anchor:S4,landable:false,color:'#ffb066',blurb:'BRONZE DWARF · FORGE-SUN OF THE SYNOD',resList:['SOLAR STORM']});
+    const core=new THREE.Mesh(new THREE.SphereGeometry(72,32,24),toon(0xffb066,{emissive:0xff7a2e,emissiveIntensity:0.85}));
+    addOutline(core,OL_BIG);sun.group.add(core);
+    const halo=new THREE.Mesh(new THREE.SphereGeometry(84,24,16),new THREE.MeshBasicMaterial({color:0xffb066,transparent:true,opacity:0.13,blending:THREE.AdditiveBlending,depthWrite:false}));
+    sun.group.add(halo);
+    const ring=new THREE.Mesh(new THREE.TorusGeometry(120,2.4,6,64),new THREE.MeshBasicMaterial({color:0xffe0a8,transparent:true,opacity:0.18,blending:THREE.AdditiveBlending,depthWrite:false}));
+    ring.rotation.x=Math.PI/2-0.3;sun.group.add(ring);
+    sun.updaters.push((dt,t)=>{core.rotation.y+=dt*0.03;ring.rotation.z+=dt*0.02;halo.scale.setScalar(1+Math.sin(t*0.7)*0.02);});
+
+    const b=makeBody({name:'SETHIS',sys:'khepri',R:58,anchor:S4,orbitR:680,orbitSpeed:0.0044,phase:0.8,sky:0.85,skyColor:0xffb066,color:'#ffb066',blurb:'BRONZE FORGE WORLD · SETHARI HOLY CITY',resList:['FE','SO','AE'],grav:0.78});
+    const n1=makeNoise(6101),n2=makeNoise(6102),rnd=mulberry32(6103);
+    b.heightAt=(x,y,z)=>{
+      const c=fbm(n1,x*1.4+3,y*1.4,z*1.4-1,4)*2.0;
+      const ridge=Math.pow(Math.max(0,fbm(n2,x*3.4,y*3.4+2,z*3.4,3)),1.7)*8.5;
+      return 0.35+c*1.4+ridge*sstep(-0.02,0.2,c)+0.3*Math.abs(n2(x*7,y*7,z*7));
+    };
+    const cD=new C3(0x3a2416),cB=new C3(0x8a5a2a),cG=new C3(0xffb066),cC=new C3(0xfff2dc),cR=new C3(0xb3562e);
+    buildRocky(b,{N:56,colFn:(x,y,z,h,s,c)=>{
+      const col=s<0.7?cD:s<0.82?cB:h>6.8?cC:(n2(x*4.6,y*4.6,z*4.6)>0.1?cR:cG);
+      c[0]=col.r;c[1]=col.g;c[2]=col.b;
+    }});
+    addAtmosphere(b,0xffb066,b.R*1.36,0.95,5);
+    b.detail=new THREE.Group();b.group.add(b.detail);
+    const forge=merge([
+      [new THREE.CylinderGeometry(0.5,1.1,1.8,6),0x6b4a2a,Mx(0,0.9,0)],
+      [new THREE.CylinderGeometry(0.65,0.65,0.24,8),0xffb066,Mx(0,2.0,0)],
+      [new THREE.ConeGeometry(0.5,1.7,4),0xffe0a8,Mx(0,3.0,0)],
+      [new THREE.TorusGeometry(0.75,0.07,6,20),0xff7a2e,Mx(0,2.4,0,Math.PI/2,0,0)]
+    ]);
+    scatter(b,rnd,230,6500,(d,h,r)=>h>0.35?0.8+r()*1.5:0,forge,new THREE.MeshToonMaterial({vertexColors:true,gradientMap:gradTex,emissive:0xffb066,emissiveIntensity:0.35}),null);
+    const banner=merge([
+      [new THREE.CylinderGeometry(0.06,0.06,3.4,5),0x3a2416,Mx(0,1.7,0)],
+      [new THREE.BoxGeometry(1.5,1.0,0.05),0xffb066,Mx(0,3.0,0)],
+      [new THREE.OctahedronGeometry(0.18,0),0xfff2dc,Mx(0,3.0,0.05)]
+    ]);
+    scatter(b,rnd,60,5000,(d,h,r)=>h>0.5?0.7+r()*0.6:0,banner,new THREE.MeshToonMaterial({vertexColors:true,gradientMap:gradTex,emissive:0xffb066,emissiveIntensity:0.3}),null);
+    spawnResourceNodes(b,rnd,['fe','so','ae'],24);
+    spawnPlanetaryEcosystem(b,rnd,{wildlife:5,wildlifeColor:0xffd166});
+    civWorld(b,'khepri',0);
+  }]);
+
+  steps.push(['GLASS DUNES OF AMMON',()=>{
+    const b=makeBody({name:'AMMON',sys:'khepri',R:50,anchor:S4,orbitR:1080,orbitSpeed:0.0031,phase:2.4,sky:0.8,skyColor:0xffe0a8,color:'#ffe0a8',blurb:'GLASS DUNES · SYNOD SUN-TEMPLES',resList:['AE','SO','VD'],grav:0.62});
+    const n1=makeNoise(6201),n2=makeNoise(6202),rnd=mulberry32(6203);
+    b.heightAt=(x,y,z)=>{
+      const c=fbm(n1,x*1.7,y*1.7,z*1.7,4)*1.9+0.06;
+      const dune=Math.pow(Math.max(0,Math.sin(fbm(n2,x*2.6,y*2.6,z*2.6,3)*6.2)),2)*4.4;
+      return 0.25+c*1.3+dune*sstep(-0.1,0.2,c);
+    };
+    const cS=new C3(0xfff2dc),cA=new C3(0xffe0a8),cB=new C3(0xc98a3a),cG=new C3(0x8ee8ff),cD=new C3(0x3a2416);
+    buildRocky(b,{N:54,colFn:(x,y,z,h,s,c)=>{
+      const col=s<0.72?cB:h>4.6?cS:(n2(x*5,y*5,z*5)>0.12?cG:cA);
+      c[0]=col.r;c[1]=col.g;c[2]=col.b;
+    }});
+    addAtmosphere(b,0xffe0a8,b.R*1.4,1.0,5);
+    b.detail=new THREE.Group();b.group.add(b.detail);
+    const glass=merge([
+      [new THREE.OctahedronGeometry(0.55,0),0x8ee8ff,Mx(0,1.0,0,0,0,0,0.7,2.6,0.7)],
+      [new THREE.OctahedronGeometry(0.32,0),0xffe0a8,Mx(0.45,0.5,0.1,0.2,0,0.4,0.5,1.4,0.5)],
+      [new THREE.OctahedronGeometry(0.28,0),0xffffff,Mx(-0.4,0.4,-0.15,-0.2,0,-0.4,0.5,1.1,0.5)]
+    ]);
+    scatter(b,rnd,250,6200,(d,h,r)=>h>0.3?0.6+r()*1.6:0,glass,new THREE.MeshToonMaterial({vertexColors:true,gradientMap:gradTex,emissive:0x8ee8ff,emissiveIntensity:0.55}),null);
+    const temple=merge([
+      [new THREE.CylinderGeometry(1.6,2.0,0.5,10),0x6b4a2a,Mx(0,0.25,0)],
+      [new THREE.CylinderGeometry(1.0,1.3,1.6,8),0xffe0a8,Mx(0,1.3,0)],
+      [new THREE.CylinderGeometry(1.3,1.3,0.18,8),0xffb066,Mx(0,2.15,0)],
+      [new THREE.OctahedronGeometry(0.42,0),0xfff2dc,Mx(0,2.8,0,0,0,0,0.8,2.0,0.8)]
+    ]);
+    scatter(b,rnd,26,4200,(d,h,r)=>h>0.4?0.9+r()*0.7:0,temple,new THREE.MeshToonMaterial({vertexColors:true,gradientMap:gradTex,emissive:0xffb066,emissiveIntensity:0.28}),null);
+    spawnResourceNodes(b,rnd,['ae','so','vd'],22);
+    spawnPlanetaryEcosystem(b,rnd,{wildlife:4,wildlifeColor:0x8ee8ff});
+    civWorld(b,'khepri',1);
+  }]);
+
+  steps.push(['SETHARI PENAL MOON · TALON',()=>{
+    const seth=bodies.find(x=>x.name==='SETHIS');
+    const talon=makeMoon({name:'TALON',sys:'khepri',R:15,parent:seth,orbitR:126,orbitSpeed:0.05,phase:1.7,tilt:0.22,color:'#ffb066',blurb:'SETHARI PENAL MOON · A STRANDED SYNOD ARK SLEEPS HERE'},[0x3a2416,0x6b4a2a,0xffb066],6104,['so','vd']);
+    addAtmosphere(talon,0xffb066,talon.R*1.5,0.85,5);
+    const trnd=mulberry32(6114);
+    const chains=merge([
+      [new THREE.TorusGeometry(1.4,0.16,6,18,Math.PI),0x6b4a2a,Mx(0,0.1,0)],
+      [new THREE.CylinderGeometry(0.1,0.1,2.2,5),0x3a2416,Mx(0.9,1.2,0)],
+      [new THREE.OctahedronGeometry(0.22,0),0xffb066,Mx(1.4,1.9,0)]
+    ]);
+    scatter(talon,trnd,90,3200,(d,h,r)=>h>0.05?0.7+r()*1.2:0,chains,new THREE.MeshToonMaterial({vertexColors:true,gradientMap:gradTex,emissive:0xffb066,emissiveIntensity:0.4}),null);
+  }]);
+
+  // ================= SYSTEM 6: VESK HOLLOW =================
+  steps.push(['IGNITING THE HOLLOW',()=>{
+    const sun=makeBody({name:'VESK CORE',sys:'vesk',kind:'sun',R:48,anchor:S5,landable:false,color:'#66ffd5',blurb:'NEUTRON HALO · DEAD HEART OF THE CHOIR',resList:['SOLAR STORM']});
+    const core=new THREE.Mesh(new THREE.SphereGeometry(48,32,24),toon(0xd8fff8,{emissive:0x66ffd5,emissiveIntensity:0.9}));
+    addOutline(core,OL_BIG);sun.group.add(core);
+    const halo=new THREE.Mesh(new THREE.SphereGeometry(58,24,16),new THREE.MeshBasicMaterial({color:0x66ffd5,transparent:true,opacity:0.12,blending:THREE.AdditiveBlending,depthWrite:false}));
+    sun.group.add(halo);
+    for(const [r,o] of [[92,0.16],[116,0.1]]){
+      const ring=new THREE.Mesh(new THREE.TorusGeometry(r,0.9,5,64),new THREE.MeshBasicMaterial({color:0x66ffd5,transparent:true,opacity:o,blending:THREE.AdditiveBlending,depthWrite:false}));
+      ring.rotation.x=Math.PI/2+0.2;sun.group.add(ring);
+    }
+    sun.updaters.push((dt,t)=>{core.rotation.y+=dt*0.05;halo.scale.setScalar(1+Math.sin(t*1.2)*0.03);});
+
+    const b=makeBody({name:'VESK-01',sys:'vesk',R:60,anchor:S5,orbitR:720,orbitSpeed:0.0038,phase:0.4,sky:0.9,skyColor:0x66ffd5,color:'#66ffd5',blurb:'HOLLOW LATTICE WORLD · THE CHOIR CATHEDRAL',resList:['VD','SO','AE'],grav:0.5});
+    const n1=makeNoise(7101),n2=makeNoise(7102),rnd=mulberry32(7103);
+    b.heightAt=(x,y,z)=>{
+      const c=fbm(n1,x*1.25+2,y*1.25,z*1.25,4)*2.6;
+      const grid=Math.pow(Math.max(0,Math.cos(fbm(n2,x*2.2,y*2.2,z*2.2,3)*7.5)),5)*5.0;
+      return 0.4+c*2.2+grid*sstep(-0.15,0.15,c);
+    };
+    const cD=new C3(0x0b1a1e),cS=new C3(0x1d3a42),cT=new C3(0x2a4a52),cG=new C3(0x66ffd5),cW=new C3(0xd8fff8);
+    buildRocky(b,{N:58,colFn:(x,y,z,h,s,c)=>{
+      const col=s<0.66?cD:s<0.8?cS:h>5.8?cW:(n2(x*5.4,y*5.4,z*5.4)>0.04?cG:cT);
+      c[0]=col.r;c[1]=col.g;c[2]=col.b;
+    }});
+    addAtmosphere(b,0x66ffd5,b.R*1.34,1.05,5);
+    b.detail=new THREE.Group();b.group.add(b.detail);
+    const lattice=merge([
+      [new THREE.BoxGeometry(0.3,3.4,0.3),0x2a4a52,Mx(0,1.7,0)],
+      [new THREE.BoxGeometry(0.3,0.3,3.4),0x2a4a52,Mx(0,1.0,0)],
+      [new THREE.TorusGeometry(0.8,0.16,6,16),0x66ffd5,Mx(0,2.4,0,0,0,0)],
+      [new THREE.OctahedronGeometry(0.24,0),0xd8fff8,Mx(0,3.4,0)]
+    ]);
+    scatter(b,rnd,300,7000,(d,h,r)=>h>0.3?0.7+r()*1.4:0,lattice,new THREE.MeshToonMaterial({vertexColors:true,gradientMap:gradTex,emissive:0x66ffd5,emissiveIntensity:0.45}),null);
+    for(let i=0;i<4;i++){
+      const d=randUnit(rnd);d.y=d.y*0.6+0.2;d.normalize();
+      const portal=new THREE.Mesh(new THREE.TorusGeometry(7.5,0.3,6,36),new THREE.MeshBasicMaterial({color:0x66ffd5,transparent:true,opacity:0.3,blending:THREE.AdditiveBlending,depthWrite:false}));
+      portal.position.copy(d).multiplyScalar(b.R+12+i*3);portal.rotation.set(rnd(),rnd()*TAU,0.4);
+      b.detail.add(portal);
+    }
+    spawnResourceNodes(b,rnd,['vd','so','ae'],24);
+    spawnPlanetaryEcosystem(b,rnd,{wildlife:4,wildlifeColor:0x66ffd5});
+    civWorld(b,'vesk',0);
+  }]);
+
+  steps.push(['CANTICLE · SINGING ICE',()=>{
+    const b=makeBody({name:'CANTICLE',sys:'vesk',R:52,anchor:S5,orbitR:1160,orbitSpeed:0.0027,phase:2.9,liquid:true,liquidSolid:true,sky:0.95,skyColor:0xd8fff8,color:'#d8fff8',blurb:'SINGING ICE · RESONANCE CHORUS WORLD',resList:['LUMINA','VD','AE'],grav:0.55});
+    const n1=makeNoise(7201),n2=makeNoise(7202),rnd=mulberry32(7203);
+    b.heightAt=(x,y,z)=>{
+      const c=fbm(n1,x*1.5,y*1.5,z*1.5,4)*2.1;
+      if(c<0)return Math.max(-4,c*7);
+      const ridge=Math.pow(Math.max(0,1-Math.abs(fbm(n2,x*3.6,y*3.6,z*3.6,3))*2.4),2)*4.8;
+      return 0.25+c*2.0+ridge*sstep(0.0,0.3,c);
+    };
+    const cW=new C3(0xd8fff8),cI=new C3(0x9dd8e0),cT=new C3(0x2a6a70),cG=new C3(0x66ffd5),cV=new C3(0x8f7bff);
+    buildRocky(b,{N:56,colFn:(x,y,z,h,s,c)=>{
+      const col=s<0.7?cT:h>4.4?cW:(n2(x*4.8,y*4.8,z*4.8)>0.06?cG:cI);
+      c[0]=col.r;c[1]=col.g;c[2]=col.b;
+    },liq:{shallow:0xd8fff8,mid:0x66ffd5,deep:0x1a4a52,foam:0xffffff,glow:0.7,glowAll:0.25,rings:1}});
+    addAtmosphere(b,0xd8fff8,b.R*1.4,1.0,5);
+    b.detail=new THREE.Group();b.group.add(b.detail);
+    const chime=merge([
+      [new THREE.CylinderGeometry(0.12,0.5,3.6,6),0x9dd8e0,Mx(0,1.8,0)],
+      [new THREE.OctahedronGeometry(0.4,0),0x66ffd5,Mx(0,3.9,0,0,0,0,0.7,1.6,0.7)],
+      [new THREE.TorusGeometry(0.9,0.06,5,18),0xd8fff8,Mx(0,2.6,0,Math.PI/2,0,0)]
+    ]);
+    scatter(b,rnd,220,6000,(d,h,r)=>h>0.15?0.7+r()*1.8:0,chime,new THREE.MeshToonMaterial({vertexColors:true,gradientMap:gradTex,emissive:0x66ffd5,emissiveIntensity:0.5}),null);
+    spawnResourceNodes(b,rnd,['lum','vd','ae'],24);
+    spawnPlanetaryEcosystem(b,rnd,{wildlife:5,wildlifeColor:0xd8fff8});
+    civWorld(b,'vesk',1);
+  }]);
+
+  steps.push(['NULLWEAVE · CHOIR RELIQUARY',()=>{
+    const v=bodies.find(x=>x.name==='VESK-01');
+    const nul=makeMoon({name:'NULLWEAVE',sys:'vesk',R:15,parent:v,orbitR:140,orbitSpeed:0.045,phase:3.2,tilt:-0.18,color:'#66ffd5',blurb:'CHOIR RELIQUARY MOON · A SILENT CHOIRFRAME WAITS'},[0x0b1a1e,0x2a4a52,0x66ffd5],7104,['vd','lum']);
+    addAtmosphere(nul,0x66ffd5,nul.R*1.5,0.9,5);
+    const nrnd=mulberry32(7114);
+    const relic=merge([
+      [new THREE.TorusGeometry(1.2,0.1,6,20),0x66ffd5,Mx(0,1.2,0,1.1,0,0.3)],
+      [new THREE.BoxGeometry(0.24,0.24,0.24),0x2a4a52,Mx(0,0.3,0,0.4,0.7,0)],
+      [new THREE.OctahedronGeometry(0.2,0),0xd8fff8,Mx(0,1.2,0)]
+    ]);
+    scatter(nul,nrnd,80,3000,(d,h,r)=>h>0.05?0.7+r()*1.1:0,relic,new THREE.MeshToonMaterial({vertexColors:true,gradientMap:gradTex,emissive:0x66ffd5,emissiveIntensity:0.5}),null);
+  }]);
+
+  // ================= SYSTEM 7: THE WEAVING =================
+  steps.push(['THE LOOM AWAKENS',()=>{
+    const sun=makeBody({name:'THE LOOM',sys:'weaving',kind:'sun',R:40,anchor:S6,landable:false,color:'#ff5ce1',blurb:'FOLDED SPACETIME FILAMENT · THE LOOM',resList:['SOLAR STORM']});
+    const core=new THREE.Mesh(new THREE.IcosahedronGeometry(40,2),toon(0xffd1f5,{emissive:0xff5ce1,emissiveIntensity:0.95}));
+    addOutline(core,OL_BIG);sun.group.add(core);
+    const halo=new THREE.Mesh(new THREE.SphereGeometry(54,24,16),new THREE.MeshBasicMaterial({color:0xff5ce1,transparent:true,opacity:0.1,blending:THREE.AdditiveBlending,depthWrite:false}));
+    sun.group.add(halo);
+    for(let i=0;i<5;i++){
+      const ring=new THREE.Mesh(new THREE.TorusGeometry(74+i*13,0.55,4,80),new THREE.MeshBasicMaterial({color:i%2?0x9a5cff:0xff5ce1,transparent:true,opacity:0.2,blending:THREE.AdditiveBlending,depthWrite:false}));
+      ring.rotation.set(Math.PI/2+i*0.5,i*0.7,i*0.3);sun.group.add(ring);
+    }
+    sun.updaters.push((dt,t)=>{core.rotation.y+=dt*0.08;core.rotation.x+=dt*0.03;halo.scale.setScalar(1+Math.sin(t*1.6)*0.04);});
+
+    const b=makeBody({name:'LOOMSPIRE',sys:'weaving',R:62,anchor:S6,orbitR:760,orbitSpeed:0.0034,phase:1.1,sky:0.88,skyColor:0xff5ce1,color:'#ff5ce1',blurb:'WOVEN SPIRES · IMPOSSIBLE CITY OF THE UNMADE',resList:['AE','LUMINA','VD'],grav:0.45});
+    const n1=makeNoise(8101),n2=makeNoise(8102),rnd=mulberry32(8103);
+    b.heightAt=(x,y,z)=>{
+      const c=fbm(n1,x*1.35+6,y*1.35,z*1.35-3,4)*2.3;
+      const weave=Math.pow(Math.max(0,Math.sin(fbm(n2,x*4.4,y*4.4,z*4.4,3)*9.0)),3)*6.0;
+      return 0.3+c*2.0+weave*sstep(-0.1,0.2,c);
+    };
+    const cD=new C3(0x1a0b24),cP=new C3(0x3d1a55),cM=new C3(0x9a5cff),cG=new C3(0xff5ce1),cR=new C3(0xffd1f5);
+    buildRocky(b,{N:58,colFn:(x,y,z,h,s,c)=>{
+      const col=s<0.66?cD:s<0.8?cP:h>6?cR:(n2(x*5.2,y*5.2,z*5.2)>0.03?cG:cM);
+      c[0]=col.r;c[1]=col.g;c[2]=col.b;
+    }});
+    addAtmosphere(b,0xff5ce1,b.R*1.38,1.05,5);
+    b.detail=new THREE.Group();b.group.add(b.detail);
+    const weaveGeo=merge([
+      [new THREE.TorusKnotGeometry(0.85,0.09,48,7,2,3),0xff5ce1,Mx(0,1.8,0,0.2,0.4,0.1)],
+      [new THREE.TorusGeometry(1.3,0.05,5,20),0xffd1f5,Mx(0,0.5,0,Math.PI/2,0,0)],
+      [new THREE.OctahedronGeometry(0.22,0),0x9a5cff,Mx(0.9,2.4,0.2)]
+    ]);
+    scatter(b,rnd,260,7000,(d,h,r)=>h>0.25?0.6+r()*1.7:0,weaveGeo,new THREE.MeshToonMaterial({vertexColors:true,gradientMap:gradTex,emissive:0xff5ce1,emissiveIntensity:0.6}),null);
+    for(let i=0;i<5;i++){
+      const d=randUnit(rnd);d.y=d.y*0.7+0.15;d.normalize();
+      const ribbon=new THREE.Mesh(new THREE.TorusKnotGeometry(6.5,0.32,72,8,2,5),new THREE.MeshToonMaterial({vertexColors:false,color:0x9a5cff,emissive:0xff5ce1,emissiveIntensity:0.35}));
+      ribbon.position.copy(d).multiplyScalar(b.R+15+rnd()*10);ribbon.rotation.set(rnd(),rnd()*TAU,rnd());
+      b.detail.add(ribbon);
+    }
+    spawnResourceNodes(b,rnd,['ae','lum','vd'],26);
+    spawnPlanetaryEcosystem(b,rnd,{wildlife:4,wildlifeColor:0xff5ce1});
+    civWorld(b,'weaving',0);
+  }]);
+
+  steps.push(['THE UNSEWN',()=>{
+    const b=makeBody({name:'THE UNSEWN',sys:'weaving',R:50,anchor:S6,orbitR:1180,orbitSpeed:0.0025,phase:3.6,sky:0.92,skyColor:0x9a5cff,color:'#9a5cff',blurb:'FRAGMENT WORLD · REALITY IS COMING APART AT THE SEAMS',resList:['VD','SO','LUMINA'],grav:0.4});
+    const n1=makeNoise(8201),n2=makeNoise(8202),rnd=mulberry32(8203);
+    b.heightAt=(x,y,z)=>{
+      const c=fbm(n1,x*1.9,y*1.9,z*1.9,4)*1.7;
+      const shard=Math.pow(Math.max(0,1-Math.abs(fbm(n2,x*5.2,y*5.2,z*5.2,3))*2.6),3)*7.5;
+      return 0.2+c*1.1+shard*sstep(-0.2,0.15,c)-1.2*sstep(0.25,0.6,c);
+    };
+    const cD=new C3(0x12081c),cV=new C3(0x4a1a6a),cP=new C3(0x9a5cff),cM=new C3(0xff5ce1),cW=new C3(0xffd1f5);
+    buildRocky(b,{N:56,colFn:(x,y,z,h,s,c)=>{
+      const col=s<0.7?cD:s<0.82?cV:h>4?cW:(n2(x*4.6,y*4.6,z*4.6)>0?cM:cP);
+      c[0]=col.r;c[1]=col.g;c[2]=col.b;
+    }});
+    addAtmosphere(b,0x9a5cff,b.R*1.42,1.1,5);
+    b.detail=new THREE.Group();b.group.add(b.detail);
+    const shardGeo=merge([
+      [new THREE.BoxGeometry(0.7,2.6,0.14),0x4a1a6a,Mx(0,1.3,0,0.1,0.3,0.25)],
+      [new THREE.BoxGeometry(0.5,1.6,0.12),0x9a5cff,Mx(0.7,0.9,0.2,-0.2,0.1,-0.3)],
+      [new THREE.OctahedronGeometry(0.18,0),0xff5ce1,Mx(0.2,2.7,0)]
+    ]);
+    scatter(b,rnd,240,6400,(d,h,r)=>h>0.05?0.7+r()*1.6:0,shardGeo,new THREE.MeshToonMaterial({vertexColors:true,gradientMap:gradTex,emissive:0xff5ce1,emissiveIntensity:0.45}),null);
+    for(let i=0;i<6;i++){
+      const d=randUnit(rnd);d.y=d.y*0.6+0.2;d.normalize();
+      const chunk=new THREE.Mesh(new THREE.DodecahedronGeometry(2.4+rnd()*2.2,0),vcToon);
+      chunk.position.copy(d).multiplyScalar(b.R+18+rnd()*16);chunk.rotation.set(rnd(),rnd(),rnd());
+      addOutline(chunk,OL_BIG);b.detail.add(chunk);
+    }
+    spawnResourceNodes(b,rnd,['vd','so','lum'],24);
+    spawnPlanetaryEcosystem(b,rnd,{wildlife:3,wildlifeColor:0x9a5cff});
+    civWorld(b,'weaving',1);
+  }]);
+
+  steps.push(['THREAD · LOOM RELIQUARY',()=>{
+    const l=bodies.find(x=>x.name==='LOOMSPIRE');
+    const th=makeMoon({name:'THREAD',sys:'weaving',R:13,parent:l,orbitR:150,orbitSpeed:0.04,phase:5.1,tilt:0.3,color:'#ff5ce1',blurb:'LOOM RELIQUARY MOON · A WEAVER SHIP HANGS BY ONE THREAD'},[0x1a0b24,0x4a1a6a,0xff5ce1],8104,['vd','lum']);
+    addAtmosphere(th,0xff5ce1,th.R*1.5,0.95,5);
+    const trnd=mulberry32(8114);
+    const thread=merge([
+      [new THREE.TorusKnotGeometry(0.9,0.05,40,6,2,3),0xff5ce1,Mx(0,1.5,0,0.3,0.2,0.4)],
+      [new THREE.CylinderGeometry(0.02,0.02,4.0,4),0xffd1f5,Mx(0,2.0,0,0,0,0.3)],
+      [new THREE.OctahedronGeometry(0.14,0),0x9a5cff,Mx(0.5,2.6,0)]
+    ]);
+    scatter(th,trnd,70,2800,(d,h,r)=>h>0.02?0.7+r()*1.0:0,thread,new THREE.MeshToonMaterial({vertexColors:true,gradientMap:gradTex,emissive:0xff5ce1,emissiveIntensity:0.55}),null);
+  }]);
+
   return steps;
 }
 const _sd2=new V3();
+
+/* ===================== LIVING CIVILIZATIONS — SYSTEMS 05-07 ===================== */
+const CIVS={
+  khepri:{sys:'khepri',civ:'sethari',name:'SETHARI SYNOD',tier:3,color:0xffb066,glow:0xff7a2e,bolt:0xffb066,
+    cityNames:['FORGE-CITADEL OF SETHIS','SUN-TEMPLE OF AMMON'],station:'SYNOD CROWN RING',
+    greet:'THE FORGE-SUN HAS NOTICED YOU. THE SYNOD IS WATCHING.',
+    alarm:'THE SYNOD HAS DECLARED YOU UNCLEAN'},
+  vesk:{sys:'vesk',civ:'vesk',name:'VESK CHOIR',tier:5,color:0x66ffd5,glow:0x2a8a7a,bolt:0x66ffd5,
+    cityNames:['CHOIR CATHEDRAL VESK-01','RESONANCE SPIRE CANTICLE'],station:'CANTICLE HALO',
+    greet:'A SINGLE COLD NOTE CROSSES YOUR HULL. THE CHOIR IS LISTENING.',
+    alarm:'YOU ARE A DISCORDANT STRING'},
+  weaving:{sys:'weaving',civ:'unmaking',name:'THE UNMADE',tier:7,color:0xff5ce1,glow:0x9a5cff,bolt:0xff5ce1,
+    cityNames:['THE IMPOSSIBLE CITY','THE UNSEWN COURT'],station:'THE LOOM ANCHOR',
+    greet:'SOMETHING ENORMOUS TURNS ITS ATTENTION TO YOUR WAKE. A THREAD PULLS TAUT.',
+    alarm:'THEY HAVE CUT YOU LOOSE FROM THE PATTERN'}
+};
+const CIV_ALERT_NAMES=['UNNOTICED','WATCHED','HOSTILE','HUNTED'];
+const CIVFX=[];
+let CIV_T=0;
+function civAlert(sys){return clamp((GAME.civAlert&&GAME.civAlert[sys])|0,0,3);}
+function civSetAlert(sys,n){GAME.civAlert=GAME.civAlert||{};GAME.civAlert[sys]=clamp(n,0,3);updateCivTag();}
+function updateCivTag(){
+  const el=$('sysTag');if(!el)return;
+  const C=CIVS[activeSystemId],nm=(SYSTEMS.find(s=>s.id===activeSystemId)||{}).name||'';
+  el.textContent=C?`${nm} · ${CIV_ALERT_NAMES[civAlert(activeSystemId)]}`:nm;
+}
+function civNudge(sys,n,why){
+  const C=CIVS[sys];if(!C)return;
+  const before=civAlert(sys);civSetAlert(sys,before+n);const after=civAlert(sys);
+  if(after>before){
+    toast(`⚠ ${C.name} ALERT: ${CIV_ALERT_NAMES[after]}${why?' — '+why:''}`);
+    if(after>=2)SFX.alarm();
+    saveGame(true);
+  }
+}
+function civColonyLabel(col){
+  const C=col.civ,a=civAlert(C.sys);
+  return a>0?`HAIL ${C.name} · PAY TRIBUTE ${a*60} 🪙`:col.name.toUpperCase();
+}
+function civWorld(b,sysKey,idx){
+  const C=CIVS[sysKey];if(!C||!b)return;
+  const rnd=mulberry32((b.name.length*1319+C.tier*71+idx*13)|0);
+  let dir=null;
+  for(let i=0;i<220&&!dir;i++){
+    const y=1-(i+0.5)/220*2,rr=Math.sqrt(1-y*y),t=i*2.399963;
+    const d=new V3(Math.cos(t)*rr,y,Math.sin(t)*rr);
+    const h=b.heightAt(d.x,d.y,d.z);
+    if(h>0.22&&!(b.liquid&&!b.liquidSolid&&h<0.55))dir=d;
+  }
+  if(!dir)dir=new V3(0,0.6,0.8).normalize();
+  const gr=b.groundR(dir.x,dir.y,dir.z);
+  const g=new THREE.Group();g.matrixAutoUpdate=false;g.matrix.copy(placeM(dir,gr-0.05,rnd()*TAU,1.25));
+  const bodyMat=new THREE.MeshToonMaterial({vertexColors:true,gradientMap:gradTex,emissive:C.color,emissiveIntensity:0.3});
+  const dark=C.tier>=6?0x1a0b24:C.tier>=4?0x0b1a1e:0x3a2416;
+  const P=[];
+  P.push([new THREE.CylinderGeometry(9,9.6,0.5,16),dark,Mx(0,0.25,0)]);
+  P.push([new THREE.CylinderGeometry(7.2,7.2,0.2,16),C.color,Mx(0,0.55,0)]);
+  for(let i=0;i<8;i++){
+    const a=i/8*TAU,r=5.6,x=Math.cos(a)*r,z=Math.sin(a)*r,hgt=1.6+rnd()*2.6;
+    P.push([new THREE.CylinderGeometry(0.7,1.0,hgt,6),dark,Mx(x,0.6+hgt/2,z)]);
+    P.push([new THREE.OctahedronGeometry(0.34,0),C.color,Mx(x,0.75+hgt,z,0,0,0,0.8,1.5,0.8)]);
+    if(C.tier>=4)P.push([new THREE.BoxGeometry(1.3,0.12,1.0),C.glow,Mx(x,0.9+hgt,z)]);
+  }
+  P.push([new THREE.CylinderGeometry(1.6,2.6,7.2,8),dark,Mx(0,4.0,0)]);
+  P.push([new THREE.CylinderGeometry(2.2,2.2,0.4,10),C.color,Mx(0,6.4,0)]);
+  P.push([new THREE.ConeGeometry(2.5,3.4,6),C.color,Mx(0,8.2,0)]);
+  if(C.tier>=5){
+    P.push([new THREE.TorusGeometry(3.1,0.16,6,28),C.glow,Mx(0,7.2,0,Math.PI/2,0,0)]);
+    P.push([new THREE.TorusGeometry(2.3,0.1,6,24),C.color,Mx(0,8.4,0,Math.PI/2,0,0)]);
+  }
+  if(C.tier>=6){
+    P.push([new THREE.TorusKnotGeometry(2.8,0.14,52,7,2,3),C.glow,Mx(0,10.4,0)]);
+  }
+  for(let i=0;i<3;i++){
+    const a=i/3*TAU+0.5,x=Math.cos(a)*8.6,z=Math.sin(a)*8.6;
+    P.push([new THREE.CylinderGeometry(0.28,0.42,2.6,6),dark,Mx(x,1.5,z)]);
+    P.push([new THREE.CylinderGeometry(0.55,0.55,0.35,8),C.color,Mx(x,2.9,z)]);
+    P.push([new THREE.SphereGeometry(0.24,8,6),C.glow,Mx(x,3.2,z)]);
+  }
+  const city=new THREE.Mesh(merge(P),bodyMat);addOutline(city,OL_BIG);
+  g.add(city);
+  const citizens=[];
+  const cGeo=merge([
+    [new THREE.CylinderGeometry(0.16,0.2,0.5,5),C.color,Mx(0,0.55,0)],
+    [new THREE.SphereGeometry(0.17,8,6),C.glow,Mx(0,0.92,0)],
+    [new THREE.BoxGeometry(0.16,0.3,0.1),dark,Mx(0,0.25,0)]
+  ]);
+  const cMat=new THREE.MeshToonMaterial({vertexColors:true,gradientMap:gradTex,emissive:C.color,emissiveIntensity:0.35});
+  for(let i=0;i<9;i++){
+    const m=new THREE.Mesh(cGeo,cMat),rr=4.2+rnd()*5.2;
+    m.position.set(Math.cos(rnd()*TAU)*rr,C.tier>=6?0.9:0.55,Math.sin(rnd()*TAU)*rr);
+    addOutline(m,OL_PROP);g.add(m);
+    citizens.push({m,rr,a:rnd()*TAU,sp:(0.10+rnd()*0.16)*(rnd()<0.5?-1:1),y:C.tier>=6?0.9:0.55});
+  }
+  (b.detail||b.group).add(g);
+  const localPos=dir.clone().multiplyScalar(gr);
+  b.colony={dir:dir.clone(),localPos,name:C.cityNames[idx]||`${b.name} COLONY`,civ:C,city:g,citizens,zapT:0,kills:0};
+  b.colliders.push({p:localPos.clone(),r:2.4});
+  b.updaters.push((dt,t)=>{
+    for(const c of citizens){
+      c.a+=c.sp*dt;
+      c.m.position.set(Math.cos(c.a)*c.rr,Math.sin(t*2.4+c.a)*0.06+c.y,Math.sin(c.a)*c.rr);
+      c.m.rotation.y=-c.a;
+    }
+  });
+  // Orbital civilization station above the colony world
+  const sg=new THREE.Group();b.group.add(sg);
+  const SP=[];
+  SP.push([new THREE.CylinderGeometry(1.2,2.2,7,8),dark,Mx(0,0,0)]);
+  SP.push([new THREE.TorusGeometry(6,0.35,6,32),C.color,Mx(0,0,0,Math.PI/2,0,0)]);
+  SP.push([new THREE.TorusGeometry(4.2,0.2,6,28),C.glow,Mx(0,1.6,0,Math.PI/2,0,0)]);
+  SP.push([new THREE.SphereGeometry(1.5,12,9),C.color,Mx(0,2.6,0)]);
+  for(let i=0;i<4;i++){
+    const a=i/4*TAU;
+    SP.push([new THREE.BoxGeometry(1.5,0.5,1.1),dark,Mx(Math.cos(a)*6,0,Math.sin(a)*6,0,-a,0)]);
+    SP.push([new THREE.SphereGeometry(0.3,8,6),C.glow,Mx(Math.cos(a)*6,0.6,Math.sin(a)*6)]);
+  }
+  const st=new THREE.Mesh(merge(SP),bodyMat);addOutline(st,OL_BIG);sg.add(st);
+  sg.position.set(0,b.R*1.75,0);
+  b.station=sg;b.updaters.push((dt,t)=>{sg.rotation.y+=dt*0.18;sg.position.y=b.R*1.75+Math.sin(t*0.4)*1.4;});
+}
+function civParley(col){
+  if(!col)return;
+  const C=col.civ,sys=C.sys,a=civAlert(sys);
+  if(a<=0){
+    grantCivRep(C.civ,1);
+    toast(`🕊 ${C.cityNames?C.cityNames[0]:C.name} RECEIVES YOU IN SILENCE — "MIND THE PATTERN."`);
+    SFX.discover();return;
+  }
+  const cost=a*60;
+  if((INV.gold||0)<cost){toast(`PARLEY REFUSED — NEED ${cost} 🪙 TRIBUTE`);SFX.ui();return;}
+  INV.gold-=cost;updateResHUD();
+  civSetAlert(sys,0);grantCivRep(C.civ,3+a*2);
+  comicPop('TRIBUTE ACCEPTED','#5df2c0',50,36);
+  toast(`🕊 ${C.name} RETRACTS ITS HUNT — THE SKY GOES QUIET (${cost} 🪙)`);
+  SFX.upgrade();saveGame(true);
+}
+function civTick(dt){
+  if(!started)return;
+  CIV_T+=dt;
+  if(CIV_T>150){
+    CIV_T=0;
+    const C=CIVS[activeSystemId];
+    if(C&&civAlert(activeSystemId)>0)civSetAlert(activeSystemId,civAlert(activeSystemId)-1);
+  }
+  for(let i=CIVFX.length-1;i>=0;i--){
+    const f=CIVFX[i];f.t+=dt;
+    f.mesh.material.opacity=0.85*Math.max(0,1-f.t/0.22);
+    if(f.t>0.22){if(f.mesh.parent)f.mesh.parent.remove(f.mesh);f.mesh.material.dispose();CIVFX.splice(i,1);}
+  }
+  if(PL.mode!=='walk'&&PL.mode!=='rover')return;
+  const b=PL.body;if(!b||!b.colony)return;
+  const C=b.colony.civ;if(civAlert(C.sys)<1)return;
+  const pos=PL.mode==='walk'?astro.group.position:rover.localPos;
+  const d=pos.distanceTo(b.colony.localPos);
+  if(d>36)return;
+  if(!b.colony.warned){b.colony.warned=true;toast(`⚠ ${C.name} DEFENSES TRACK YOU — LEAVE OR HAIL THE COLONY`);SFX.alarm();}
+  b.colony.zapT-=dt;
+  if(b.colony.zapT>0)return;
+  b.colony.zapT=2.4;
+  const top=b.colony.localPos.clone().normalize().multiplyScalar(b.colony.localPos.length()+11);
+  const dirv=pos.clone().sub(top),len=dirv.length()||1;
+  const beam=new THREE.Mesh(new THREE.CylinderGeometry(0.14,0.14,1,6,1,true),new THREE.MeshBasicMaterial({color:C.bolt,transparent:true,opacity:0.85,blending:THREE.AdditiveBlending,depthWrite:false}));
+  beam.position.copy(top).addScaledVector(dirv,0.5);
+  beam.quaternion.setFromUnitVectors(AY,dirv.clone().multiplyScalar(1/len));
+  beam.scale.y=len;
+  b.group.add(beam);CIVFX.push({mesh:beam,t:0});
+  hurt(3+C.tier*0.9,`${C.name} DEFENSE BEAM — CEASE TRESPASS`,'','CIV DEFENSE BEAM');
+  SFX.raiderShot();camShake=Math.max(camShake,0.25);
+}
+
 
 /* ---------- 8. SHIP, ASTRONAUT, ROVER & OUTPOSTS ---------- */
 /* ---- Coin Shop skins (rocket + astronaut looks) ---- */
@@ -4527,6 +4964,9 @@ const SHIP_SKINS=[
   {id:'luminarch',name:'VESPERA LUMINARCH',price:0,locked:true,wreck:'VESPERA',shape:'lumen',body:0x2a1650,acc:0x39c6ff,str:0xff6bd6,glass:0x9dfcff,gEm:0x0a6a7a,f1:0x39c6ff,f2:0xff6bd6,bonus:'regen',desc:'SALVAGED ON VESPERA (NYX) — a living bioluminescent bell-ship with crystal spines and glowing tendrils. LIVING HULL: slowly heals you.'},
   {id:'horizon',name:'EREBUS HORIZON',price:0,locked:true,wreck:'EREBUS-9',shape:'horizon',body:0x0d0b16,acc:0x2b2340,str:0xff7a1e,glass:0xffb347,gEm:0x7a2a00,f1:0xff7a1e,f2:0xffe066,bonus:'armor',desc:'SALVAGED ON EREBUS-9 (GARGANTUA) — a dark-matter monolith with its own blazing accretion disc. EVENT SHIELD: takes 25% less damage.'},
   {id:'singularity',name:'SINGULARITY ARK · TYPE VII',price:0,locked:true,wreck:'GARGANTUA',shape:'ark',body:0xeef2f8,acc:0x14182a,str:0x7fe9ff,glass:0x0b1a2e,gEm:0x39c6ff,f1:0x9dfcff,f2:0xffffff,bonus:'speed',desc:'ADRIFT AT THE EDGE OF GARGANTUA — a Type VII civilization starship: pearl-chrome tri-blade hull, a warp-halo drive ring and a captive singularity core. WARP HULL: +15% top speed.'},
+  {id:'synod',name:'SETHARI SYNOD ARK',price:0,locked:true,wreck:'TALON',shape:'synod',body:0xffb066,acc:0x5a2c10,str:0xffe0a8,glass:0xff7a2e,gEm:0x7a3a00,f1:0xffb066,f2:0xfff0c0,bonus:'armor',desc:'SALVAGED ON TALON (KHEPRI) — a bronze four-tier cathedral ark with solar sails and a forge-crown ring. FORGE PLATE: takes 25% less damage.'},
+  {id:'choir',name:'VESK CANTICLE FRAME',price:0,locked:true,wreck:'NULLWEAVE',shape:'choir',body:0x0b1a1e,acc:0x2a4a52,str:0x66ffd5,glass:0xd8fff8,gEm:0x1a6a5a,f1:0x66ffd5,f2:0xd8fff8,bonus:'speed',desc:'SALVAGED ON NULLWEAVE (VESK) — three resonant halo rings around a dead machine spine. HARMONIC DRIVE: +15% top speed.'},
+  {id:'loom',name:'UNMADE LOOMSHIP',price:0,locked:true,wreck:'THREAD',shape:'loom',body:0x2a0b2e,acc:0x9a5cff,str:0xff5ce1,glass:0xffd1f5,gEm:0x7a1060,f1:0xff5ce1,f2:0xffd1f5,bonus:'regen',desc:'SALVAGED ON THREAD (THE WEAVING) — a folded torus-knot hull held together by impossible ribbons. LIVING SEAM: slowly heals you while flying.'},
   {id:'vanguard',name:'VANGUARD MK-II',price:22000,model:'models/spaceship.glb',body:0x6b7280,acc:0x39d7ff,str:0xffd23f,glass:0x8eeaff,gEm:0x0a6a7a,f1:0x39d7ff,f2:0xffffff,flameZ:2.0,flameK:1.5,desc:'A hand-modeled strike fighter loaded straight into the game: glass canopy, eight wing cannons and glowing hull strips. Real 3D mesh hull.'},
 ];
 const ASTRO_SKINS=[
@@ -4545,6 +4985,9 @@ const ASTRO_SKINS=[
   {id:'samurai',name:'ORBIT SAMURAI',price:0,locked:true,team:4,shape:'samurai',suit:0x2b2d6e,legs:0x1a1a3e,chest:0xd62828,belt:0xffd23f,visor:0xff2a6d,vEm:0x8a0030,limb:1.1,headY:0.92,bonus:'armor',desc:'TEAM OPS TIER 4 EXCLUSIVE — layered crimson armor, a golden crescent kabuto and a star-katana on the back. ARMORED: takes less damage.'},
   {id:'biolume',name:'VESPERA BIOLUME DIVER',price:0,locked:true,wreck:'VESPERA',shape:'biolume',suit:0x3a1f6e,legs:0x24124a,chest:0x39c6ff,belt:0xff6bd6,visor:0x9dfcff,vEm:0x0a8a9a,limb:1.0,headY:0.92,bonus:'swim',desc:'SALVAGED ON VESPERA — a glass bell helmet with glowing tendrils. DEEP-SEA SUIT: swim at full speed.'},
   {id:'warden',name:'EREBUS VOID WARDEN',price:0,locked:true,wreck:'EREBUS-9',shape:'warden',suit:0x14111f,legs:0x0d0b16,chest:0x2b2340,belt:0xff7a1e,visor:0xffb347,vEm:0x8a3a00,limb:1.12,headY:0.92,bonus:'armor',desc:'SALVAGED ON EREBUS-9 — monolith armor with a blazing halo ring. ARMORED: takes less damage.'},
+  {id:'sunwarden',name:'SETHARI SUN-WARDEN',price:0,locked:true,wreck:'TALON',shape:'sunwarden',suit:0xffb066,legs:0x5a2c10,chest:0xffe0a8,belt:0xff7a2e,visor:0x1a0a05,vEm:0x6a2408,limb:1.1,headY:0.94,bonus:'armor',desc:'SALVAGED ON TALON — a bronze forge-priest shell with a sun crest and layered skirt plates. FORGE-BLESSED: takes less damage.'},
+  {id:'veskframe',name:'VESK CANTICLE FRAME',price:0,locked:true,wreck:'NULLWEAVE',shape:'veskframe',suit:0x1d3a42,legs:0x0b1a1e,chest:0x2a4a52,belt:0x66ffd5,visor:0xd8fff8,vEm:0x1a8a7a,limb:1.0,headY:0.9,bonus:'jump',desc:'SALVAGED ON NULLWEAVE — a machine-chorister frame that floats its own head. HARMONIC LEGS: jump higher and jetpack fuel lasts longer.'},
+  {id:'unmade',name:'THE UNMADE SHELL',price:0,locked:true,wreck:'THREAD',shape:'unmade',suit:0x2a0b2e,legs:0x14061a,chest:0x4a1a6a,belt:0xff5ce1,visor:0xffd1f5,vEm:0x9a1050,limb:1.05,headY:0.92,bonus:'speed',desc:'SALVAGED ON THREAD — a ribbon-wrapped shell with orbiting shards. UNSEWN STEP: runs 25% faster.'},
   {id:'knight',name:'STAR KNIGHT',price:13000,shape:'knight',suit:0xc7ccd6,legs:0x9aa1ad,chest:0xe8ecf2,belt:0xd62828,visor:0x39c6ff,vEm:0x1b5a7a,limb:1.12,headY:1.0,bonus:'armor',desc:'Shining armor and a red plume. KNIGHT PLATE: takes 30% less damage on foot.'},
   {id:'mech',name:'MINI MECH',price:16000,shape:'mech',suit:0xffb703,legs:0x2b2d42,chest:0x3d405b,belt:0xd62828,visor:0xff4d6d,vEm:0x8a0020,limb:1.55,headY:0.86,bonus:'speed',desc:'A walking tank. SERVO LEGS: run 25% faster.'},
 ];
@@ -6059,6 +6502,19 @@ function switchActiveSystem(sysId){
   const sys=SYSTEMS.find(s=>s.id===sysId)||SYSTEMS[0];
   PL.currentSys=sys;
   $('sysTag').textContent=sys.name;
+  const CIV=CIVS[sysId];
+  if(CIV){
+    const firstVisit=!GAME.sysVisited.includes(sysId);
+    civRecord(CIV.civ,'patrol');
+    updateCivTag();
+    RAIDER.bossT=civAlert(sysId)>=3?30+Math.random()*20:1e9;
+    RAIDER.nextIn=Math.min(RAIDER.nextIn,26);
+    if(firstVisit)setTimeout(()=>{
+      toast(CIV.greet);
+      comicPop(CIV.name+' TERRITORY','#'+CIV.color.toString(16).padStart(6,'0'),50,32);
+      setTimeout(()=>toast('⚖ LAND AT A COLONY TO HAIL THEM · ATTACKS ESCALATE WITH TRESPASS'),4200);
+    },1600);
+  }
   skyMat.uniforms.uSysTint.value.copy(srgb(sys.tint));
   for(const b of bodies){
     const on=b.sys===sysId;
@@ -6134,7 +6590,7 @@ function saveGame(silent=false){
         missionOffers:GAME.missionOffers,dynMissions:GAME.dynMissions,missionHistory:GAME.missionHistory,missionCompletions:GAME.missionCompletions,missionDay:GAME.missionDay,
         galaxySeen:GAME.galaxySeen,anomalyLog:GAME.anomalyLog,rescues:GAME.rescues,escorts:GAME.escorts,escapes:GAME.escapes,diplomacy:GAME.diplomacy,
         titles:GAME.titles,equippedTitle:GAME.equippedTitle,cosmetics:GAME.cosmetics,equippedCosmetic:GAME.equippedCosmetic,planetComplete:GAME.planetComplete,planetLooted:GAME.planetLooted,
-        strangerWrecks:GAME.strangerWrecks,rareFinds:GAME.rareFinds},
+        strangerWrecks:GAME.strangerWrecks,rareFinds:GAME.rareFinds,civAlert:GAME.civAlert},
       hazard:{stormActive:PL.stormActive,stormTimer:PL.stormTimer,stormWarned:PL.stormWarned,pollenActive:PL.pollenActive,pollenTimer:PL.pollenTimer,pollenWarned:PL.pollenWarned}
     };
     Object.assign(data,SAVE_EXTRA);
@@ -6166,7 +6622,7 @@ function loadGame(){
     if(data.upgrades){
       UPGRADES.tool.lvl=clamp(data.upgrades.tool||1,1,5);
       UPGRADES.suit.lvl=clamp(data.upgrades.suit||1,1,5);
-      UPGRADES.ship.lvl=clamp(data.upgrades.ship||1,1,5);
+      UPGRADES.ship.lvl=clamp(data.upgrades.ship||1,1,7);
     }
     if(Array.isArray(data.visited)){
       for(const b of bodies)if(data.visited.includes(b.name))b.visited=true;
@@ -6203,7 +6659,7 @@ function loadGame(){
       GAME.contacts=Array.isArray(data.game.contacts)?data.game.contacts.filter(x=>typeof x==='string').slice(0,64):[];
       const GK=['title','achievements','milestones','contracts','contractSeed','outposts','sysVisited','seenElysian','rep','factionContracts','factionSeed','tamed','photoLog','catReward','poiState','treasure','crew','raiderKills','contacts',
         'civRep','civMet','civTrades','shipSeen','legendSeen','missionOffers','dynMissions','missionHistory','missionCompletions','missionDay',
-        'galaxySeen','anomalyLog','rescues','escorts','escapes','diplomacy','titles','equippedTitle','cosmetics','equippedCosmetic','planetComplete','planetLooted','strangerWrecks','rareFinds'];
+        'galaxySeen','anomalyLog','rescues','escorts','escapes','diplomacy','titles','equippedTitle','cosmetics','equippedCosmetic','planetComplete','planetLooted','strangerWrecks','rareFinds','civAlert'];
       for(const k in data.game)if(!GK.includes(k))GAME_EXTRA[k]=data.game[k];
       const obj=v=>v&&typeof v==='object'&&!Array.isArray(v)?v:{};
       const num=(v,d=0)=>Number.isFinite(+v)?+v:d;
@@ -6213,6 +6669,8 @@ function loadGame(){
       for(const c of CIV_IDS){const m=civMetSrc[c];if(m&&typeof m==='object')GAME.civMet[c]={first:num(m.first,Date.now()),ship:typeof m.ship==='string'?m.ship:'scout',sys:typeof m.sys==='string'?m.sys:''};}
       GAME.civTrades=obj(data.game.civTrades);
       GAME.shipSeen=obj(data.game.shipSeen);
+      const alertSrc=obj(data.game.civAlert);GAME.civAlert={};
+      for(const k in alertSrc)if(k!=='__proto__')GAME.civAlert[k]=clamp(num(alertSrc[k]),0,3);
       GAME.legendSeen=Array.isArray(data.game.legendSeen)?data.game.legendSeen.filter(x=>typeof x==='string').slice(0,64):[];
       const fixReward=r=>({gold:clamp(num(r&&r.gold,120),1,99999),rp:clamp(num(r&&r.rp,3),0,999),rep:clamp(num(r&&r.rep,6),0,99),res:obj(r&&r.res)});
       GAME.missionOffers=Array.isArray(data.game.missionOffers)?data.game.missionOffers.filter(o=>o&&o.id&&DYN_DEFS[o.type]).map(o=>({
@@ -6407,16 +6865,17 @@ function ensureRaiderMarker(r){
 }
 function makeRaider(i,count,boss=false){
   const g=new THREE.Group();
+  const civ=CIVS[activeSystemId]||null;
   const hull=new THREE.Mesh(raiderBodyGeo,new THREE.MeshToonMaterial({vertexColors:true,gradientMap:gradTex,
-    color:boss?0xffc4d2:0xffffff,emissive:boss?0x7a0b22:0x2d0b3a,emissiveIntensity:boss?0.7:0.55}));
+    color:boss?0xffc4d2:(civ?civ.color:0xffffff),emissive:boss?0x7a0b22:(civ?civ.glow:0x2d0b3a),emissiveIntensity:boss?0.7:0.55}));
   addOutline(hull,OL_PROP);g.add(hull);
-  addSheen(hull,boss?0xffc4d2:0xc9a4ff,3.0,0.45);
-  const eye=new THREE.Mesh(raiderEyeGeo,new THREE.MeshBasicMaterial({color:boss?0xff1e4d:0xff4d6d}));
+  addSheen(hull,boss?0xffc4d2:(civ?civ.glow:0xc9a4ff),3.0,0.45);
+  const eye=new THREE.Mesh(raiderEyeGeo,new THREE.MeshBasicMaterial({color:boss?0xff1e4d:(civ?civ.glow:0xff4d6d)}));
   eye.position.set(0,0.03,-2.75);eye.scale.setScalar(boss?1.5:1);g.add(eye);
   const glows=[];
   const glowSpots=boss?[[-0.62,0,2.02],[0.62,0,2.02],[-1.3,0,0.7],[1.3,0,0.7]]:[[-0.62,0,2.02],[0.62,0,2.02]];
   for(const p of glowSpots){
-    const gl=new THREE.Mesh(raiderGlowGeo,new THREE.MeshBasicMaterial({color:boss?0xff6b9a:0xc77dff,transparent:true,opacity:.9}));
+    const gl=new THREE.Mesh(raiderGlowGeo,new THREE.MeshBasicMaterial({color:boss?0xff6b9a:(civ?civ.color:0xc77dff),transparent:true,opacity:.9}));
     gl.position.set(p[0],p[1],p[2]);g.add(gl);glows.push(gl);
   }
   const fwd=new V3(0,0,-1).applyQuaternion(ship.group.quaternion);
@@ -6429,7 +6888,7 @@ function makeRaider(i,count,boss=false){
   g.scale.setScalar(0.05);
   hull.castShadow=true;hull.receiveShadow=true;
   scene.add(g);
-  const hp=boss?(activeSystemId==='elysian'?34:28)+UPGRADES.ship.lvl*3:5+(UPGRADES.ship.lvl>=4?2:0);
+  const hp=(boss?(activeSystemId==='elysian'?34:28)+UPGRADES.ship.lvl*3:5+(UPGRADES.ship.lvl>=4?2:0))*(civ?0.9+civ.tier*0.22:1);
   return {id:++RAIDER.uid,group:g,glows,eye,hp,maxHp:hp,dead:false,spawnT:0,ang:Math.random()*TAU,boss,
     spin:(boss?-1:Math.random()<.5?-1:1)*(boss?0.16+Math.random()*0.14:0.3+Math.random()*.28),
     R:boss?40+Math.random()*16:20+Math.random()*16,fwd:boss?24:8,
@@ -6438,13 +6897,27 @@ function makeRaider(i,count,boss=false){
 function startRaiderWave(boss=false){
   if(RAIDER.active||!started||PL.mode!=='fly')return false;
   const lvl=UPGRADES.ship.lvl,bossWave=!!boss;
-  const count=bossWave?(activeSystemId==='elysian'?3:2):1+(lvl>=3?1:0)+(lvl>=5?1:0);
+  const civ=CIVS[activeSystemId]||null,alert=civ?civAlert(activeSystemId):0;
+  const count=bossWave?(activeSystemId==='elysian'?3:civ?3:2):1+(lvl>=3?1:0)+(lvl>=5?1:0)+(civ?(alert>=3?2:1):0);
   RAIDER.active=true;RAIDER.bossWave=bossWave;RAIDER.warnT=bossWave?6:5;RAIDER.fightT=bossWave?55:42;RAIDER.escapeT=0;RAIDER.escapeWarned=false;
+  RAIDER.civ=civ;
+  RAIDER.boltMat.color.setHex(civ?civ.bolt:0xff5ccf);
   RAIDER.list=[];RAIDER.chatterT=2.2;
   for(let i=0;i<count;i++)RAIDER.list.push(makeRaider(i,count,bossWave&&i===0));
   for(const r of RAIDER.list)ensureRaiderMarker(r);
   fleeNpcs(true);
   SFX.alienWarp();SFX.setAlien(true,0.18,0);
+  if(civ){
+    SFX.alarm();
+    if(bossWave){
+      comicPop('☠ '+civ.name+' TITAN INBOUND!','#'+civ.color.toString(16).padStart(6,'0'),50,34);
+      toast(`☠ ${civ.name} TITAN + ${count-1} ESCORT${count>2?'S':''} INBOUND — ${civ.alarm}`);
+    }else{
+      comicPop('🚨 '+civ.name+' DEFENDERS','#'+civ.color.toString(16).padStart(6,'0'),50,34);
+      toast(`🚨 ${count} ${civ.name} DEFENDER${count>1?'S':''} INBOUND — ${touchUI?'HOLD FIRE':'HOLD F'} WHEN THEY ENGAGE`);
+    }
+    return true;
+  }
   if(bossWave){
     SFX.alarm();
     comicPop('☠ ALIEN DREADNOUGHT INBOUND!','#ff2d55',50,34);
@@ -6467,12 +6940,16 @@ function endRaiderWave(retreat=true,silent=false){
   }
   for(const r of RAIDER.list){if(r.mk)r.mk.remove();if(r.group.parent)r.group.parent.remove(r.group);}
   RAIDER.list.length=0;clearRaiderBolts();
-  RAIDER.active=false;RAIDER.warnT=0;RAIDER.fightT=0;RAIDER.escapeT=0;RAIDER.escapeWarned=false;RAIDER.nextIn=30+Math.random()*30;
+  RAIDER.active=false;RAIDER.warnT=0;RAIDER.fightT=0;RAIDER.escapeT=0;RAIDER.escapeWarned=false;
+  RAIDER.nextIn=CIVS[activeSystemId]?12+Math.random()*14:30+Math.random()*30;
+  RAIDER.boltMat.color.setHex(0xff5ccf);RAIDER.civ=null;
   if(RAIDER.bossWave){
     RAIDER.bossWave=false;
-    RAIDER.bossT=activeSystemId==='elysian'?55+Math.random()*30:activeSystemId==='gargantua'?105+Math.random()*45:1e9;
+    const civ=CIVS[activeSystemId];
+    RAIDER.bossT=civ?(civAlert(activeSystemId)>=3?34+Math.random()*24:1e9):activeSystemId==='elysian'?55+Math.random()*30:activeSystemId==='gargantua'?105+Math.random()*45:1e9;
   }
-  if(!silent&&retreat)toast('🛸 THE RAIDERS JUMPED OUT — SPACE IS QUIET AGAIN');
+  const civEnd=CIVS[activeSystemId];
+  if(!silent&&retreat)toast(civEnd?`🛸 ${civEnd.name} DEFENDERS BREAK OFF — THE PATTERN IS QUIET AGAIN`:'🛸 THE RAIDERS JUMPED OUT — SPACE IS QUIET AGAIN');
 }
 function boom(pos,color,scale=1){
   const m=new THREE.Mesh(new THREE.IcosahedronGeometry(1,1),new THREE.MeshBasicMaterial({color,transparent:true,opacity:.95,blending:THREE.AdditiveBlending,depthWrite:false}));
@@ -6491,7 +6968,7 @@ function spawnRaiderBolt(r,spread=0){
   mesh.scale.set(r.boss?1.5:1,r.boss?1.5:1,r.boss?3.4:2.4);
   scene.add(mesh);
   RAIDER.bolts.push({mesh,vel:dir.multiplyScalar(90),life:0,
-    dmg:r.boss?(touchUI?7:10):(touchUI?12:16)});
+    dmg:(r.boss?(touchUI?7:10):(touchUI?12:16))*(CIVS[activeSystemId]?1+(CIVS[activeSystemId].tier-3)*0.22:1)});
   SFX.raiderShot();
 }
 function raiderHitShip(n){
@@ -6546,19 +7023,23 @@ function destroyRaider(r){
   updateResHUD();
   factionProgress('combat',isBoss?2:1);grantRep('guild',isBoss?16:7);
   dynProgress('bounty',1,{raider:true});
-  if(first)recordDiscovery('Combat','Alien Raider','Deep Space','A hostile alien raider skiff destroyed in ship-to-ship combat over the frontier.');
+  const civHit=CIVS[activeSystemId];
+  if(civHit){grantCivRep(civHit.civ,-6);civNudge(civHit.sys,1,'YOU FIRED ON THE '+civHit.name);}
+  if(first&&!civHit)recordDiscovery('Combat','Alien Raider','Deep Space','A hostile alien raider skiff destroyed in ship-to-ship combat over the frontier.');
+  if(civHit&&!GAME.civMet[civHit.civ])civRecord(civHit.civ,'defender');
   if(isBoss){
     grantAch('dreadnought');
-    recordDiscovery('Combat','Alien Dreadnought','Deep Space','A capital-class alien dreadnought destroyed in open space.');
-    comicPop(`☠ DREADNOUGHT DESTROYED! +${gold} 🪙`,'#ff2d55',50,40);
-  }else comicPop(`☠ RAIDER DOWN! +${gold} 🪙`,'#ff4d6d',50,36);
+    if(!civHit)recordDiscovery('Combat','Alien Dreadnought','Deep Space','A capital-class alien dreadnought destroyed in open space.');
+    comicPop(civHit?`☠ ${civHit.name} TITAN DESTROYED! +${gold} 🪙`:`☠ DREADNOUGHT DESTROYED! +${gold} 🪙`,'#ff2d55',50,40);
+  }else comicPop(civHit?`☠ ${civHit.name} DEFENDER DOWN! +${gold} 🪙`:`☠ RAIDER DOWN! +${gold} 🪙`,'#ff4d6d',50,36);
   checkAchievements();checkMilestones();
+  const civClear=CIVS[activeSystemId];
   if(RAIDER.list.every(x=>x.dead)){
     const bonus=(isBoss?140:50)+RAIDER.list.length*25;
     earnGold(bonus,true);INV.rp=(INV.rp||0)+2;updateResHUD();
     endRaiderWave(false,true);
     comicPop('SECTOR SECURED!','#5df2c0',50,42);
-    toast(`✅ RAIDER PACK DESTROYED! +${bonus} 🪙 · +2 RP`);
+    toast(civClear?`✅ ${civClear.name} PATROL DESTROYED! +${bonus} 🪙 · ALERT RISING`:`✅ RAIDER PACK DESTROYED! +${bonus} 🪙 · +2 RP`);
   }
   saveGame(true);
 }
@@ -6589,10 +7070,13 @@ function updateRaiders(dt){
   const sp=ship.group.position;
   if(!RAIDER.active){
     SFX.setAlien(false,0,0);
-    if((activeSystemId==='elysian'||activeSystemId==='gargantua')&&canSpawnRaider()){
+    const civNow=CIVS[activeSystemId]||null;
+    const civHot=!!civNow&&civAlert(activeSystemId)>=2;
+    if((activeSystemId==='elysian'||activeSystemId==='gargantua'||(civNow&&civAlert(activeSystemId)>=3))&&canSpawnRaider()){
       RAIDER.bossT-=dt;
       if(RAIDER.bossT<=0){startRaiderWave(true);return;}
     }
+    if(civNow&&!civHot){RAIDER.nextIn=Math.max(RAIDER.nextIn,8);return;}
     RAIDER.nextIn-=dt;
     if(RAIDER.nextIn<=0&&canSpawnRaider())startRaiderWave();
     return;
@@ -6723,7 +7207,16 @@ const NPC_SPECIES=[
     trade:{cost:{lum:3},gold:102,rp:3,label:'TRADE 3 LUMINA FOR RECOVERED ABYSS DATA'}},
   {id:'helion',species:'HELION CONCORD',sigil:'H',color:0xff6b9a,ring:true,style:'wing',home:'THE OUTER RIM',trait:'DYNASTIC TRADERS',personality:'Regal, transactional, keeps a ledger of every slight.',
     lines:['The Concord extends a measured welcome. Mind your wake.','Every favor is a debt. Every debt is a song.','You have not yet earned a full bow. Continue impressively.'],
-    trade:{cost:{fe:8,ae:6},gold:130,rp:4,label:'TRADE 8 FE + 6 AE FOR A CONCORD LEDGER-SEAL'}}
+    trade:{cost:{fe:8,ae:6},gold:130,rp:4,label:'TRADE 8 FE + 6 AE FOR A CONCORD LEDGER-SEAL'}},
+  {id:'sethari',species:'SETHARI SYNOD',sigil:'K',color:0xffb066,ring:true,style:'wing',home:'KHEPRI DOMINION',trait:'FORGE-FLAME THEOCRATS',personality:'Ceremonial, proud, convinced the sun speaks through their foundries.',
+    lines:['The Synod has weighed your arrival. It is... molten.','Every hull is a prayer. Yours is badly translated.','Kneel to the Forge-Sun or burn in its shadow, traveler.'],
+    trade:{cost:{so:6},gold:150,rp:4,label:'TRADE 6 SOLARITE FOR A FORGE-SEAL'}},
+  {id:'vesk',species:'VESK CHOIR',sigil:'V',color:0x66ffd5,ring:false,style:'angular',home:'VESK HOLLOW',trait:'MACHINE CANTICLE',personality:'Collective, exact, speaks as one voice made of many.',
+    lines:['WE HAVE HEARD YOU. YOU ARE OUT OF TUNE.','Your engines sing a dead key. Interesting.','The Hollow remembers frequency. Yours will be archived.'],
+    trade:{cost:{vd:3,lum:2},gold:180,rp:5,label:'TRADE 3 VD + 2 LUMINA FOR A CANTICLE SHARD'}},
+  {id:'unmaking',species:'THE UNMADE',sigil:'W',color:0xff5ce1,ring:false,style:'organic',home:'THE WEAVING',trait:'REALITY WEAVERS',personality:'Patient, alien, speaks in terms of thread and seam.',
+    lines:['You are a loose thread, and yet you speak. How charming.','We have woven your arrival into three possible pasts.','Do not pull at the sky. It is load-bearing.'],
+    trade:{cost:{seed:3},gold:220,rp:6,label:'TRADE 3 AETHER SEEDS FOR A WOVEN PARADOX'}}
 ];
 const NPC={list:[],nextIn:20+Math.random()*24,uid:0,bolts:[]};
 const CIV_IDS=NPC_SPECIES.map(s=>s.id);
@@ -6753,7 +7246,7 @@ function civRecord(id,shipClass){
   GAME.civMet[id]=GAME.civMet[id]||{first:Date.now(),ship:shipClass||'scout',sys:activeSystemId};
   if(shipClass)GAME.shipSeen[`${id}:${shipClass}`]=Date.now();
   const sp=civById(id);
-  if(Object.keys(GAME.civMet).filter(k=>CIV_IDS.includes(k)).length>=6)grantAch('civ6');
+  if(CIV_IDS.every(k=>GAME.civMet[k]))grantAch('civ6');
 }
 function civShipSeen(id,shipClass){
   const key=`${id}:${shipClass}`;
@@ -7383,6 +7876,9 @@ function updateEcosystemAndHazards(dt,t){
     if(poiBest&&(!PL.nearInteract||PL.nearInteract.kind==='rover'||PL.nearInteract.kind==='poi')){
       PL.nearInteract={kind:'poi',poi:poiBest,label:poiBest.label||poiBest.name};
     }
+    if(b.colony&&(!PL.nearInteract||PL.nearInteract.kind==='rover'||PL.nearInteract.kind==='poi')&&localPos.distanceTo(b.colony.localPos)<14){
+      PL.nearInteract={kind:'colony',colony:b.colony,label:civColonyLabel(b.colony)};
+    }
     if(!PL.nearInteract)for(const cr of b.creatures){
       if(cr.tamed)continue;
       if(localPos.distanceTo(cr.mesh.position)<3.2){
@@ -7498,6 +7994,7 @@ function updateEcosystemAndHazards(dt,t){
 function handleInteract(){
   if(!PL.nearInteract)return false;
   if(PL.nearInteract.kind==='wreck'){wreckRepair(PL.nearInteract.W);return true;}
+  if(PL.nearInteract.kind==='colony'){civParley(PL.nearInteract.colony);return true;}
   if(PL.nearInteract.kind==='rover'){
     PL.mode='rover';rover.active=true;astro.group.visible=false;
     toast('DRIVING NOMAD ROVER · [E] TO EXIT');
@@ -7638,6 +8135,11 @@ function finishTouchdown(b,site,r1){
   PL.mode='landed';PL.local.copy(site).multiplyScalar(r1);PL.D=null;PL.L=null;$('entryFx').classList.remove('on');
   ship.gear.visible=true;ship.gear.scale.y=1;
   PL.lastLand=b.name;if(!b.visited){b.visited=true;SFX.discover();earnGold(25,true);updatePassport();saveGame(true);toast('NEW WORLD DISCOVERED: '+b.name+'! +25 🪙');}else toast('TOUCHDOWN!');
+  if(b.colony&&!PL.dead){
+    const C=b.colony.civ;
+    civNudge(C.sys,1,civAlert(C.sys)===0?'UNSANCTIONED LANDING':'REPEAT TRESPASS');
+    setTimeout(()=>toast(`🏛 ${C.name}: "${b.colony.name}" — HAIL THE COLONY TO NEGOTIATE`),1800);
+  }
 }
 function updateDescend(dt){
   const D=PL.D,b=D.b;if(!D)return;
@@ -8281,7 +8783,7 @@ function frame(dt){
   updateMP(dt);
   if(started)updateCapsule(dt);
   if(started)updateShop2(dt);
-  if(window.__HQ){updateCoop(dt);if(started){wreckTick();derelictTick();}}
+  if(window.__HQ){updateCoop(dt);if(started){wreckTick();derelictTick();civTick(dt);}}
   look.x=look.y=0;
 
   let tint=0;
@@ -9640,7 +10142,10 @@ function coopOpen(){if(!MP.room){toast('JOIN A MULTIPLAYER LOBBY TO DO TEAM OPS'
 
 /* ===================== STRANDED WRECKS — salvage-only rockets and suits ===================== */
 const WRECKS=[{body:'VESPERA',ship:'luminarch',suit:'biolume',cost:{fe:120,ae:80,so:40},beam:0x39c6ff},
-  {body:'EREBUS-9',ship:'horizon',suit:'warden',cost:{fe:200,ae:150,so:80,vd:40},beam:0xff7a1e}];
+  {body:'EREBUS-9',ship:'horizon',suit:'warden',cost:{fe:200,ae:150,so:80,vd:40},beam:0xff7a1e},
+  {body:'TALON',ship:'synod',suit:'sunwarden',cost:{fe:520,ae:380,so:260,vd:120},beam:0xffb066},
+  {body:'NULLWEAVE',ship:'choir',suit:'veskframe',cost:{fe:820,ae:640,so:420,vd:260},beam:0x66ffd5},
+  {body:'THREAD',ship:'loom',suit:'unmade',cost:{fe:1300,ae:1000,so:620,vd:440,lum:200},beam:0xff5ce1}];
 HQ.wrecks=[];
 function wreckFor(b){return WRECKS.find(w=>w.body===b.name);}
 function wreckSpawn(b,w){
@@ -9804,6 +10309,45 @@ function buildShapeShip(sk){
     for(let i=0;i<3;i++){const a=i/3*TAU+Math.PI;P.push([shipWing([[0.6,0.55],[1.75,0.55],[2.5,1.75],[1.65,1.6]]),sk.acc,new M4().makeRotationZ(a).multiply(new M4().makeRotationY(-Math.PI/2))]);}
     nozzle(0,1.95,0.4);
     gp=[0,0.32,-0.95];gs=[0.62,0.62,0.62];
+  }else if(sk.shape==='synod'){
+    P.push([new THREE.CylinderGeometry(0.3,0.85,5.2,4),sk.body,Mx(0,0,0,Math.PI/2,Math.PI/4,0,1,1,0.72)]);
+    P.push([new THREE.BoxGeometry(2.4,0.42,1.5),sk.acc,Mx(0,0.02,0.4)]);
+    P.push([new THREE.BoxGeometry(1.8,0.38,1.15),sk.str,Mx(0,0.28,0.9)]);
+    P.push([new THREE.BoxGeometry(1.2,0.34,0.9),sk.acc,Mx(0,0.52,1.35)]);
+    P.push([new THREE.TorusGeometry(1.35,0.1,8,36),sk.str,Mx(0,0,-1.9)]);
+    P.push([new THREE.TorusGeometry(1.0,0.05,6,32),sk.body,Mx(0,0,-1.55)]);
+    const sail=[[0.8,-0.5],[3.4,0.6],[3.6,1.15],[0.8,1.1]];
+    P.push(hfin(sail,0.05));P.push(hfin(mirror(sail),0.05));
+    for(const s of [-1,1]){
+      P.push([new THREE.CylinderGeometry(0.09,0.09,2.0,8),sk.str,Mx(s*2.0,0.05,0.55,Math.PI/2,0,0)]);
+      P.push([new THREE.ConeGeometry(0.18,1.3,5),sk.str,Mx(s*3.1,0.06,0.9,0,0,s*-0.15)]);
+      P.push([new THREE.BoxGeometry(0.5,0.1,0.16),sk.body,Mx(s*2.4,0.05,0.2)]);
+    }
+    P.push([new THREE.OctahedronGeometry(0.3,0),sk.str,Mx(0,0.4,-2.6)]);
+    nozzle(0,2.75,0.42);nozzle(0.55,2.55,0.24);nozzle(-0.55,2.55,0.24);
+    gp=[0,0.5,-2.3];gs=[0.62,0.46,0.9];
+  }else if(sk.shape==='choir'){
+    P.push([new THREE.CylinderGeometry(0.34,0.34,5.4,8),sk.acc,Mx(0,0,-0.2,Math.PI/2,0,0)]);
+    P.push([new THREE.OctahedronGeometry(0.55,0),sk.str,Mx(0,0,-2.8,0,0,0,0.6,0.6,1.6)]);
+    for(const [r,z,tube] of [[1.9,-0.9,0.09],[1.4,0.2,0.07],[2.3,1.2,0.1]]){
+      P.push([new THREE.TorusGeometry(r,tube,8,40),sk.str,Mx(0,0,z)]);
+      P.push([new THREE.TorusGeometry(r-0.35,tube*0.6,6,36),sk.body,Mx(0,0,z+0.12)]);
+    }
+    for(let i=0;i<6;i++){const a=i/6*TAU;P.push([new THREE.BoxGeometry(0.26,0.26,0.26),i%2?sk.acc:sk.body,Mx(Math.cos(a)*2.3,Math.sin(a)*2.3,1.2,0.4,0.7,0.3)]);}
+    for(let i=0;i<3;i++){const a=i/3*TAU;P.push([new THREE.CylinderGeometry(0.05,0.05,1.6,6),sk.acc,Mx(Math.cos(a)*0.9,Math.sin(a)*0.9,1.8,Math.PI/2,0,0)]);}
+    P.push([new THREE.SphereGeometry(0.4,12,10),sk.str,Mx(0,0,0.9)]);
+    nozzle(0,2.7,0.3);nozzle(0.7,2.2,0.2);nozzle(-0.7,2.2,0.2);
+    gp=[0,0,-2.2];gs=[0.5,0.5,0.7];
+  }else if(sk.shape==='loom'){
+    P.push([new THREE.TorusKnotGeometry(1.15,0.2,72,8,2,3),sk.body,Mx(0,0,0,Math.PI/2,0,0,1,1,1.75)]);
+    P.push([new THREE.TorusKnotGeometry(1.45,0.07,64,6,3,4),sk.str,Mx(0,0,0,0.4,0.6,0,1,1,1.5)]);
+    P.push([new THREE.TorusGeometry(2.2,0.06,5,44),sk.acc,Mx(0,0,0,Math.PI/2,0.6,0,1,1,1.2)]);
+    P.push([new THREE.TorusGeometry(2.2,0.06,5,44),sk.acc,Mx(0,0,0,Math.PI/2,-0.6,0,1,1,1.2)]);
+    for(let i=0;i<5;i++){const a=i/5*TAU;P.push([new THREE.OctahedronGeometry(0.16,0),sk.str,Mx(Math.cos(a)*2.1,Math.sin(a)*1.1,0.9)]);}
+    P.push([new THREE.OctahedronGeometry(0.4,0),sk.str,Mx(0,0,-2.6,0,0,0,0.5,0.5,1.4)]);
+    P.push([new THREE.TorusGeometry(0.9,0.04,6,36),sk.acc,Mx(0,0,-1.9)]);
+    nozzle(0,2.5,0.3);
+    gp=[0,0.25,-2.1];gs=[0.55,0.5,0.85];
   }else{ /* whale */
     P.push([SPH(1,20,14),sk.body,Mx(0,0.05,0.1,0,0,0,1.25,1.0,2.35)]);
     P.push([SPH(1,18,12),sk.str,Mx(0,-0.33,-0.05,0,0,0,1.02,0.62,2.15)]);
@@ -9868,6 +10412,32 @@ function buildShapeAstro(sk){
       [new THREE.CylinderGeometry(0.19,0.19,0.1,14),sk.chest,Mx(0,0.79,0)],[B(0.06,0.18,0.36),sk.belt,Mx(0,0.92,0.02)],
       [S(0.1),sk.chest,Mx(0.2,0.56,0,0,0,0,1,0.7,1)],[S(0.1),sk.chest,Mx(-0.2,0.56,0,0,0,0,1,0.7,1)],[B(0.32,0.05,0.2),sk.belt,Mx(0,0.29,0)]);
     vg=B(0.22,0.035,0.03);vp=[0,0.71,-0.185];vs=[1,1,1];
+  }else if(sk.shape==='sunwarden'){
+    P.push([cap(0.16,0.18),sk.suit,Mx(0,0.38,0)],[B(0.32,0.32,0.2),sk.chest,Mx(0,0.46,-0.02)],
+      [new THREE.CylinderGeometry(0.3,0.38,0.26,8),sk.belt,Mx(0,0.24,0)],[S(0.19),sk.suit,Mx(0,0.7,0)],
+      [new THREE.ConeGeometry(0.14,0.3,6),sk.chest,Mx(0,0.93,0)],[new THREE.TorusGeometry(0.2,0.03,6,20),sk.belt,Mx(0,0.84,0,Math.PI/2,0,0)]);
+    for(const s of [-1,1]){
+      P.push([S(0.1),sk.chest,Mx(s*0.26,0.58,0)],[new THREE.TorusGeometry(0.1,0.02,6,16),sk.belt,Mx(s*0.26,0.58,0,0,0,Math.PI/2)]);
+      P.push([B(0.1,0.34,0.16),sk.suit,Mx(s*0.24,0.3,0,0,0,s*0.2)]);
+    }
+    P.push([B(0.34,0.4,0.05),sk.belt,Mx(0,0.34,0.2,0.12,0,0)]);
+    vg=B(0.28,0.09,0.03);vp=[0,0.69,-0.2];vs=[1,1,1];
+  }else if(sk.shape==='veskframe'){
+    P.push([B(0.36,0.3,0.24),sk.suit,Mx(0,0.38,0)],[B(0.42,0.06,0.3),sk.belt,Mx(0,0.24,0)],
+      [new THREE.TorusGeometry(0.3,0.025,6,26),sk.belt,Mx(0,0.56,0,Math.PI/2,0,0)],
+      [new THREE.TorusGeometry(0.36,0.015,5,28),sk.belt,Mx(0,0.6,0,Math.PI/2,0,0)]);
+    P.push([B(0.26,0.28,0.28),sk.chest,Mx(0,0.84,0)]);
+    for(let i=0;i<4;i++){const a=i/4*TAU;P.push([B(0.1,0.1,0.1),sk.chest,Mx(Math.cos(a)*0.4,0.46,Math.sin(a)*0.3)],[S(0.03,6,4),sk.belt,Mx(Math.cos(a)*0.4,0.52,Math.sin(a)*0.3)]);}
+    for(const s of [-1,1])P.push([B(0.08,0.3,0.1),sk.chest,Mx(s*0.23,0.5,0)]);
+    vg=B(0.22,0.09,0.03);vp=[0,0.84,-0.15];vs=[1,1,1];
+  }else if(sk.shape==='unmade'){
+    P.push([cap(0.15,0.16),sk.suit,Mx(0,0.38,0)],[S(0.2),sk.suit,Mx(0,0.7,0,0,0,0,0.95,1.05,0.95)],
+      [new THREE.ConeGeometry(0.28,0.34,7),sk.chest,Mx(0,0.93,0)],
+      [new THREE.TorusGeometry(0.24,0.035,6,24),sk.belt,Mx(0,0.45,0,0.4,0.3,0.2)],
+      [new THREE.TorusGeometry(0.28,0.02,5,26),sk.chest,Mx(0,0.34,0,1.2,0.4,0.6)]);
+    for(let i=0;i<5;i++){const a=i/5*TAU;P.push([new THREE.OctahedronGeometry(0.06,0),sk.belt,Mx(Math.cos(a)*0.4,0.5+Math.sin(a*2)*0.2,Math.sin(a)*0.3)]);}
+    for(const s of [-1,1])P.push([B(0.09,0.3,0.09),sk.suit,Mx(s*0.24,0.52,0,0,0,s*0.25)]);
+    vg=new THREE.SphereGeometry(0.14,12,8);vp=[0,0.7,-0.12];vs=[1.15,0.55,0.9];
   }else{ /* mech */
     P.push([B(0.44,0.4,0.32),sk.suit,Mx(0,0.42,0)],[B(0.16,0.16,0.16),sk.chest,Mx(0.3,0.58,0)],[B(0.16,0.16,0.16),sk.chest,Mx(-0.3,0.58,0)],
       [S(0.14),sk.legs,Mx(0,0.72,-0.02)],[new THREE.TorusGeometry(0.15,0.04,8,18),sk.chest,Mx(0,0.64,0,Math.PI/2,0,0)],
