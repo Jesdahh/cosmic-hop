@@ -1063,6 +1063,7 @@ body.photoMode #ui{opacity:0!important}
           <li><b>BASES</b>: press <kbd>E</kbd> at an outpost for storage, farms and teleporters. Visit your bases from the <b>MAP</b>.</li>
           <li><b>STORM RUSH</b>: when a solar storm hits, glowing storm crystals erupt nearby. Mine them before the storm passes!</li>
           <li><b>ALIEN RAIDERS</b>: raider packs hunt you while you fly between worlds, arriving after a short warning. Hold <kbd>F</kbd> (or <b>FIRE</b> on phone) — your laser auto-locks the nearest raider. Their hits also chew through hull HP. Destroy them for coins, ore, Guild rep and contracts, or boost away until they jump out. Systems 3–4 send alien <b>DREADNOUGHTS</b> — huge volley-firing capital ships guarded by escorts, with heavy loot.</li>
+          <li><b>CIVILIZED SYSTEMS 5–7</b>: Khepri, Vesk and the Weaving host living cities with alien citizens. Land and they will defend their world — citizens zap you on foot and armed <b>orbital defense platforms</b> open fire on your ship at HOSTILE alert. Fight back with your laser (<kbd>F</kbd> / <b>FIRE</b>): destroy citizens and platforms for loot, but every kill raises their alert. Hail the colony beacon [E] to pay tribute and stand down, or clear their missions to earn exclusive rocket &amp; suit skins.</li>
           <li><b>UNKNOWN VESSELS</b>: friendly alien ships from other star systems cruise the spacelanes. Fly close and press <kbd>E</kbd> (or tap <b>HAIL</b>) to talk — first contact with each species pays credits, Cartographer rep and codex data.</li></ul></section>
         <section><h3><svg class="ic"><use href="#i-full"/></svg> PHONE &amp; TABLET</h3><ul>
           <li>Left side: drag the <b>joystick</b> to fly or walk.</li>
@@ -1947,7 +1948,10 @@ const MISSIONS=[
   {id:'m7',title:'LIVING DISCOVERIES',desc:'Scan 5 living organisms in the Elysian Veil with the Pulse Scanner [C].',type:'elysianScan',goal:5,prog:0,done:false,gold:100,reward:{fe:10,ae:15,lum:6,bp:2,so:0,vd:0}},
   {id:'m8',title:'THE LOST NETWORK',desc:'Find and reactivate 3 of the 5 lost Energy Network nodes.',type:'elysianNode',goal:3,prog:0,done:false,gold:100,reward:{fe:20,ae:20,lum:8,bp:2,so:0,vd:0}},
   {id:'m9',title:'CRYSTAL HARVEST',desc:'Mine 10 rare Lumina Crystals from the floating islands, oceans and crystal peaks.',type:'lumCrystal',goal:10,prog:0,done:false,gold:100,reward:{fe:0,ae:20,lum:10,bp:3,so:0,vd:0}},
-  {id:'m10',title:'ETERNAL BLOOM',desc:'Restore THE ETERNAL BLOOM: activate all 5 Energy Network nodes and scan 10 Elysian species, then stabilize the Bloom.',type:'bloom',goal:1,prog:0,done:false,gold:500,reward:{fe:50,ae:50,lum:20,bp:10,vw:10,seed:2,so:20,vd:10}}
+  {id:'m10',title:'ETERNAL BLOOM',desc:'Restore THE ETERNAL BLOOM: activate all 5 Energy Network nodes and scan 10 Elysian species, then stabilize the Bloom.',type:'bloom',goal:1,prog:0,done:false,gold:500,reward:{fe:50,ae:50,lum:20,bp:10,vw:10,seed:2,so:20,vd:10}},
+  {id:'m11',title:'BRONZE CROWN',desc:'Enter the Khepri Dominion and destroy 2 SETHARI orbital defense platforms (they engage at HOSTILE alert while you fly near their worlds).',type:'civPlat',goal:2,prog:0,done:false,gold:600,reward:{fe:60,ae:50,so:40,vd:20},skin:{kind:'astro',id:'dawnbearer'}},
+  {id:'m12',title:'COLD CHOIR',desc:'Provoke the VESK CHOIR to HUNTED and destroy one of their TITAN warships in the Vesk Hollow.',type:'civTitan',goal:1,prog:0,done:false,gold:800,reward:{ae:60,so:50,vd:40,lum:15},skin:{kind:'ship',id:'hollowsong'}},
+  {id:'m13',title:'PATTERN BREAKER',desc:'Destroy 6 orbital defense platforms belonging to the civilizations of systems 5–7.',type:'civPlat',goal:6,prog:0,done:false,gold:1200,reward:{so:60,vd:60,lum:30,bp:6},skin:{kind:'astro',id:'frayed'}}
   ,{id:'hq1',hq:true,title:'WELCOME HOME',desc:'Fly to your orbital HQ FRONTIER COMMANDER and dock your ship in its hangar [L].',type:'hqDock',goal:1,prog:0,done:false,gold:300,reward:{fe:20,ae:10}},
   {id:'hq2',hq:true,title:'MEET THE CREW',desc:'Talk to 4 different crew members living aboard your station [E].',type:'hqCrew',goal:4,prog:0,done:false,gold:400,reward:{fe:15,ae:15,so:5}},
   {id:'hq3',hq:true,title:'GRAND TOUR',desc:'Walk into 5 different rooms of the station on foot.',type:'hqRoom',goal:5,prog:0,done:false,gold:400,reward:{fe:20,ae:15}},
@@ -1980,6 +1984,15 @@ function advanceMission(type,amt=1){
       const g=m.gold||100;earnGold(g,true);
       toast(`MISSION COMPLETE: ${m.title}! +${g} 🪙`);
       if(m.id==='m10')grantEternalExplorer();
+      if(m.skin){
+        const list=m.skin.kind==='ship'?SKIN.ownedShip:SKIN.ownedAstro;
+        const def=(m.skin.kind==='ship'?SHIP_SKINS:ASTRO_SKINS).find(s=>s.id===m.skin.id);
+        if(def&&!list.includes(m.skin.id)){
+          list.push(m.skin.id);
+          comicPop(def.name+' UNLOCKED!','#ffd23f',50,34);
+          toast(`NEW ${m.skin.kind==='ship'?'ROCKET':'SUIT'} EARNED: ${def.name}`);
+        }
+      }
     }
   }
   if(changed){updateMissionHUD();updateElyHUD();checkAchievements();checkMilestones();saveGame(true);}
@@ -4853,14 +4866,17 @@ function civWorld(b,sysKey,idx){
   const cGeo=merge([
     [new THREE.CylinderGeometry(0.16,0.2,0.5,5),C.color,Mx(0,0.55,0)],
     [new THREE.SphereGeometry(0.17,8,6),C.glow,Mx(0,0.92,0)],
-    [new THREE.BoxGeometry(0.16,0.3,0.1),dark,Mx(0,0.25,0)]
+    [new THREE.BoxGeometry(0.16,0.3,0.1),dark,Mx(0,0.25,0)],
+    [new THREE.TorusGeometry(0.3,0.035,5,18),C.glow,Mx(0,0.32,0,Math.PI/2,0,0)],
+    ...(C.tier>=6?[[new THREE.TorusGeometry(0.24,0.02,5,20),C.color,Mx(0,1.14,0,Math.PI/2,0.4,0)]]:[])
   ]);
   const cMat=new THREE.MeshToonMaterial({vertexColors:true,gradientMap:gradTex,emissive:C.color,emissiveIntensity:0.35});
-  for(let i=0;i<9;i++){
+  const cCount=C.tier>=7?14:C.tier>=5?12:10;
+  for(let i=0;i<cCount;i++){
     const m=new THREE.Mesh(cGeo,cMat),rr=4.2+rnd()*5.2;
     m.position.set(Math.cos(rnd()*TAU)*rr,C.tier>=6?0.9:0.55,Math.sin(rnd()*TAU)*rr);
     addOutline(m,OL_PROP);g.add(m);
-    citizens.push({m,rr,a:rnd()*TAU,sp:(0.10+rnd()*0.16)*(rnd()<0.5?-1:1),y:C.tier>=6?0.9:0.55});
+    citizens.push({m,rr,a:rnd()*TAU,sp:(0.10+rnd()*0.16)*(rnd()<0.5?-1:1),y:C.tier>=6?0.9:0.55,hp:3+C.tier,fireT:0.7+i*0.4,dead:false});
   }
   (b.detail||b.group).add(g);
   const localPos=dir.clone().multiplyScalar(gr);
@@ -4888,6 +4904,25 @@ function civWorld(b,sysKey,idx){
   const st=new THREE.Mesh(merge(SP),bodyMat);addOutline(st,OL_BIG);sg.add(st);
   sg.position.set(0,b.R*1.75,0);
   b.station=sg;b.updaters.push((dt,t)=>{sg.rotation.y+=dt*0.18;sg.position.y=b.R*1.75+Math.sin(t*0.4)*1.4;});
+  // Orbital defense grid — armed platforms that engage tresspassing ships
+  const nPlat=C.tier>=7?5:C.tier>=5?4:3,platR=b.R*2.3;
+  b.civBoltMat=new THREE.MeshBasicMaterial({color:C.bolt,transparent:true,opacity:.95,blending:THREE.AdditiveBlending,depthWrite:false});
+  b.civDef=[];
+  for(let i=0;i<nPlat;i++){
+    const pg=new THREE.Group();b.group.add(pg);
+    const PP=[
+      [new THREE.BoxGeometry(2.2,0.5,2.2),dark,Mx(0,0,0)],
+      [new THREE.CylinderGeometry(0.3,0.45,1.6,6),C.color,Mx(0,0.95,0)],
+      [new THREE.ConeGeometry(0.34,1.5,6),C.glow,Mx(0,2.2,0,Math.PI,0,0)],
+      [new THREE.SphereGeometry(0.32,8,6),C.glow,Mx(0,0.55,0)]
+    ];
+    if(C.tier>=5)PP.push([new THREE.TorusGeometry(1.5,0.08,5,22),C.glow,Mx(0,0.25,0,Math.PI/2,0,0)]);
+    if(C.tier>=7)PP.push([new THREE.TorusKnotGeometry(1.1,0.05,36,5,2,3),C.color,Mx(0,0.1,0)]);
+    const pm=new THREE.Mesh(merge(PP),bodyMat);addOutline(pm,OL_BIG);pg.add(pm);
+    b.civDef.push({g:pg,a:i/nPlat*TAU+rnd()*0.7,r:i%2?platR*1.12:platR,y0:i%2?10:-8,bobT:rnd()*TAU,bobS:0.5+rnd()*0.4,
+      hp:16+C.tier*6,maxHp:16+C.tier*6,fireT:1+rnd()*2,dead:false});
+  }
+  b.updaters.push((dt,t)=>{for(const d of b.civDef){if(d.dead)continue;d.a+=dt*0.12;d.bobT+=dt*d.bobS;d.g.position.set(Math.cos(d.a)*d.r,d.y0+Math.sin(d.bobT)*3.2,Math.sin(d.a)*d.r);}});
 }
 function civParley(col){
   if(!col)return;
@@ -4925,6 +4960,38 @@ function civTick(dt){
   const d=pos.distanceTo(b.colony.localPos);
   if(d>36)return;
   if(!b.colony.warned){b.colony.warned=true;toast(`⚠ ${C.name} DEFENSES TRACK YOU — LEAVE OR HAIL THE COLONY`);SFX.alarm();}
+  // citizens fight back: the closest ones close in and zap the intruder
+  const cits=b.colony.citizens||[];
+  let shooters=0;
+  for(let i=0;i<cits.length&&shooters<3;i++){
+    const c=cits[i];if(c.dead)continue;
+    const cLoc=_cv0.copy(c.m.position).applyMatrix4(b.colony.city.matrix);
+    const cd=cLoc.distanceTo(pos);
+    if(cd>26)continue;
+    shooters++;
+    const pa=Math.atan2(pos.z-b.colony.localPos.z,pos.x-b.colony.localPos.x);
+    let da=pa-c.a;while(da>Math.PI)da-=TAU;while(da<-Math.PI)da+=TAU;
+    c.a+=da*Math.min(1,dt*2.2);
+    c.rr+=(Math.min(13,Math.max(7,cd*0.55))-c.rr)*Math.min(1,dt*2);
+    c.fireT-=dt;
+    if(c.fireT<=0){
+      c.fireT=2.1+Math.random()*0.8;
+      const start=cLoc.clone();
+      const miss=Math.random()<0.3;
+      const end=miss?pos.clone().add(new V3((Math.random()-.5)*7,(Math.random()-.5)*3,(Math.random()-.5)*7)):pos.clone();
+      const dirv=end.sub(start),len=dirv.length()||1;
+      const beam=new THREE.Mesh(new THREE.CylinderGeometry(0.08,0.08,1,6,1,true),new THREE.MeshBasicMaterial({color:C.bolt,transparent:true,opacity:0.85,blending:THREE.AdditiveBlending,depthWrite:false}));
+      beam.position.copy(start).addScaledVector(dirv,0.5);
+      beam.quaternion.setFromUnitVectors(AY,dirv.multiplyScalar(1/len));
+      beam.scale.y=len;
+      b.group.add(beam);CIVFX.push({mesh:beam,t:0});
+      if(!miss){
+        hurt(1.5+C.tier*0.75,null,true,`${C.name} CITIZEN ZAP`);
+        camShake=Math.max(camShake,0.18);
+      }
+      SFX.raiderShot();
+    }
+  }
   b.colony.zapT-=dt;
   if(b.colony.zapT>0)return;
   b.colony.zapT=2.4;
@@ -4937,6 +5004,98 @@ function civTick(dt){
   b.group.add(beam);CIVFX.push({mesh:beam,t:0});
   hurt(3+C.tier*0.9,`${C.name} DEFENSE BEAM — CEASE TRESPASS`,'','CIV DEFENSE BEAM');
   SFX.raiderShot();camShake=Math.max(camShake,0.25);
+}
+const _cv0=new V3(),_cv1=new V3();
+function civCitizenWorld(b,c,out){return out.copy(c.m.position).applyMatrix4(b.colony.city.matrix).add(b.center);}
+function damageCitizen(b,c,n){
+  if(!c||c.dead)return;
+  c.hp-=n;
+  civCitizenWorld(b,c,_cv0);boom(_cv0,0xffd166,0.22);
+  if(c.hp<=0)destroyCitizen(b,c);else SFX.raiderHit();
+}
+function destroyCitizen(b,c){
+  if(c.dead)return;c.dead=true;
+  civCitizenWorld(b,c,_cv0);boom(_cv0,0xffb27a,0.8);SFX.explode();
+  if(c.m.parent)c.m.parent.remove(c.m);
+  const C=b.colony.civ;b.colony.kills=(b.colony.kills||0)+1;
+  grantCivRep(C.civ,-4);civNudge(C.sys,1,'CITIZEN KILLED');
+  const gold=18+C.tier*10;earnGold(gold,true);
+  if(C.tier>=7){INV.lum=(INV.lum||0)+2;}
+  else if(C.tier>=5){INV.vd=(INV.vd||0)+1;INV.ae=(INV.ae||0)+2;}
+  else{INV.ae=(INV.ae||0)+2;INV.so=(INV.so||0)+1;}
+  updateResHUD();
+  comicPop(C.name+' CITIZEN DOWN','#'+C.color.toString(16).padStart(6,'0'),50,36);
+  toast(`⚔ CITIZEN KILLED — ${C.name} ALERT RISES`);
+  if(window.__HQ)coopEvent('raider',1);
+  saveGame(true);
+}
+const CIVDEF={bolts:[],warned:{}};
+function civDefWorld(b,d,out){return out.set(Math.cos(d.a)*d.r,d.y0+Math.sin(d.bobT)*3.2,Math.sin(d.a)*d.r).add(b.center);}
+function civHitShip(n){
+  if(PL.mode!=='fly')return;
+  const dmg=Math.max(5,n-UPGRADES.ship.lvl*1.1);
+  camShake=Math.max(camShake,0.5);buzz(20);
+  const absorbed=Math.min(PL.shield,dmg);PL.shield=Math.max(0,PL.shield-absorbed);
+  const bleed=Math.max(2,dmg*0.26)+Math.max(0,dmg-absorbed)*0.45;
+  const hf=$('hurtFx');hf.classList.remove('go');void hf.offsetWidth;hf.classList.add('go');
+  hurt(bleed,null,true,'SHOT DOWN BY ORBITAL DEFENSES');SFX.hurt();
+  if(absorbed>0)SFX.shieldHit();
+  if(PL.shield<=0&&uTime.value-(PL.hullWarnT||-99)>7){PL.hullWarnT=uTime.value;toast('⚠️ SHIELDS DOWN — THE ORBITAL GRID IS CHEWING YOUR HULL!');}
+}
+function damageCivDef(b,d,n){
+  if(d.dead)return;
+  d.hp-=n;
+  civDefWorld(b,d,_cv0);boom(_cv0,0xffd166,0.3);
+  if(d.hp<=0)destroyCivDef(b,d);else SFX.raiderHit();
+}
+function destroyCivDef(b,d){
+  if(d.dead)return;d.dead=true;
+  civDefWorld(b,d,_cv0);boom(_cv0,0xffb27a,1.2);boom(_cv1.copy(_cv0).add(new V3(1.2,0.5,0)),0xff4d6d,0.6);
+  SFX.explode();
+  if(d.g.parent)d.g.parent.remove(d.g);
+  const C=CIVS[b.sys];
+  grantCivRep(C.civ,-6);civNudge(C.sys,1,'DEFENSE PLATFORM DESTROYED');
+  const gold=Math.round(80+C.tier*22+Math.random()*30);earnGold(gold,true);
+  if(C.tier>=7){INV.lum=(INV.lum||0)+2;INV.bp=(INV.bp||0)+1;}
+  else if(C.tier>=5){INV.vd=(INV.vd||0)+2;INV.ae=(INV.ae||0)+2;}
+  else{INV.so=(INV.so||0)+2;INV.ae=(INV.ae||0)+2;}
+  INV.rp=(INV.rp||0)+2;updateResHUD();
+  comicPop('DEFENSE PLATFORM DOWN','#'+C.color.toString(16).padStart(6,'0'),50,36);
+  advanceMission('civPlat',1);
+  if(window.__HQ)coopEvent('raider',1);
+  const left=b.civDef.filter(x=>!x.dead).length;
+  toast(left?`⚔ ORBITAL PLATFORM DESTROYED — ${left} STILL ACTIVE`:`⚔ ${C.name} ORBITAL GRID NEUTRALIZED OVER ${b.name}`);
+  saveGame(true);
+}
+function civDefTick(dt){
+  for(let i=CIVDEF.bolts.length-1;i>=0;i--){
+    const bl=CIVDEF.bolts[i];bl.life+=dt;bl.mesh.position.addScaledVector(bl.vel,dt);bl.mesh.rotation.z+=dt*7;
+    if(bl.mesh.position.distanceTo(ship.group.position)<6){civHitShip(bl.dmg);boom(bl.mesh.position,bl.mesh.material.color.getHex(),0.4);scene.remove(bl.mesh);CIVDEF.bolts.splice(i,1);continue;}
+    if(bl.life>4.4){scene.remove(bl.mesh);CIVDEF.bolts.splice(i,1);}
+  }
+  if(PL.mode!=='fly')return;
+  const b=PL.near;if(!b||!b.civDef||!b.civDef.length)return;
+  const C=CIVS[b.sys];if(!C||civAlert(C.sys)<2)return;
+  if(ship.group.position.distanceTo(b.center)>b.R*4+140)return;
+  if(!CIVDEF.warned[b.name]){CIVDEF.warned[b.name]=1;toast(`⚠ ${C.name} ORBITAL DEFENSE GRID ONLINE — EVADE OR DESTROY THE PLATFORMS`);SFX.alarm();}
+  for(const d of b.civDef){
+    if(d.dead)continue;
+    civDefWorld(b,d,_cv0);
+    const dd=_cv0.distanceTo(ship.group.position);
+    d.g.lookAt(ship.group.position);
+    d.fireT-=dt;
+    if(d.fireT<=0&&dd<210){
+      d.fireT=1.7+Math.random()*0.9;
+      const aim=ship.group.position.clone().addScaledVector(PL.vel,0.2);
+      aim.x+=(Math.random()-.5)*8;aim.y+=(Math.random()-.5)*6;aim.z+=(Math.random()-.5)*8;
+      const dir=aim.sub(_cv0),len=dir.length()||1;dir.multiplyScalar(1/len);
+      const mesh=new THREE.Mesh(RAIDER.boltGeo,b.civBoltMat);
+      mesh.position.copy(_cv0).addScaledVector(dir,3);mesh.scale.set(1,1,2.6);
+      scene.add(mesh);
+      CIVDEF.bolts.push({mesh,vel:dir.multiplyScalar(82),life:0,dmg:5+C.tier*1.1});
+      SFX.raiderShot();
+    }
+  }
 }
 
 
@@ -4967,6 +5126,7 @@ const SHIP_SKINS=[
   {id:'synod',name:'SETHARI SYNOD ARK',price:0,locked:true,wreck:'TALON',shape:'synod',body:0xffb066,acc:0x5a2c10,str:0xffe0a8,glass:0xff7a2e,gEm:0x7a3a00,f1:0xffb066,f2:0xfff0c0,bonus:'armor',desc:'SALVAGED ON TALON (KHEPRI) — a bronze four-tier cathedral ark with solar sails and a forge-crown ring. FORGE PLATE: takes 25% less damage.'},
   {id:'choir',name:'VESK CANTICLE FRAME',price:0,locked:true,wreck:'NULLWEAVE',shape:'choir',body:0x0b1a1e,acc:0x2a4a52,str:0x66ffd5,glass:0xd8fff8,gEm:0x1a6a5a,f1:0x66ffd5,f2:0xd8fff8,bonus:'speed',desc:'SALVAGED ON NULLWEAVE (VESK) — three resonant halo rings around a dead machine spine. HARMONIC DRIVE: +15% top speed.'},
   {id:'loom',name:'UNMADE LOOMSHIP',price:0,locked:true,wreck:'THREAD',shape:'loom',body:0x2a0b2e,acc:0x9a5cff,str:0xff5ce1,glass:0xffd1f5,gEm:0x7a1060,f1:0xff5ce1,f2:0xffd1f5,bonus:'regen',desc:'SALVAGED ON THREAD (THE WEAVING) — a folded torus-knot hull held together by impossible ribbons. LIVING SEAM: slowly heals you while flying.'},
+  {id:'hollowsong',name:'VESK HOLLOWSONG',price:0,locked:true,mission:true,shape:'choir',body:0x0d2620,acc:0x2a4a3a,str:0x66ffd5,glass:0xd8fff8,gEm:0x1a8a7a,f1:0x66ffd5,f2:0xd8fff8,bonus:'speed',desc:'MISSION REWARD — a captured VESK CHOIR frame with its three resonant halo rings. HARMONIC DRIVE: +15% top speed.'},
   {id:'vanguard',name:'VANGUARD MK-II',price:22000,model:'models/spaceship.glb',body:0x6b7280,acc:0x39d7ff,str:0xffd23f,glass:0x8eeaff,gEm:0x0a6a7a,f1:0x39d7ff,f2:0xffffff,flameZ:2.0,flameK:1.5,desc:'A hand-modeled strike fighter loaded straight into the game: glass canopy, eight wing cannons and glowing hull strips. Real 3D mesh hull.'},
 ];
 const ASTRO_SKINS=[
@@ -4988,6 +5148,8 @@ const ASTRO_SKINS=[
   {id:'sunwarden',name:'SETHARI SUN-WARDEN',price:0,locked:true,wreck:'TALON',shape:'sunwarden',suit:0xffb066,legs:0x5a2c10,chest:0xffe0a8,belt:0xff7a2e,visor:0x1a0a05,vEm:0x6a2408,limb:1.1,headY:0.94,bonus:'armor',desc:'SALVAGED ON TALON — a bronze forge-priest shell with a sun crest and layered skirt plates. FORGE-BLESSED: takes less damage.'},
   {id:'veskframe',name:'VESK CANTICLE FRAME',price:0,locked:true,wreck:'NULLWEAVE',shape:'veskframe',suit:0x1d3a42,legs:0x0b1a1e,chest:0x2a4a52,belt:0x66ffd5,visor:0xd8fff8,vEm:0x1a8a7a,limb:1.0,headY:0.9,bonus:'jump',desc:'SALVAGED ON NULLWEAVE — a machine-chorister frame that floats its own head. HARMONIC LEGS: jump higher and jetpack fuel lasts longer.'},
   {id:'unmade',name:'THE UNMADE SHELL',price:0,locked:true,wreck:'THREAD',shape:'unmade',suit:0x2a0b2e,legs:0x14061a,chest:0x4a1a6a,belt:0xff5ce1,visor:0xffd1f5,vEm:0x9a1050,limb:1.05,headY:0.92,bonus:'speed',desc:'SALVAGED ON THREAD — a ribbon-wrapped shell with orbiting shards. UNSEWN STEP: runs 25% faster.'},
+  {id:'dawnbearer',name:'KHEPRI DAWNBEARER',price:0,locked:true,mission:true,shape:'sunwarden',suit:0xffcf8a,legs:0x8a4a1a,chest:0xffe8c0,belt:0x39c6ff,visor:0x9dfcff,vEm:0x0a6a7a,limb:1.1,headY:0.94,bonus:'armor',desc:'MISSION REWARD — a SETHARI forge-priest shell reforged in dawn bronze with a teal reactor mantle. FORGE-BLESSED: takes less damage.'},
+  {id:'frayed',name:'FRAYED PATTERN SHELL',price:0,locked:true,mission:true,shape:'unmade',suit:0x3a1050,legs:0x1a0b24,chest:0x9a5cff,belt:0xff5ce1,visor:0xffd1f5,vEm:0x9a1050,limb:1.05,headY:0.92,bonus:'speed',desc:'MISSION REWARD — a suit cut from the Weaving\'s own loose threads, still humming with the pattern. UNSEWN STEP: runs 25% faster.'},
   {id:'knight',name:'STAR KNIGHT',price:13000,shape:'knight',suit:0xc7ccd6,legs:0x9aa1ad,chest:0xe8ecf2,belt:0xd62828,visor:0x39c6ff,vEm:0x1b5a7a,limb:1.12,headY:1.0,bonus:'armor',desc:'Shining armor and a red plume. KNIGHT PLATE: takes 30% less damage on foot.'},
   {id:'mech',name:'MINI MECH',price:16000,shape:'mech',suit:0xffb703,legs:0x2b2d42,chest:0x3d405b,belt:0xd62828,visor:0xff4d6d,vEm:0x8a0020,limb:1.55,headY:0.86,bonus:'speed',desc:'A walking tank. SERVO LEGS: run 25% faster.'},
 ];
@@ -5956,15 +6118,15 @@ function renderShop(){
     const tkey=(isShip&&k.model)||hid?'':(isShip?'ship:':'astro:')+k.id;
     const card=document.createElement('div');card.className='uCard'+(eq?' equipped':'');
     card.innerHTML=`<div><div class="shopPrev" data-thumb="${tkey}">${hid?'<svg viewBox="0 0 100 60"><text x="50" y="44" text-anchor="middle" font-size="40" font-weight="900" fill="#5a5a7a">?</text></svg>':isShip?shipPrev(k):astroSvg(k)}</div>
-      <div class="uTitle" style="margin-top:8px"><span>${hid?(isShip?'??? LOST ROCKET':'??? LOST SUIT'):k.name}</span><span class="uLvl">${k.wreck?(hid?'???':'SALVAGED'):k.team?'TEAM ONLY':locked?'REWARD':k.price?k.price+' 🪙':'FREE'}</span></div>
+      <div class="uTitle" style="margin-top:8px"><span>${hid?(isShip?'??? LOST ROCKET':'??? LOST SUIT'):k.name}</span><span class="uLvl">${k.wreck?(hid?'???':'SALVAGED'):k.team?'TEAM ONLY':k.mission?'MISSION REWARD':locked?'REWARD':k.price?k.price+' 🪙':'FREE'}</span></div>
       <div class="uDesc" style="margin-top:4px">${hid?'Something is lost out there. It cannot be bought.':k.desc}</div></div>
-      <button class="uBtn${has?'':' buy'}" data-skin="${k.id}" ${eq||(!has&&(!afford||locked))?'disabled':''}>${eq?'★ EQUIPPED':locked?(k.wreck?'UNDISCOVERED':k.team?'TEAM OPS TIER '+k.team+' REWARD':'ETERNAL BLOOM REWARD'):has?'EQUIP':afford?'BUY · '+k.price+' <svg class="ic"><use href="#i-coin"/></svg>':'NEED '+(k.price-gold)+' MORE <svg class="ic"><use href="#i-coin"/></svg>'}</button>`;
+      <button class="uBtn${has?'':' buy'}" data-skin="${k.id}" ${eq||(!has&&(!afford||locked))?'disabled':''}>${eq?'★ EQUIPPED':locked?(k.wreck?'UNDISCOVERED':k.team?'TEAM OPS TIER '+k.team+' REWARD':k.mission?'COMPLETE ITS MISSION TO UNLOCK':'ETERNAL BLOOM REWARD'):has?'EQUIP':afford?'BUY · '+k.price+' <svg class="ic"><use href="#i-coin"/></svg>':'NEED '+(k.price-gold)+' MORE <svg class="ic"><use href="#i-coin"/></svg>'}</button>`;
     grid.appendChild(card);
   }
   thumbAttach(grid);
   grid.querySelectorAll('[data-skin]').forEach(b=>b.addEventListener('click',()=>{
     const id=b.dataset.skin,k=list.find(s=>s.id===id);
-    if(k.locked&&!owned.includes(id)){toast(k.wreck?'SOMETHING IS LOST OUT THERE…':k.team?`TEAM-ONLY: CLEAR TEAM OPS TIER ${k.team} IN MULTIPLAYER TO UNLOCK ${k.name}`:k.id==='goldenbloom'?'RESTORE THE ETERNAL BLOOM TO EARN THE GOLDEN BLOOM SKIN':'REACH EXPLORER RANK III TO EARN THE VOIDLIGHT ENVOY SKIN');return;}
+    if(k.locked&&!owned.includes(id)){toast(k.wreck?'SOMETHING IS LOST OUT THERE…':k.team?`TEAM-ONLY: CLEAR TEAM OPS TIER ${k.team} IN MULTIPLAYER TO UNLOCK ${k.name}`:k.mission?'EARNED FROM FRONTIER MISSIONS IN SYSTEMS 5–7 — CHECK YOUR MISSION LOG':k.id==='goldenbloom'?'RESTORE THE ETERNAL BLOOM TO EARN THE GOLDEN BLOOM SKIN':'REACH EXPLORER RANK III TO EARN THE VOIDLIGHT ENVOY SKIN');return;}
     if(!owned.includes(id)){if((INV.gold||0)<k.price)return;INV.gold-=k.price;owned.push(id);toast(`PURCHASED ${k.name}!`);SFX.coin();}
     if(isShip){SKIN.ship=id;dressShip(ship.model,ship.flame,id);}else{SKIN.astro=id;dressAstro(astro,id);}
     SFX.upgrade();updateResHUD();saveGame(true);renderShop();
@@ -6775,10 +6937,24 @@ function updateMining(dt){
   if(PL.mode==='fly'&&RAIDER.active)for(const r of RAIDER.list){
     if(r.dead)continue;
     const d=ref.distanceTo(r.group.position);
-    if(d<foeDist){foeDist=d;foeTarget=r;}
+    if(d<foeDist){foeDist=d;foeTarget={kind:'raider',raider:r,worldPos:r.group.position};}
+  }
+  if(PL.mode==='fly'&&PL.near&&PL.near.civDef)for(const d0 of PL.near.civDef){
+    if(d0.dead)continue;
+    civDefWorld(PL.near,d0,_cv0);
+    const d=ref.distanceTo(_cv0);
+    if(d<foeDist){foeDist=d;foeTarget={kind:'civdef',body:PL.near,def:d0,worldPos:_cv0.clone()};}
+  }
+  if((PL.mode==='walk'||PL.mode==='rover')&&PL.body&&PL.body.colony&&civAlert(PL.body.colony.civ.sys)>=1){
+    for(const c of PL.body.colony.citizens){
+      if(c.dead)continue;
+      civCitizenWorld(PL.body,c,_cv0);
+      const d=ref.distanceTo(_cv0);
+      if(d<foeDist){foeDist=d;foeTarget={kind:'citizen',body:PL.body,cit:c,worldPos:_cv0.clone()};}
+    }
   }
   PL.targetFoe=foeTarget;
-  const aim=foeTarget?{kind:'raider',raider:foeTarget,worldPos:foeTarget.group.position}:bestTarget;
+  const aim=foeTarget||bestTarget;
   const ret=$('reticle');
   ret.classList.toggle('show',started&&!modalOpen&&(PL.mode==='walk'||PL.mode==='rover'||!!aim));
   ret.classList.toggle('lock',!!aim);
@@ -6791,7 +6967,7 @@ function updateMining(dt){
     laserBeam.position.copy(startPos);
     laserBeam.lookAt(aim.worldPos);
     laserBeam.scale.set(1,1,startPos.distanceTo(aim.worldPos));
-    laserBeam.material.color.setHex(aim.kind==='raider'?0xff4d6d:RES_META[aim.type].color);
+    laserBeam.material.color.setHex(aim.kind==='node'||aim.kind==='ast'?RES_META[aim.type].color:(aim.kind==='civdef'?aim.def&&CIVS[aim.body.sys].bolt:0xff4d6d));
 
     const power=(1+(UPGRADES.tool.lvl-1)*0.45)*((PL.mode==='walk'&&astroBonus()==='miner')||(PL.mode==='fly'&&shipBonus()==='mining')?1.3:1);
     PL.mineTimer+=dt*power;
@@ -6799,6 +6975,10 @@ function updateMining(dt){
       PL.mineTimer=0;
       if(aim.kind==='raider'){
         damageRaider(aim.raider,1+(UPGRADES.tool.lvl>=3?1:0));
+      }else if(aim.kind==='civdef'){
+        damageCivDef(aim.body,aim.def,1+(UPGRADES.tool.lvl>=3?1:0));
+      }else if(aim.kind==='citizen'){
+        damageCitizen(aim.body,aim.cit,1);
       }else{
       const yieldAmt=1+Math.floor((UPGRADES.tool.lvl-1)*0.75);
       const meta=RES_META[bestTarget.type];
@@ -7027,6 +7207,7 @@ function destroyRaider(r){
   if(civHit){grantCivRep(civHit.civ,-6);civNudge(civHit.sys,1,'YOU FIRED ON THE '+civHit.name);}
   if(first&&!civHit)recordDiscovery('Combat','Alien Raider','Deep Space','A hostile alien raider skiff destroyed in ship-to-ship combat over the frontier.');
   if(civHit&&!GAME.civMet[civHit.civ])civRecord(civHit.civ,'defender');
+  if(civHit&&isBoss&&civHit.sys==='vesk')advanceMission('civTitan',1);
   if(isBoss){
     grantAch('dreadnought');
     if(!civHit)recordDiscovery('Combat','Alien Dreadnought','Deep Space','A capital-class alien dreadnought destroyed in open space.');
@@ -8183,7 +8364,7 @@ function exitShip(){
     const h=b.heightAt(_a.x,_a.y,_a.z);if(b.liquid&&!b.liquidSolid&&h<-0.2)continue;A.dir.copy(_a);placed=true;break;}
   if(!placed)A.dir.copy(PL.local).addScaledVector(_r,2.5).normalize();
   A.view.copy(_f).addScaledVector(A.dir,-_f.dot(A.dir)).normalize();A.face.copy(A.view);A.yOff=0;A.vy=0;A.pitch=0.32;
-  PL.jetFuel=100;
+  PL.jetFuel=100;PL.spawnProt=uTime.value+2.5;
   b.group.add(A.group);A.group.visible=true;PL.mode='walk';placeAstro(b);
   SFX.jump();
   toast('SPACE: JETPACK · C: SCAN · F: MINE!');
@@ -8675,9 +8856,10 @@ function updateHUD(dt){
   else if(m==='fly'){const foes=RAIDER.active?RAIDER.list.filter(r=>!r.dead).length:0,npcNear=nearestNpc(150),
     boss=RAIDER.active?RAIDER.list.find(r=>r.boss&&!r.dead):null;
     setBtn(bLand,'LAND',false,!canLand,canLand);setBtn(bExit,npcNear?'HAIL':'EXIT',!npcNear,false,!!npcNear);setBtn(bBoost,'BOOST',false);
-    setBtn(bMine,RAIDER.active?'FIRE':'MINE',false,!RAIDER.active&&!PL.targetNode,!!RAIDER.active||!!PL.targetNode);
+    setBtn(bMine,(RAIDER.active||PL.targetFoe)?'FIRE':'MINE',false,!(RAIDER.active||PL.targetFoe||PL.targetNode),!!(RAIDER.active||PL.targetFoe||PL.targetNode));
     if(RAIDER.active&&RAIDER.warnT>0)setPrompt(boss?`DREADNOUGHT INBOUND — ENGAGE IN ${Math.ceil(RAIDER.warnT)}s`:`ALIEN RAIDERS INBOUND — ENGAGE IN ${Math.ceil(RAIDER.warnT)}s`);
     else if(RAIDER.active)setPrompt(boss?`${key('F')}HOLD FIRE · DREADNOUGHT ${Math.max(0,Math.ceil(boss.hp))}/${boss.maxHp} HP · ${Math.ceil(RAIDER.fightT)}s`:`${key('F')}HOLD FIRE · ${foes} RAIDER${foes===1?'':'S'} · ${Math.ceil(RAIDER.fightT)}s`);
+    else if(PL.targetFoe&&PL.targetFoe.kind==='civdef')setPrompt(`${key('F')}HOLD FIRE · DEFENSE PLATFORM ${Math.max(0,Math.ceil(PL.targetFoe.def.hp))}/${PL.targetFoe.def.maxHp} HP`);
     else if(window.__HQ&&derelictNear()){setPrompt(`${key('E')}SALVAGE THE ANCIENT VESSEL · ${Object.entries(DERELICT.cost).map(([k,v])=>v+' '+k.toUpperCase()).join(' ')}`);setBtn(bExit,'SALVAGE',false,false,true);}
     else if(npcNear)setPrompt(`${key('E')}HAIL ${npcNear.species} VESSEL — ${npcNear.origin}`);
     else if(PL.targetNode)setPrompt(`${key('F')}HOLD TO MINE ${RES_META[PL.targetNode.type].label}`);
@@ -8689,15 +8871,17 @@ function updateHUD(dt){
   else if(m==='landed'){setBtn(bLand,'TAKE OFF',false);setBtn(bExit,'EXIT',false,false,true);setBtn(bBoost,'BOOST',true);setBtn(bMine,'MINE',true);setPrompt(`${key('E')}HOP OUT · ${key('L')}TAKE OFF`);}
   else if(m==='walk'){
     const canE=!!PL.nearInteract||astro.nearShip;
-    setBtn(bLand,'JET/JMP',false);setBtn(bExit,PL.nearInteract?'USE':'ENTER',false,!canE,canE);setBtn(bBoost,'RUN',false);setBtn(bMine,'MINE',false,!PL.targetNode,!!PL.targetNode);
+    setBtn(bLand,'JET/JMP',false);setBtn(bExit,PL.nearInteract?'USE':'ENTER',false,!canE,canE);setBtn(bBoost,'RUN',false);setBtn(bMine,PL.targetFoe?'FIRE':'MINE',false,!(PL.targetFoe||PL.targetNode),!!(PL.targetFoe||PL.targetNode));
     if(PL.nearInteract)setPrompt(`${key('E')}${PL.nearInteract.label}`);
+    else if(PL.targetFoe)setPrompt(`${key('F')}HOLD FIRE — FIGHT BACK AGAINST THE ${PL.body.colony.civ.name}!`);
     else if(PL.targetNode)setPrompt(`${key('F')}HOLD TO MINE ${RES_META[PL.targetNode.type].label}`);
     else if(astro.nearShip)setPrompt(`${key('E')}CLIMB ABOARD`);
     else if(PL.foodNear)setPrompt('FOOD NEARBY — WALK INTO THE GLOWING FRUIT TO PICK IT UP');
     else setPrompt('');}
   else if(m==='rover'){
-    setBtn(bLand,'HORN',false);setBtn(bExit,'EXIT',false,false,true);setBtn(bBoost,'TURBO',false);setBtn(bMine,'MINE',false,!PL.targetNode,!!PL.targetNode);
-    if(PL.targetNode)setPrompt(`${key('F')}HOLD TO MINE ${RES_META[PL.targetNode.type].label}`);
+    setBtn(bLand,'HORN',false);setBtn(bExit,'EXIT',false,false,true);setBtn(bBoost,'TURBO',false);setBtn(bMine,PL.targetFoe?'FIRE':'MINE',false,!(PL.targetFoe||PL.targetNode),!!(PL.targetFoe||PL.targetNode));
+    if(PL.targetFoe)setPrompt(`${key('F')}HOLD FIRE — FIGHT BACK AGAINST THE ${PL.body.colony.civ.name}!`);
+    else if(PL.targetNode)setPrompt(`${key('F')}HOLD TO MINE ${RES_META[PL.targetNode.type].label}`);
     else setPrompt(`${key('E')}EXIT ROVER`);
   }
   else if(m==='descend'||m==='landing'){
@@ -8783,7 +8967,7 @@ function frame(dt){
   updateMP(dt);
   if(started)updateCapsule(dt);
   if(started)updateShop2(dt);
-  if(window.__HQ){updateCoop(dt);if(started){wreckTick();derelictTick();civTick(dt);}}
+  if(window.__HQ){updateCoop(dt);if(started){wreckTick();derelictTick();civTick(dt);civDefTick(dt);}}
   look.x=look.y=0;
 
   let tint=0;
