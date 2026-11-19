@@ -8927,12 +8927,62 @@ function hqCanDock(){
   return ship.group.position.distanceTo(HQ.group.position)<340;
 }
 const _hqQ=new Q(),_hqQ2=new Q(),_hqV=new V3(),_hqT=new V3();
+function hqInBay(p){return Math.abs(p.x)<14.6&&p.y>-0.6&&p.y<12.6&&p.z<-13&&p.z>-52;}
+function hqDockPath(p0){
+  const tail=[new V3(0,6,-70),new V3(0,4.2,-46),new V3(0,HQ_PAD_Y+1.2,-31),new V3(0,HQ_PAD_Y,HQ_PAD_Z)];
+  if(hqInBay(p0))return p0.z<-33?[p0,new V3(0,HQ_PAD_Y+1.4,-31),new V3(0,HQ_PAD_Y,HQ_PAD_Z)]:[p0,new V3(p0.x*0.5,HQ_PAD_Y+0.8,(p0.z+HQ_PAD_Z)/2),new V3(0,HQ_PAD_Y,HQ_PAD_Z)];
+  const C=new V3(0,5,-4),R=128,front=new V3(0,0.05,-1).normalize(),pts=[p0.clone()];
+  const pb=p0.clone();if(hqSolidPush(pb))pts.push(pb.clone());
+  const dir0=pb.clone().sub(C).normalize(),r0=pb.distanceTo(C);
+  /* already lined up in front of the bay: fly straight in */
+  if(dir0.dot(front)>0.8&&pb.z<-62&&Math.abs(pb.x)<60&&Math.abs(pb.y-5)<45){pts.push(new V3(pb.x*0.4,8,Math.min(-110,pb.z-10)),...tail);return pts;}
+  /* close to the ring plane between hull and ring: climb/dive clear of it first */
+  const hr=Math.hypot(pb.x,pb.z+4);
+  if(Math.abs(pb.y+2)<9&&hr>40&&hr<95){const clear=dy=>{for(let i=1;i<=10;i++){const q=pb.clone();q.y+=dy*i/10;if(hqSolidPush(q))return false;}return true;};
+    const pref=pb.y+2>=0?18:-18,dy=clear(pref)?pref:(clear(-pref)?-pref:pref);pts.push(new V3(pb.x,pb.y+dy,pb.z));}
+  /* climb out to the safety sphere, travel around it (over the top when coming from behind), then approach the bay */
+  const last=pts[pts.length-1],d1=last.clone().sub(C).normalize();
+  if(r0<R)pts.push(C.clone().addScaledVector(d1,R));
+  const route=[d1];if(d1.dot(front)<-0.2)route.push(d1.clone().add(front).multiplyScalar(0.5).add(new V3(0,0.9,0)).normalize());route.push(front);
+  for(let k=0;k<route.length-1;k++){const a=route[k],b=route[k+1],n=Math.max(1,Math.ceil(a.angleTo(b)/0.45));
+    const qq=new Q().setFromUnitVectors(a,b);for(let i=1;i<=n;i++){const d=a.clone().applyQuaternion(new Q().slerp(qq,i/n));pts.push(C.clone().addScaledVector(d,R));}}
+  pts.push(...tail);
+  return pts.filter((p,i)=>i===0||p.distanceTo(pts[i-1])>0.5);
+}
+/* station collision volumes (station-local), used in free flight */
+function hqBoxPush(p,x0,x1,y0,y1,z0,z1){if(p.x<=x0||p.x>=x1||p.y<=y0||p.y>=y1||p.z<=z0||p.z>=z1)return false;
+  const d=[p.x-x0,x1-p.x,p.y-y0,y1-p.y,p.z-z0,z1-p.z];let k=0;for(let i=1;i<6;i++)if(d[i]<d[k])k=i;
+  if(k===0)p.x=x0;else if(k===1)p.x=x1;else if(k===2)p.y=y0;else if(k===3)p.y=y1;else if(k===4)p.z=z0;else p.z=z1;return true;}
+function hqTorusPush(p,cy,R,r,tilt){
+  let x=p.x,y=p.y+2-(cy+2),z=p.z+4;
+  if(tilt){const c=Math.cos(-tilt),s2=Math.sin(-tilt),nx=x*c-y*s2,ny=x*s2+y*c;x=nx;y=ny;}
+  const h=Math.hypot(x,z)||1e-6,ex=h-R,dd=Math.hypot(ex,y);if(dd>=r)return false;
+  let nh,ny2;if(dd<1e-4){nh=R;ny2=r;}else{nh=R+ex*r/dd;ny2=y*r/dd;}
+  x=x/h*nh;z=z/h*nh;y=ny2;
+  if(tilt){const c=Math.cos(tilt),s2=Math.sin(tilt),nx=x*c-y*s2,ny=x*s2+y*c;x=nx;y=ny;}
+  p.set(x,y-2+(cy+2),z-4);return true;}
+function hqSolidPush(p){
+  const L=HQ.level,m=2.4;let hit=false;
+  for(let it=0;it<2;it++){
+    if(!hqInBay(p))hit=hqBoxPush(p,-47-m,47+m,-11.5-m,16.5+m,-51-m,41+m)||hit;
+    hit=hqBoxPush(p,-22-m,22+m,15,31.5+m,-9.5-m,31.5+m)||hit;
+    hit=hqBoxPush(p,-1.6-m,1.6+m,28,(L>=5?52:46),0.4-m,3.6+m)||hit;
+    for(const sx of [-1,1]){hit=hqBoxPush(p,sx*55-3.8-m,sx*55+3.8+m,-0.8-m,6.8+m,-1-m,34+m)||hit;
+      hit=hqBoxPush(p,Math.min(sx*45,sx*54)-0.5,Math.max(sx*45,sx*54)+0.5,1.6-m,4.4+m,9.5-m,18.5+m)||hit;
+      if(L>=4)hit=hqBoxPush(p,sx*36-2.9-m,sx*36+2.9+m,-13.4-m,-6,10-m,34+m)||hit;}
+    hit=hqTorusPush(p,-2,66,3.7+m,0)||hit;
+    if(L>=5)hit=hqTorusPush(p,-2,74,1.2+m,-0.2)||hit;
+    if(hqHas('ring2'))hit=hqTorusPush(p,-2,82,2.3+m,0.35)||hit;
+    if(hqHas('energy')){const dx=p.x,dy=p.y+18,dz=p.z-14,d=Math.hypot(dx,dy,dz),rr=9.5+m;if(d<rr&&d>1e-4){p.set(dx/d*rr,dy/d*rr-18,dz/d*rr+14);hit=true;}}
+    if(hqHas('storage'))hit=hqBoxPush(p,-38.5-m,38.5+m,-9.4-m,-6,-5.2-m,20.2+m)||hit;
+  }
+  return hit;
+}
 function hqDock(){
   const p0=HQ.group.worldToLocal(ship.group.position.clone());
-  const pre=p0.z>-80?(()=>{const sx=p0.x>=0?1:-1;return [new V3(sx*Math.max(115,Math.abs(p0.x)),Math.max(28,p0.y*0.5),clamp(p0.z,-60,90)),new V3(sx*95,14,-125)];})():[new V3(p0.x*0.4,8,Math.min(-120,p0.z))];
-  const curve=new THREE.CatmullRomCurve3([p0,...pre,new V3(0,6,-70),new V3(0,4.2,-46),new V3(0,HQ_PAD_Y+1.2,-31),new V3(0,HQ_PAD_Y,HQ_PAD_Z)],false,'centripetal');
+  const curve=new THREE.CatmullRomCurve3(hqDockPath(p0),false,'centripetal');
   const qL=_hqQ.copy(HQ.group.quaternion).invert().multiply(ship.group.quaternion).clone();
-  HQ.dock={curve,t:0,dur:clamp(curve.getLength()/40,5,13),q0:qL,turn:0};
+  HQ.dock={curve,t:0,dur:clamp(curve.getLength()/42,4,15),q0:qL,turn:0};
   PL.mode='hqdock';PL.body=HQBODY;PL.speed=0;PL.vel.set(0,0,0);HQ.busy=true;ship.gear.visible=false;
   SFX.ui();toast('DOCKING CLEARANCE GRANTED — AUTOPILOT ENGAGED');
 }
@@ -9029,8 +9079,9 @@ function hqCamera(dt,snap){
     camera.position.lerp(_a,snap||HQ.nav.snap?1:1-Math.exp(-dt*2.5));HQ.nav.snap=false;camera.up.set(0,1,0);camera.lookAt(c);camera.fov=lerp(camera.fov,baseFov,1-Math.exp(-dt*3));return;}
   if(m==='hqdock'||m==='hqlaunch'){
     _f.set(0,0,-1).applyQuaternion(ship.group.quaternion);_u.set(0,1,0).applyQuaternion(HQ.group.quaternion);
-    _a.copy(ship.group.position).addScaledVector(_f,-12).addScaledVector(_u,4.2);camera.position.lerp(_a,snap?1:1-Math.exp(-dt*4));
-    camera.up.copy(_u);camera.lookAt(_b.copy(ship.group.position).addScaledVector(_f,6));camera.fov=lerp(camera.fov,baseFov,1-Math.exp(-dt*3));return;}
+    _a.copy(ship.group.position).addScaledVector(_f,-13).addScaledVector(_u,5);camera.position.lerp(_a,snap?1:1-Math.exp(-dt*9));
+    const D=HQ.dock,w=(m==='hqdock'&&D&&!D.launch&&D.t<0.8&&ship.group.position.distanceTo(HQ.group.position)>75)?0.22:0;
+    _b.copy(ship.group.position).addScaledVector(_f,6);if(w)_b.lerp(HQ.group.position,w);camera.up.copy(_u);camera.lookAt(_b);camera.fov=lerp(camera.fov,baseFov,1-Math.exp(-dt*3));return;}
   let tgtL,lookL;
   if(m==='hqlanded'){orbit.yaw-=look.x;orbit.pitch=clamp(orbit.pitch+look.y,0.06,1.2);
     const r=11;tgtL=_hqV.set(Math.sin(orbit.yaw)*Math.cos(orbit.pitch)*r,HQ_PAD_Y+Math.sin(orbit.pitch)*r,HQ_PAD_Z+Math.cos(orbit.yaw)*Math.cos(orbit.pitch)*r);
@@ -9111,9 +9162,9 @@ function updateHQ(dt){
     else HQ.health=Math.max(10,HQ.health-dt*0.6);}
   /* ships may not fly through the hull */
   if(PL.mode==='fly'){const p=HQ.group.worldToLocal(_hqV.copy(ship.group.position));
-    if(Math.abs(p.x)<48&&p.y>-12&&p.y<22&&p.z>-51&&p.z<41){const dx=48-Math.abs(p.x),dyT=22-p.y,dyB=p.y+12,dzF=p.z+51,dzB=41-p.z,mn=Math.min(dx,dyT,dyB,dzF,dzB);
-      if(mn===dx)p.x=Math.sign(p.x||1)*48;else if(mn===dyT)p.y=22;else if(mn===dyB)p.y=-12;else if(mn===dzF)p.z=-51;else p.z=41;
-      ship.group.position.copy(HQ.group.localToWorld(p));PL.speed*=0.4;PL.vel.multiplyScalar(0.3);if(uTime.value-(HQ.bumpT||-9)>2){HQ.bumpT=uTime.value;toast('PROXIMITY ALERT — USE DOCK [L] TO ENTER THE HANGAR');}}}
+    if(hqInBay(p)&&p.z>-50&&hqCanDock()){hqDock();}
+    else if(hqSolidPush(p)){
+      ship.group.position.copy(HQ.group.localToWorld(p));PL.speed*=0.4;PL.vel.multiplyScalar(0.3);if(uTime.value-(HQ.bumpT||-9)>2){HQ.bumpT=uTime.value;SFX.shieldHit&&SFX.shieldHit();toast('PROXIMITY ALERT — PRESS DOCK [L] OR FLY INTO THE GLOWING HANGAR BAY');}}}
   hqUpdateTag();
 }
 let hqBeamM=null,hqBeamT=0;
