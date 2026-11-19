@@ -1061,6 +1061,7 @@ body.photoMode #ui{opacity:0!important}
           <li><b>PHOTO MODE</b>: <kbd>P</kbd> hides the HUD, <kbd>ENTER</kbd> captures. Photograph creatures for Star Cartographer contracts.</li>
           <li><b>FACTIONS</b>: rescues, salvage, photos and discoveries earn reputation and daily / weekly contracts. Claim them in <b>LOG → FACTIONS</b>.</li>
           <li><b>BASES</b>: press <kbd>E</kbd> at an outpost for storage, farms and teleporters. Visit your bases from the <b>MAP</b>.</li>
+          <li><b>CO-PILOT SHIP</b>: buy your wingmate for <b>10,000 coins</b> in <b>SHOP → GEAR</b>. It follows you in space and on planets, mines nearby deposits, and prioritizes hostile aliens with support fire. It respects peaceful colonies and your cloak. Recall or redeploy it from the same shop card; your pet and mining drone stay equipped.</li>
           <li><b>PLANETARY CITIZENS (SYSTEMS 3–4)</b>: native patrols guard landing areas on Gargantua and Elysian worlds. Their appearance matches each world, from void wardens to reefkin and mushroom folk. They warn outsiders, then fire glowing plasma that you can dodge or block with terrain. Hold <kbd>F</kbd> or <b>FIRE</b> to fight back for coins, or retreat to your ship. These are separate from scannable wildlife.</li>
           <li><b>STORM RUSH</b>: when a solar storm hits, glowing storm crystals erupt nearby. Mine them before the storm passes!</li>
           <li><b>ALIEN RAIDERS</b>: raider packs hunt you while you fly between worlds, arriving after a short warning. Hold <kbd>F</kbd> (or <b>FIRE</b> on phone) — your laser auto-locks the nearest raider. Their hits also chew through hull HP. Destroy them for coins, ore, Guild rep and contracts, or boost away until they jump out. Systems 3–4 send alien <b>DREADNOUGHTS</b> — huge volley-firing capital ships guarded by escorts, with heavy loot.</li>
@@ -5169,7 +5170,7 @@ function nativeClear(b,start,end){
     const t=len2?clamp(p.copy(c.p).sub(start).dot(delta)/len2,0,1):0;
     if(p.copy(start).addScaledVector(delta,t).distanceToSquared(c.p)<c.r*c.r)return false;
   }
-  for(const c of b.natives.scenery){
+  for(const c of b.natives?b.natives.scenery:[]){
     const t=len2?clamp(p.copy(c.sphere.center).sub(start).dot(delta)/len2,0,1):0;
     if(p.copy(start).addScaledVector(delta,t).distanceToSquared(c.sphere.center)>c.sphere.radius*c.sphere.radius)continue;
     const a=start.clone().applyMatrix4(c.inv),z=end.clone().applyMatrix4(c.inv);
@@ -6941,7 +6942,9 @@ function loadGame(){
     if(data.inv)Object.assign(INV,data.inv);
     if(data.lastLand)PL.lastLand=data.lastLand;
     if(data.hq&&window.__HQ){try{hqLoad(data.hq);}catch(err){console.warn('HQ load',err);}}
-    if(data.shop2&&typeof data.shop2==='object'){const d2=data.shop2;SHOP2.own=Array.isArray(d2.own)?d2.own:[];SHOP2.eq=Object.assign({hat:'',back:'',trail:'',steps:'',pet:''},d2.eq||{});SHOP2.gear=Object.assign({},d2.gear||{});SHOP2.dblUntil=+d2.dblUntil||0;
+    SHOP2.own=SHOP2.own.filter(id=>id!=='copilot_ship');SHOP2.eq.copilot=false;COPILOT.fresh=true;
+    if(data.shop2&&typeof data.shop2==='object'){const d2=data.shop2;SHOP2.own=Array.isArray(d2.own)?d2.own:[];SHOP2.eq=Object.assign({hat:'',back:'',trail:'',steps:'',pet:'',copilot:false},d2.eq||{});SHOP2.gear=Object.assign({},d2.gear||{});SHOP2.dblUntil=+d2.dblUntil||0;
+      SHOP2.eq.copilot=SHOP2.own.includes('copilot_ship')&&SHOP2.eq.copilot===true;
       setTimeout(()=>applyAstroStyle(astro,SHOP2.eq.hat,SHOP2.eq.back),0);}
     if(data.vitals){PL.hp=clamp(+data.vitals.hp||100,20,100);PL.food=clamp(+data.vitals.food||100,0,100);}
     if(data.skins){
@@ -7077,6 +7080,29 @@ function loadGame(){
 }
 
 /* ---- Mining Laser & Resource Extraction ---- */
+function harvestResource(target,yieldAmt,b,prefix=''){
+  const item=target.kind==='node'?target.node:target.ast;
+  if(item.depleted)return;
+  const meta=RES_META[target.type];
+  INV[target.type]+=yieldAmt;if(window.__HQ)coopEvent('mine',yieldAmt);
+  if(target.type==='so')advanceMission('solarite',yieldAmt);
+  if(target.type==='lum')advanceMission('lumCrystal',yieldAmt);
+  const gEarn=yieldAmt*(GOLD_RATE[target.type]||1)*(dblOn()?2:1);tutFlags.mine=1;
+  INV.gold=(INV.gold||0)+gEarn;
+  updateResHUD();SFX.minePop();
+  comicPop(`${prefix}+${yieldAmt} ${meta.label}! +${gEarn} COINS`,meta.hex,50,42);
+  item.hp--;
+  if(item.hp<=0){
+    item.depleted=true;item.mesh.visible=false;
+    if(target.kind==='node'&&item.storm){
+      if(b&&b.stormNodes){const si=b.stormNodes.indexOf(item);if(si>=0)b.stormNodes.splice(si,1);}
+      const ni=b?b.nodes.indexOf(item):-1;if(ni>=0)b.nodes.splice(ni,1);
+      INV.rp=(INV.rp||0)+1;factionProgress('storm',1);earnGold(14,true);
+      comicPop('STORM CRYSTAL HARVESTED!','#a0f0ff',50,38);
+      toast('STORM CRYSTAL SECURED — TRADE IT AT THE EXCHANGE');
+    }else item.respawnT=target.kind==='node'?40:45;
+  }
+}
 function updateMining(dt){
   const ref=PL.mode==='walk'?_e.copy(astro.group.position).add(PL.body.center):(PL.mode==='rover'?_e.copy(rover.localPos).add(PL.body.center):ship.group.position);
   const maxRange=(PL.mode==='walk'||PL.mode==='rover')?20:65;
@@ -7162,34 +7188,7 @@ function updateMining(dt){
       }else if(aim.kind==='native'){
         damageNative(aim.body,aim.cit,1+(UPGRADES.tool.lvl>=3?1:0));
       }else{
-      const yieldAmt=1+Math.floor((UPGRADES.tool.lvl-1)*0.75);
-      const meta=RES_META[bestTarget.type];
-      INV[bestTarget.type]+=yieldAmt;if(window.__HQ)coopEvent('mine',yieldAmt);
-      if(bestTarget.type==='so')advanceMission('solarite',yieldAmt);
-      if(bestTarget.type==='lum')advanceMission('lumCrystal',yieldAmt);
-      const gEarn=yieldAmt*(GOLD_RATE[bestTarget.type]||1)*(dblOn()?2:1);tutFlags.mine=1;
-      INV.gold=(INV.gold||0)+gEarn;
-      updateResHUD();
-      SFX.minePop();
-      comicPop(`+${yieldAmt} ${meta.label}! +${gEarn}🪙`,meta.hex,50,42);
-
-      if(bestTarget.kind==='node'){
-        bestTarget.node.hp--;
-        if(bestTarget.node.hp<=0){
-          bestTarget.node.depleted=true;bestTarget.node.mesh.visible=false;
-          if(bestTarget.node.storm){
-            const sb=searchBodies[0];
-            if(sb&&sb.stormNodes){const si=sb.stormNodes.indexOf(bestTarget.node);if(si>=0)sb.stormNodes.splice(si,1);}
-            const ni=sb?sb.nodes.indexOf(bestTarget.node):-1;if(ni>=0)sb.nodes.splice(ni,1);
-            INV.rp=(INV.rp||0)+1;factionProgress('storm',1);earnGold(14,true);
-            comicPop('STORM CRYSTAL HARVESTED!','#a0f0ff',50,38);
-            toast('⚡ STORM CRYSTAL SECURED — TRADE IT AT THE EXCHANGE');
-          }else bestTarget.node.respawnT=40;
-        }
-      }else{
-        bestTarget.ast.hp--;
-        if(bestTarget.ast.hp<=0){bestTarget.ast.depleted=true;bestTarget.ast.mesh.visible=false;bestTarget.ast.respawnT=45;}
-      }
+        harvestResource(bestTarget,1+Math.floor((UPGRADES.tool.lvl-1)*0.75),searchBodies[0]);
       }
     }
   }else{
@@ -9142,6 +9141,7 @@ function frame(dt){
     updateGalaxy(dt);
     nativeTick(dt);
     updateMining(dt);
+    updateCopilot(dt);
     updateEcosystemAndHazards(dt,simT);
   }
   if(activeSystemId==='elysian')updateElysFx(dt,simT);
@@ -9301,6 +9301,7 @@ async function boot(){
     if(isTouchDev&&canFS)goFull();
     SFX.init();SFX.discover();
     if(resume)loadGame();
+    else{SHOP2.own=SHOP2.own.filter(id=>id!=='copilot_ship');SHOP2.eq.copilot=false;COPILOT.fresh=true;}
     ensureFactionContracts();
     if(checkCosmetics())saveGame(true);
     started=true;$('start').classList.add('bye');$('ui').classList.add('live');canvas.focus();PL.speed=30;
@@ -10577,7 +10578,7 @@ HQ.api.wreckTick=wreckTick;HQ.api.wrecks=()=>HQ.wrecks;
 
 // SHOP2-BEGIN
 /* ===== SHOP 2.0 — new rocket & suit shapes, GEAR, STYLE, PETS, BOOSTS ===== */
-const SHOP2={own:[],eq:{hat:'',back:'',trail:'',steps:'',pet:''},gear:{},dblUntil:0};
+const SHOP2={own:[],eq:{hat:'',back:'',trail:'',steps:'',pet:'',copilot:false},gear:{},dblUntil:0};
 function shipBonus(){return (SHIP_SKINS.find(s=>s.id===SKIN.ship)||{}).bonus||'';}
 function astroBonus(){return (ASTRO_SKINS.find(s=>s.id===SKIN.astro)||{}).bonus||'';}
 function gearLvl(id){return SHOP2.gear[id]||0;}
@@ -10951,6 +10952,103 @@ function buildBoard(){const m=new THREE.Mesh(merge([[new THREE.CylinderGeometry(
 function buildWings(){const g=new THREE.Group();for(const s of [-1,1]){const w=new THREE.Mesh(new THREE.PlaneGeometry(0.7,0.22),toon(0x9dfcff,{side:THREE.DoubleSide,emissive:0x2a7a9a,emissiveIntensity:0.4}));w.position.set(s*0.42,0.5,0.15);w.rotation.set(0,0,s*0.15);g.add(w);}g.visible=false;return g;}
 function buildDrone(){const m=new THREE.Mesh(merge([[new THREE.SphereGeometry(0.16,12,8),0x4a4960,Mx(0,0,0)],[new THREE.BoxGeometry(0.5,0.03,0.08),0x8a889c,Mx(0,0.12,0)],[new THREE.BoxGeometry(0.08,0.03,0.5),0x8a889c,Mx(0,0.12,0)],[new THREE.SphereGeometry(0.06,8,6),0x5df2c0,Mx(0,-0.03,-0.13)]]),vcToon);addOutline(m);return m;}
 
+const COPILOT={price:10000,g:null,glow:null,beam:null,fresh:true,body:null,mode:'',sys:'',think:0,fireT:0,mineT:0,beamT:0,
+  base:new V3(),up:new V3(),forward:new V3(),side:new V3(),goal:new V3(),local:new V3(),dir:new V3(),point:new V3(),end:new V3(),from:new V3(),to:new V3(),zero:new V3(),matrix:new M4(),rotation:new Q()};
+function buildCopilot(){
+  const C=COPILOT,g=new THREE.Group(),P=[
+    [new THREE.OctahedronGeometry(0.85,0),0xe8ecff,Mx(0,0,0,0,0,0,0.8,0.45,1.8)],
+    [new THREE.BoxGeometry(2.9,0.14,0.65),0x326ca8,Mx(0,-0.06,0.45)],
+    [new THREE.SphereGeometry(0.38,8,6),0x183954,Mx(0,0.25,-0.5,0,0,0,0.9,0.7,1.4)],
+    [new THREE.BoxGeometry(0.1,0.65,0.55),0xffd23f,Mx(0,0.38,0.85)]
+  ];
+  for(const x of [-1.15,1.15])P.push([new THREE.CylinderGeometry(0.24,0.3,1.5,6),0xe8ecff,Mx(x,0,0.4,Math.PI/2,0,0)],[new THREE.ConeGeometry(0.18,0.5,6),0xffd23f,Mx(x,0,-0.6,-Math.PI/2,0,0)]);
+  const hull=new THREE.Mesh(merge(P),vcToon);addOutline(hull,OL_PROP);g.add(hull);
+  C.glow=new THREE.Mesh(merge([-1.15,1.15].map(x=>[new THREE.ConeGeometry(0.2,0.7,6),0xffffff,Mx(x,0,1.4,Math.PI/2,0,0)])),new THREE.MeshBasicMaterial({color:0x5df2c0}));g.add(C.glow);
+  C.beam=new THREE.Mesh(laserBeam.geometry,new THREE.MeshBasicMaterial({color:0x5df2c0,transparent:true,opacity:0.85,blending:THREE.AdditiveBlending,depthWrite:false}));C.beam.visible=false;C.beam.frustumCulled=false;
+  C.g=g;g.visible=false;scene.add(g,C.beam);
+}
+function copilotClear(b,end){
+  if(!b||!b.landable)return true;
+  const C=COPILOT;
+  return nativeClear(b,C.from.copy(C.g.position).sub(b.center),C.to.copy(end).sub(b.center));
+}
+function copilotEnemy(b,surface){
+  const C=COPILOT;let best=null,range=surface?28:220;
+  const take=(kind,unit,body,pos)=>{
+    if(unit.dead)return;
+    const d=C.base.distanceTo(pos);
+    if(d>=range||!copilotClear(b,pos))return;
+    range=d;best={kind,unit,body,worldPos:pos.clone()};
+  };
+  if(!surface){
+    if(RAIDER.active)for(const r of RAIDER.list)take('raider',r,null,r.group.position);
+    if(b&&b.civDef)for(const d of b.civDef){
+      if(civAlert(b.sys)<2&&!(input.mine&&PL.targetFoe&&PL.targetFoe.kind==='civdef'&&PL.targetFoe.def===d))continue;
+      take('civdef',d,b,civDefWorld(b,d,C.point));
+    }
+  }else{
+    if(b.natives&&(b.natives.grace<=0||input.mine))for(const c of b.natives.citizens)take('native',c,b,nativeTarget(b,c,C.point).add(b.center));
+    if(b.colony&&civAlert(b.sys)>=1&&C.local.copy(C.base).sub(b.center).distanceTo(b.colony.localPos)<36){
+      for(const c of b.colony.citizens)take('citizen',c,b,civCitizenWorld(b,c,C.point).addScaledVector(C.up,0.6));
+    }
+  }
+  return best;
+}
+function updateCopilot(dt){
+  const C=COPILOT,m=PL.mode,surface=m==='walk'||m==='rover';
+  const active=started&&!PL.dead&&SHOP2.own.includes('copilot_ship')&&SHOP2.eq.copilot===true&&(m==='fly'||surface);
+  if(!active){if(C.g)C.g.visible=false;if(C.beam)C.beam.visible=false;C.fresh=true;return;}
+  if(dt<=0||modalOpen||photoMode||CINE.open){if(C.beam)C.beam.visible=false;return;}
+  if(!C.g)buildCopilot();
+  const b=surface?PL.body:PL.near,cloaked=m==='fly'&&uTime.value<(PL.cloakUntil||0);
+  C.g.visible=!cloaked;
+  if(surface){
+    C.base.copy(m==='walk'?astro.group.position:rover.localPos).add(b.center);
+    C.up.copy(m==='walk'?astro.dir:rover.dir);C.forward.copy(m==='walk'?astro.face:rover.face);
+  }else{
+    C.base.copy(ship.group.position);C.up.copy(AY).applyQuaternion(ship.group.quaternion);C.forward.set(0,0,-1).applyQuaternion(ship.group.quaternion);
+  }
+  C.side.crossVectors(C.forward,C.up).normalize();
+  C.goal.copy(C.base).addScaledVector(C.side,surface?3.4:7).addScaledVector(C.forward,surface?-2:-4).addScaledVector(C.up,(surface?3:2)+Math.sin(uTime.value*2)*0.2);
+  const fresh=C.fresh||C.body!==b||C.mode!==m||C.sys!==activeSystemId||C.g.position.distanceToSquared(C.goal)>6400;
+  if(fresh){C.g.position.copy(C.goal);C.think=0.3;C.fireT=0.6;C.mineT=1;C.beamT=0;C.fresh=false;}
+  else{if(b&&(surface||PL.alt<b.R*2.5+60))C.g.position.add(b.delta);C.g.position.lerp(C.goal,1-Math.exp(-dt*7));}
+  C.body=b;C.mode=m;C.sys=activeSystemId;
+  if(b&&b.landable){
+    C.local.copy(C.g.position).sub(b.center);C.dir.copy(C.local).normalize();
+    const floor=b.groundR(C.dir.x,C.dir.y,C.dir.z)+2.8;
+    if(C.local.length()<floor)C.g.position.copy(b.center).addScaledVector(C.dir,floor);
+  }
+  C.rotation.setFromRotationMatrix(setBasis(C.matrix,C.zero,C.forward,C.up));C.g.quaternion.slerp(C.rotation,1-Math.exp(-dt*8));C.g.scale.setScalar(surface?0.7:1);
+  C.beamT=Math.max(0,C.beamT-dt);C.fireT=Math.max(0,C.fireT-dt);C.mineT=Math.max(0,C.mineT-dt);C.think-=dt;
+  if(cloaked){C.beam.visible=false;C.beamT=0;return;}
+  if(C.think<=0){
+    C.think=0.3;
+    const foe=copilotEnemy(b,surface);
+    if(foe){
+      if(C.fireT<=0){
+        C.fireT=1.2;C.end.copy(foe.worldPos);C.beamT=0.18;C.beam.material.color.setHex(0x39c6ff);
+        if(foe.kind==='raider')damageRaider(foe.unit,1);
+        else if(foe.kind==='civdef')damageCivDef(foe.body,foe.unit,1);
+        else if(foe.kind==='citizen')damageCitizen(foe.body,foe.unit,1);
+        else damageNative(foe.body,foe.unit,1);
+      }
+    }else if(C.mineT<=0){
+      const target=PL.targetNode,item=target&&(target.kind==='node'?target.node:target.ast);
+      if(item&&!item.depleted){
+        C.point.copy(target.worldPos);if(target.kind==='node'&&!item.orbital)C.point.addScaledVector(item.dir,0.7);
+        if(C.base.distanceTo(C.point)<(surface?22:70)&&copilotClear(b,C.point)){
+          C.mineT=2.6;C.end.copy(C.point);C.beamT=0.3;C.beam.material.color.setHex(0x5df2c0);
+          harvestResource(target,1,b,'CO-PILOT: ');
+        }
+      }
+    }
+  }
+  C.beam.visible=C.beamT>0;
+  if(C.beam.visible){C.beam.position.copy(C.g.position);C.beam.lookAt(C.end);C.beam.scale.set(0.75,0.75,C.g.position.distanceTo(C.end));}
+  C.glow.material.color.setHex(C.beamT>0?C.beam.material.color.getHex():0x5df2c0);
+}
+
 /* ---------- gear use ---------- */
 function gearUse(id){
   if(!gearLvl(id)||PL.dead)return;const now=uTime.value;PL.gcd=PL.gcd||{};
@@ -11082,6 +11180,10 @@ function renderShop2(grid,gold){
   const head=t=>{const h=document.createElement('div');h.style.cssText='grid-column:1/-1;font-family:var(--display);font-size:20px;letter-spacing:.06em;color:#ffd23f;margin-top:4px';h.textContent=t;grid.appendChild(h);};
   const need=p=>`NEED ${p-gold} MORE ${coinIc}`;
   if(shopTab==='gear'){
+    const own=SHOP2.own.includes('copilot_ship'),on=own&&SHOP2.eq.copilot===true;
+    card(prevIcon('i-launch','#5df2c0'),'CO-PILOT SHIP',own?(on?'DEPLOYED':'RECALLED'):COPILOT.price+' COINS',
+      'A compact wingmate follows your rocket in space and hovers beside you on foot or in your rover. Automatically mines nearby rocks and asteroids, and fires on hostile aliens. Combat first; one helper, no fuel cost. Recall here any time.',
+      `<button class="uBtn${on?'':' buy'}" data-copilot ${!own&&gold<COPILOT.price?'disabled':''}>${own?(on?'RECALL CO-PILOT':'DEPLOY CO-PILOT'):(gold>=COPILOT.price?'BUY · '+COPILOT.price+' '+coinIc:need(COPILOT.price))}</button>`,on);
     for(const it of GEAR_ITEMS){
       const lvl=gearLvl(it.id);
       if(it.prices){const max=it.prices.length,next=lvl<max?it.prices[lvl]:0;
@@ -11102,6 +11204,14 @@ function renderShop2(grid,gold){
       card(prevIcon(it.icon,it.col),it.name,'HAVE '+have,it.desc+(active?' <b style="color:#ffd23f">ACTIVE NOW!</b>':''),
         `<button class="uBtn buy" data-boost="${it.id}" ${gold>=it.price?'':'disabled'}>${gold>=it.price?'BUY · '+it.price+' '+coinIc:need(it.price)}</button>`+(it.use?`<button class="uBtn sky" data-use="${it.id}" ${have>0&&!active?'':'disabled'}>USE</button>`:''),active);}
   }
+  grid.querySelectorAll('[data-copilot]').forEach(b=>b.addEventListener('click',()=>{
+    if(!SHOP2.own.includes('copilot_ship')){
+      if(!buyFor(COPILOT.price,()=>{SHOP2.own.push('copilot_ship');SHOP2.eq.copilot=true;}))return;
+    }else{SHOP2.eq.copilot=!SHOP2.eq.copilot;SFX.ui();saveGame(true);}
+    COPILOT.fresh=true;
+    if(COPILOT.g)COPILOT.g.visible=false;if(COPILOT.beam)COPILOT.beam.visible=false;
+    toast(SHOP2.eq.copilot?'CO-PILOT DEPLOYED — MINING AND COMBAT SUPPORT ONLINE':'CO-PILOT RECALLED');renderShop();
+  }));
   grid.querySelectorAll('[data-gear]').forEach(b=>b.addEventListener('click',()=>{const it=GEAR_ITEMS.find(g=>g.id===b.dataset.gear),lvl=gearLvl(it.id);const price=it.prices?it.prices[lvl]:it.price;if(!price||(!it.prices&&lvl))return;
     if(buyFor(price,()=>{SHOP2.gear[it.id]=lvl+1;}))toast(`${it.name}${it.prices?' LV '+(lvl+1):''} INSTALLED!`);renderShop();}));
   grid.querySelectorAll('[data-style]').forEach(b=>b.addEventListener('click',()=>{const it=STYLE_ITEMS.find(s=>s.id===b.dataset.style);
