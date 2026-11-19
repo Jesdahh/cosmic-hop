@@ -841,6 +841,7 @@ body.photoMode #ui{opacity:0!important}
 <symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="10.5" width="14" height="10" rx="2.2"/><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3"/><path d="M12 14.5v2.5"/></symbol>
 <symbol id="i-send" viewBox="0 0 24 24"><path d="M21 3 10.5 13.5"/><path d="M21 3l-6.5 18-4-7.5L3 9.5 21 3Z"/></symbol>
 <symbol id="i-copy" viewBox="0 0 24 24"><rect x="8.5" y="8.5" width="12" height="12" rx="2"/><path d="M15.5 8.5V5.5a2 2 0 0 0-2-2h-8a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h3"/></symbol>
+<symbol id="i-station" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><ellipse cx="12" cy="12" rx="10" ry="4"/><path d="M12 2v7M12 15v7M7 9.5V6h10v3.5M7 14.5V18h10v-3.5"/></symbol>
 <symbol id="i-help" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 1 1 4 2c-1 .7-1.5 1.2-1.5 2.5"/><path d="M12 17h.01"/></symbol>
 <symbol id="i-full" viewBox="0 0 24 24"><path d="M8 3H5a2 2 0 0 0-2 2v3M16 3h3a2 2 0 0 1 2 2v3M8 21H5a2 2 0 0 1-2-2v-3M16 21h3a2 2 0 0 0 2-2v-3"/></symbol>
 <symbol id="i-settings" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M19.1 4.9 17 7M7 17l-2.1 2.1"/></symbol>
@@ -925,6 +926,7 @@ body.photoMode #ui{opacity:0!important}
       <button class="hudBtn sky" id="btnPhoto" title="Photo Mode (P)" aria-label="Photo mode"><svg class="ic"><use href="#i-camera"/></svg></button>
       <button class="hudBtn paper" id="btnChat" title="Chat (Y)" aria-label="Chat"><svg class="ic"><use href="#i-chat"/></svg></button>
       <button class="hudBtn void" id="btnMP" title="Multiplayer (N)" aria-label="Multiplayer"><svg class="ic"><use href="#i-crew"/></svg><span class="lbl">MULTI</span><span id="mpCount"></span></button>
+      <button class="hudBtn sky" id="btnHQ" title="Headquarters" aria-label="Headquarters"><svg class="ic"><use href="#i-station"/></svg><span class="lbl">HQ</span></button>
       <button class="hudBtn gold" id="btnShop" title="Coin Shop (K)"><svg class="ic"><use href="#i-shop"/></svg><span class="lbl">SHOP</span></button>
       <button class="hudBtn void" id="btnCraft" title="Craft & Outposts (B)"><svg class="ic"><use href="#i-craft"/></svg><span class="lbl">BUILD</span></button>
       <button class="hudBtn mint" id="btnUpgrade" title="Upgrade Tech Bay (U)"><svg class="ic"><use href="#i-tech"/></svg><span class="lbl">TECH</span></button>
@@ -1942,6 +1944,18 @@ const MISSIONS=[
   {id:'m8',title:'THE LOST NETWORK',desc:'Find and reactivate 3 of the 5 lost Energy Network nodes.',type:'elysianNode',goal:3,prog:0,done:false,gold:100,reward:{fe:20,ae:20,lum:8,bp:2,so:0,vd:0}},
   {id:'m9',title:'CRYSTAL HARVEST',desc:'Mine 10 rare Lumina Crystals from the floating islands, oceans and crystal peaks.',type:'lumCrystal',goal:10,prog:0,done:false,gold:100,reward:{fe:0,ae:20,lum:10,bp:3,so:0,vd:0}},
   {id:'m10',title:'ETERNAL BLOOM',desc:'Restore THE ETERNAL BLOOM: activate all 5 Energy Network nodes and scan 10 Elysian species, then stabilize the Bloom.',type:'bloom',goal:1,prog:0,done:false,gold:500,reward:{fe:50,ae:50,lum:20,bp:10,vw:10,seed:2,so:20,vd:10}}
+  ,{id:'hq1',hq:true,title:'WELCOME HOME',desc:'Fly to your orbital HQ FRONTIER COMMANDER and dock your ship in its hangar [L].',type:'hqDock',goal:1,prog:0,done:false,gold:300,reward:{fe:20,ae:10}},
+  {id:'hq2',hq:true,title:'MEET THE CREW',desc:'Talk to 4 different crew members living aboard your station [E].',type:'hqCrew',goal:4,prog:0,done:false,gold:400,reward:{fe:15,ae:15,so:5}},
+  {id:'hq3',hq:true,title:'GRAND TOUR',desc:'Walk into 5 different rooms of the station on foot.',type:'hqRoom',goal:5,prog:0,done:false,gold:400,reward:{fe:20,ae:15}},
+  {id:'hq4',hq:true,title:'FIRST EXPANSION',desc:'Buy or construct your first station module from STATION MANAGEMENT.',type:'hqModule',goal:1,prog:0,done:false,gold:600,reward:{fe:40,ae:30,so:10}},
+  {id:'hq5',hq:true,title:'EXPANDED HEADQUARTERS',desc:'Upgrade FRONTIER COMMANDER to Level 2 to open the Research Laboratory.',type:'hqLevel',goal:1,prog:0,done:false,gold:1500,reward:{fe:60,ae:40,so:20}},
+  {id:'hq6',hq:true,title:'GREEN THUMB',desc:'Build the Botanical Garden and harvest it in your Crew Quarters.',type:'hqHarvest',goal:1,prog:0,done:false,gold:500,reward:{ae:30,so:10}},
+  {id:'hq7',hq:true,title:'STATION ENGINEER',desc:'Install 5 modules on your station.',type:'hqModule',goal:5,prog:0,done:false,gold:2500,reward:{fe:80,ae:60,so:30,vd:10}},
+  {id:'hq8',hq:true,title:'BEAM ME HOME',desc:'Teleport between your HQ and a planetary outpost (needs the Teleporter Core and an outpost teleporter).',type:'hqTeleport',goal:1,prog:0,done:false,gold:1500,reward:{fe:40,ae:40,so:20,vd:5}},
+  {id:'hq9',hq:true,title:'MOVING DAY',desc:'Pilot the whole station to orbit a new world from the Navigation Console.',type:'hqNav',goal:1,prog:0,done:false,gold:2000,reward:{fe:50,ae:50,so:25}},
+  {id:'hq10',hq:true,title:'GALACTIC COMMAND',desc:'Upgrade the station to Level 4 — heavy engines and the grand observatory.',type:'hqLevel',goal:3,prog:0,done:false,gold:5000,reward:{fe:100,ae:80,so:50,vd:20}},
+  {id:'hq11',hq:true,title:'HYPERSPACE HEADQUARTERS',desc:'Jump the entire station to another star system.',type:'hqJump',goal:1,prog:0,done:false,gold:6000,reward:{so:60,vd:30}},
+  {id:'hq12',hq:true,title:'FRONTIER FLAGSHIP',desc:'Upgrade FRONTIER COMMANDER to Level 5 — the ultimate flagship.',type:'hqLevel',goal:4,prog:0,done:false,gold:12000,reward:{fe:150,ae:120,so:80,vd:40}}
 ];
 function addMissReward(m){
   for(const k of ['fe','ae','so','vd','lum','bp','vw','seed']){
@@ -1976,14 +1990,14 @@ function updateMissionHUD(){
     $('mProg').textContent=`STAGE ${line.stage+1}/${line.def.stages?line.def.stages.length:2} · ${line.def.stages?line.def.stages[line.stage]:'IN PROGRESS'} · ${line.progTxt}`;
     return;
   }
-  const cur=MISSIONS.find(m=>!m.done);
+  const mainM=MISSIONS.find(m=>!m.done&&!m.hq),stM=MISSIONS.find(m=>!m.done&&m.hq),cur=((typeof hqIn==='function'&&hqIn()&&stM)||mainM||stM);
   if(!cur){
     $('mTitle').innerHTML='<svg class="ic"><use href="#i-check"/></svg> ALL MISSIONS COMPLETE!';
     $('mDesc').textContent=GAME.title?'TITLE EARNED: '+GAME.title:'THE GALAXY REMEMBERS YOUR NAME.';
     $('mProg').textContent='GALACTIC EXPLORER RANK ACHIEVED';
     return;
   }
-  $('mTitle').innerHTML='<svg class="ic"><use href="#i-mission"/></svg> MISSION: '+cur.title;
+  $('mTitle').innerHTML=cur.hq?'<svg class="ic"><use href="#i-station"/></svg> STATION: '+cur.title:'<svg class="ic"><use href="#i-mission"/></svg> MISSION: '+cur.title;
   $('mDesc').textContent=cur.desc;
   $('mProg').textContent=`PROGRESS: ${cur.prog} / ${cur.goal}`;
 }
@@ -2061,7 +2075,7 @@ function checkAchievements(){
   if(GAME.sysVisited.length>=4)grantAch('hopper');
   if(ELYS.nodes.length>=5&&ELYS.nodes.every(n=>n.activated))grantAch('grid');
   if(elysSpeciesCount()>=25)grantAch('biologist');
-  if(MISSIONS.every(m=>m.done))grantAch('explorer');
+  if(MISSIONS.filter(m=>!m.hq).every(m=>m.done))grantAch('explorer');
   if(ELYS.restored)grantAch('eternal');
   if((GAME.raiderKills||0)>=1)grantAch('raider');
   if((GAME.contacts||[]).length)grantAch('envoy');
@@ -2535,7 +2549,7 @@ function renderBase(){
   else farm=`<div class="uDesc">Crop growing… ready in <b>${Math.ceil((f.readyAt-now)/1000)}s</b>. It keeps growing while you explore.</div>`;
   const tps=GAME.outposts.filter(o=>o!==e&&ensureOutpostDefaults(o).teleporter);
   const tp=e.teleporter?`<div class="uDesc">Teleporter pad online. ${tps.length} linked base${tps.length===1?'':'s'}.</div>
-    <div style="display:flex;flex-direction:column;gap:6px;margin-top:8px">${tps.map(t=>`<button class="uBtn sky" data-tp="${t.id}">⚡ ${t.body} · LV.${t.lvl}</button>`).join('')||'<div class="uDesc">Build a teleporter at another outpost to link the network.</div>'}</div>`
+    <div style="display:flex;flex-direction:column;gap:6px;margin-top:8px">${(window.__HQ&&hqHas('tpcore'))?`<button class="uBtn void" data-tphq="1"><svg class="ic"><use href="#i-station"/></svg> ${hqEsc(HQ.name)} · HQ</button>`:''}${tps.map(t=>`<button class="uBtn sky" data-tp="${t.id}">⚡ ${t.body} · LV.${t.lvl}</button>`).join('')||'<div class="uDesc">Build a teleporter at another outpost — or the Teleporter Core on your HQ — to link the network.</div>'}</div>`
     :`<div class="uDesc">Build a pad to fast-travel between your outposts across systems.</div><button class="uBtn void" id="btnTpBuild" style="margin-top:8px" ${(INV.fe>=15&&INV.ae>=5&&INV.so>=3)?'':'disabled'}>BUILD TELEPORTER · 15 FE · 5 AE · 3 SO</button>`;
   const upCost={fe:20*e.lvl,ae:12*e.lvl,so:6*e.lvl,vw:2*e.lvl};
   const max=e.lvl>=5,canUp=!max&&INV.fe>=upCost.fe&&INV.ae>=upCost.ae&&INV.so>=upCost.so&&INV.vw>=upCost.vw;
@@ -2573,6 +2587,7 @@ function renderBase(){
     INV.fe-=15;INV.ae-=5;INV.so-=3;e.teleporter=true;
     SFX.upgrade();updateResHUD();saveGame(true);syncOutpostVisuals(e);renderBase();toast('⚡ TELEPORTER ONLINE — LINK OTHER BASES');
   });
+  body.querySelectorAll('[data-tphq]').forEach(b=>b.addEventListener('click',()=>{clearTimeout(baseTimer);baseEntry=null;hqTeleportIn();}));
   body.querySelectorAll('[data-tp]').forEach(b=>b.addEventListener('click',()=>{
     const t=GAME.outposts.find(x=>x.id===b.dataset.tp);
     if(t)teleportToOutpost(t);
@@ -5181,7 +5196,7 @@ function openModal(id){
 }
 function closeModals(){
   modalOpen=false;
-  ['upgradeModal','craftModal','journalModal','mapModal','settingsModal','shopModal','helpModal','confirmModal','codeModal','baseModal','photoModal','alienModal','mpModal'].forEach(id=>$(id).classList.remove('open'));
+  ['upgradeModal','craftModal','journalModal','mapModal','settingsModal','shopModal','helpModal','confirmModal','codeModal','baseModal','photoModal','alienModal','mpModal','hqModal'].forEach(id=>$(id).classList.remove('open'));
   clearTimeout(baseTimer);
 }
 function askConfirm(title,msg,btns){
@@ -5697,7 +5712,9 @@ function renderJournalModal(){
     }
     html+=`<div style="font-family:var(--display);font-size:18px;color:#5a2ca0;margin:13px 0 5px">STANDING EXPEDITIONS</div>`;
     body.innerHTML=html;
+    let hqHdr=false;
     for(const m of MISSIONS){
+      if(m.hq&&!hqHdr){hqHdr=true;const h=document.createElement('div');h.style.cssText='font-family:var(--display);font-size:18px;color:#1f6fb2;margin:13px 0 5px';h.textContent='STATION OPERATIONS · FRONTIER COMMANDER';body.appendChild(h);}
       const el=document.createElement('div');el.className='jItem';
       el.innerHTML=`<div><div style="font-family:var(--display);font-size:20px;color:${m.done?'#2b7a5b':'#ff4d6d'}">${m.done?'✓':'★'} ${m.title}</div>
         <div style="font-size:12px;font-weight:600;margin-top:2px">${m.desc}</div>
@@ -6088,6 +6105,7 @@ function warpToBody(b){
 
 /* ---- LocalStorage Save / Load System ---- */
 function saveGame(silent=false){
+  if(window.__HQ&&window.__HQ.busy)return;
   try{
     const data={
       inv:INV,
@@ -6097,7 +6115,7 @@ function saveGame(silent=false){
       missions:MISSIONS.map(m=>({id:m.id,prog:m.prog,done:m.done})),
       sys:activeSystemId,
       skins:SKIN,
-      vitals:{hp:Math.round(PL.dead?50:PL.hp),food:Math.round(PL.food)},lastLand:PL.lastLand||null,shop2:SHOP2,
+      vitals:{hp:Math.round(PL.dead?50:PL.hp),food:Math.round(PL.food)},lastLand:PL.lastLand||null,shop2:SHOP2,hq:window.__HQ?hqSaveData():undefined,
       elys:{nodes:ELYS.nodes.map(n=>({id:n.id,activated:n.activated,pylons:n.pylons.map(p=>p.lit)})),restored:ELYS.restored},
       game:{...GAME_EXTRA,title:GAME.title,achievements:GAME.achievements,milestones:GAME.milestones,contracts:GAME.contracts,contractSeed:GAME.contractSeed,outposts:GAME.outposts,sysVisited:GAME.sysVisited,seenElysian:GAME.seenElysian,
         rep:GAME.rep,factionContracts:GAME.factionContracts,factionSeed:GAME.factionSeed,tamed:GAME.tamed,photoLog:GAME.photoLog,catReward:GAME.catReward,poiState:GAME.poiState,treasure:GAME.treasure,crew:GAME.crew,raiderKills:GAME.raiderKills,contacts:GAME.contacts,
@@ -6118,9 +6136,10 @@ function loadGame(){
     const raw=localStorage.getItem('cosmic_hop_gf_save');
     if(!raw)return false;
     const data=JSON.parse(raw);
-    for(const k in data)if(!['inv','upgrades','visited','discoveries','missions','sys','skins','vitals','elys','game','hazard','lastLand','shop2'].includes(k))SAVE_EXTRA[k]=data[k];
+    for(const k in data)if(!['inv','upgrades','visited','discoveries','missions','sys','skins','vitals','elys','game','hazard','lastLand','shop2','hq'].includes(k))SAVE_EXTRA[k]=data[k];
     if(data.inv)Object.assign(INV,data.inv);
     if(data.lastLand)PL.lastLand=data.lastLand;
+    if(data.hq&&window.__HQ){try{hqLoad(data.hq);}catch(err){console.warn('HQ load',err);}}
     if(data.shop2&&typeof data.shop2==='object'){const d2=data.shop2;SHOP2.own=Array.isArray(d2.own)?d2.own:[];SHOP2.eq=Object.assign({hat:'',back:'',trail:'',steps:'',pet:''},d2.eq||{});SHOP2.gear=Object.assign({},d2.gear||{});SHOP2.dblUntil=+d2.dblUntil||0;
       setTimeout(()=>applyAstroStyle(astro,SHOP2.eq.hat,SHOP2.eq.back),0);}
     if(data.vitals){PL.hp=clamp(+data.vitals.hp||100,20,100);PL.food=clamp(+data.vitals.food||100,0,100);}
@@ -7303,7 +7322,7 @@ function updateEcosystemAndHazards(dt,t){
 
   // Check proximity to Caves, Outposts, Ruins & Rover when on surface
   PL.nearInteract=null;
-  PL.sheltered=(PL.mode==='landed');
+  PL.sheltered=(PL.mode==='landed'||PL.mode.startsWith('hq'));
   if((PL.mode==='walk'||PL.mode==='rover') && PL.body){
     const b=PL.body;
     const localPos=PL.mode==='walk'?astro.group.position:rover.localPos;
@@ -7744,6 +7763,7 @@ function clampCamToGround(b){
 }
 function updateCamera(dt,snap){
   const g=ship.group;camera.position.add(carry);
+  if(PL.mode.startsWith('hq')){hqCamera(dt,snap);return;}
   if(PL.mode==='fly'){
     _f.set(0,0,-1).applyQuaternion(g.quaternion);_u.set(0,1,0).applyQuaternion(g.quaternion);
     const sp=clamp(PL.speed/390,0,1);
@@ -7866,7 +7886,7 @@ function surfR(b,d){
 PL.hp=100;PL.food=100;PL.crashT=-9;let camShake=0;
 const FOODS=[{k:'berry',food:15,hp:0,label:'GLOW BERRIES',ic:'🍓'},{k:'fruit',food:30,hp:15,label:'STAR FRUIT',ic:'🍐'},{k:'ration',food:50,hp:5,label:'SPACE RATION',ic:'🥫'}];
 function hurt(n,msg,quiet,cause){
-  if(!(n>0)||PL.mode==='landing'||PL.mode==='descend'||PL.mode==='takeoff')return;
+  if(!(n>0)||PL.mode==='landing'||PL.mode==='descend'||PL.mode==='takeoff'||PL.mode.startsWith('hq'))return;
   if(PL.dead||uTime.value<(PL.spawnProt||0))return;
   PL.lastCause=cause||'TOOK TOO MUCH DAMAGE';
   if(PL.mode==='walk'||PL.mode==='rover'){if(astroBonus()==='armor')n*=0.7;}else if(shipBonus()==='armor')n*=0.75;
@@ -8091,7 +8111,8 @@ function iconForLabel(label){
   const s=String(label).toUpperCase();
   if(s.includes('FIRE'))return '#i-shot';
   if(s.includes('HAIL'))return '#i-comms';
-  if(s.includes('TAKE')||s.includes('LIFT'))return '#i-launch';
+  if(s.includes('TAKE')||s.includes('LIFT')||s.includes('LAUNCH'))return '#i-launch';
+  if(s.includes('DOCK'))return '#i-station';
   if(s.includes('LAND')||s.includes('DESCEND'))return '#i-gear';
   if(s.includes('JET')||s.includes('JUMP')||s.includes('JMP'))return '#i-jet';
   if(s.includes('HORN'))return '#i-horn';
@@ -8117,7 +8138,8 @@ function updateHUD(dt){
   hudT-=dt;if(hudT>0)return;hudT=0.08;
   tutTick();
   const b=PL.near,m=PL.mode;
-  if(m==='walk'||m==='rover'){locEl.textContent=PL.body.name;subEl.textContent=(m==='rover'?'ROVER':'ON FOOT')+(PL.sheltered?' · SHELTERED':' · '+(PL.body.blurb||''));}
+  if(m.startsWith('hq'))hqHUDText();
+  else if(m==='walk'||m==='rover'){locEl.textContent=PL.body.name;subEl.textContent=(m==='rover'?'ROVER':'ON FOOT')+(PL.sheltered?' · SHELTERED':' · '+(PL.body.blurb||''));}
   else if(m==='landed'){locEl.textContent=PL.body.name;subEl.textContent='LANDED · SHIP SHELTER';}
   else if(m==='descend'){locEl.textContent=PL.body.name;subEl.textContent='ATMOSPHERIC DESCENT · ALT '+Math.max(0,Math.round(PL.alt));}
   else if(RAIDER.active&&RAIDER.warnT>0){locEl.textContent='RAIDERS INBOUND';subEl.textContent='ENGAGE IN '+Math.ceil(RAIDER.warnT)+'s · EVASIVE READY';}
@@ -8134,7 +8156,8 @@ function updateHUD(dt){
   linesEl.style.opacity=(m==='fly'&&input.boost&&PL.speed>60)?clamp((PL.speed-60)/200,0,0.8):0;
 
   const canLand=m==='fly'&&b&&b.landable&&PL.alt<landRange(b);
-  if(m==='fly'){const foes=RAIDER.active?RAIDER.list.filter(r=>!r.dead).length:0,npcNear=nearestNpc(150),
+  if(m.startsWith('hq'))hqHUDButtons();
+  else if(m==='fly'){const foes=RAIDER.active?RAIDER.list.filter(r=>!r.dead).length:0,npcNear=nearestNpc(150),
     boss=RAIDER.active?RAIDER.list.find(r=>r.boss&&!r.dead):null;
     setBtn(bLand,'LAND',false,!canLand,canLand);setBtn(bExit,npcNear?'HAIL':'EXIT',!npcNear,false,!!npcNear);setBtn(bBoost,'BOOST',false);
     setBtn(bMine,RAIDER.active?'FIRE':'MINE',false,!RAIDER.active&&!PL.targetNode,!!RAIDER.active||!!PL.targetNode);
@@ -8142,6 +8165,7 @@ function updateHUD(dt){
     else if(RAIDER.active)setPrompt(boss?`${key('F')}HOLD FIRE · DREADNOUGHT ${Math.max(0,Math.ceil(boss.hp))}/${boss.maxHp} HP · ${Math.ceil(RAIDER.fightT)}s`:`${key('F')}HOLD FIRE · ${foes} RAIDER${foes===1?'':'S'} · ${Math.ceil(RAIDER.fightT)}s`);
     else if(npcNear)setPrompt(`${key('E')}HAIL ${npcNear.species} VESSEL — ${npcNear.origin}`);
     else if(PL.targetNode)setPrompt(`${key('F')}HOLD TO MINE ${RES_META[PL.targetNode.type].label}`);
+    else if(window.__HQ&&hqCanDock()){setPrompt(`${key('L')}REQUEST DOCKING · ${HQ.name}`);setBtn(bLand,'DOCK',false,false,true);}
     else if(canLand)setPrompt(`${key('L')}LAND ON ${b.name}`);
     else if(b&&b.kind==='blackhole'&&PL.alt<380)setPrompt(`ORBIT ACCRETION RIM & HOLD ${key('F')}TO MINE VOID SHARDS!`);
     else if(b&&!b.landable&&b.kind==='gas'&&PL.alt<b.R*0.6)setPrompt(`${b.name} IS ALL CLOUD — LAND ON ONE OF ITS MOONS`);
@@ -8172,15 +8196,16 @@ function updateHUD(dt){
   }else chipEl.classList.remove('on');
   updateCompanionHUD();
 }
-function actLand(){if(PL.dead)return;if(PL.mode==='fly')tryLand();else if(PL.mode==='landed')takeOff();else if(PL.mode==='walk')PL.jumpQ=true;}
+function actLand(){if(PL.dead)return;if(window.__HQ&&hqAct('land'))return;if(PL.mode==='fly')tryLand();else if(PL.mode==='landed')takeOff();else if(PL.mode==='walk')PL.jumpQ=true;}
 function actExit(){
   if(PL.dead)return;
+  if(window.__HQ&&hqAct('exit'))return;
   if(PL.mode==='fly')hailNpc();
   else if(PL.mode==='landed')exitShip();
   else if(PL.mode==='rover')exitRover();
   else if(PL.mode==='walk'){if(!handleInteract())enterShip();}
 }
-function actSpace(){if(PL.mode==='landed')takeOff();else if(PL.mode==='walk')PL.jumpQ=true;}
+function actSpace(){if(window.__HQ&&hqIn()){hqAct('space');return;}if(PL.mode==='landed')takeOff();else if(PL.mode==='walk')PL.jumpQ=true;}
 
 // ----- main loop
 const prevShip=new V3();let simT=0;
@@ -8188,6 +8213,7 @@ function frame(dt){
   if(modalOpen)dt=0;
   simT+=dt;uTime.value=simT;
   updateOrbits(simT);
+  if(window.__HQ)updateHQ(dt);
   readInput();
   lookSmooth(dt);
   SFX.update(dt,audioState());
@@ -8216,6 +8242,7 @@ function frame(dt){
   else if(PL.mode==='descend')updateDescend(dt);
   else if(PL.mode==='landing')updateLanding(dt);
   else if(PL.mode==='takeoff')updateTakeoff(dt);
+  else if(PL.mode.startsWith('hq'))updateHQMode(dt);
   else{g.position.copy(PL.body.center).add(PL.local);ship.flameT=0;if(PL.mode==='walk')updateWalk(dt);else if(PL.mode==='rover')updateRover(dt);}
   if(PL.mode==='fly')carry.subVectors(g.position,prevShip);else carry.copy(PL.body.delta);
 
@@ -8259,7 +8286,7 @@ function frame(dt){
   skyGroup.position.copy(camera.position);
   const camAlt=PL.near?Math.max(0,camera.position.distanceTo(PL.near.center)-PL.near.R):1e3;
   updateFog(camAlt);
-  camera.near=clamp(camAlt*0.03,0.14,2.5);camera.updateProjectionMatrix();
+  camera.near=(window.__HQ&&hqIn())?0.1:clamp(camAlt*0.03,0.14,2.5);camera.updateProjectionMatrix();
   updateHUD(dt);updateMarkers(ref);updateRaiderMarkers();updateNpcMarkers();updateAnomalyMarker();updatePoiMarker();
   if(cineFx>0){
     cineFx=Math.max(0,cineFx-dt*0.42);
@@ -8407,6 +8434,956 @@ async function boot(){
   contBtn.addEventListener('click',()=>{if(!started)startPlaying(true);});
 }
 boot().catch(err=>{console.error(err);const e=$('err');e.hidden=false;e.textContent='Could not start: '+(err&&err.message||err);playBtn.textContent='OOPS';});
+
+// HQ-BEGIN
+/* ===================== FRONTIER COMMANDER — player-owned mobile space station ===================== */
+const HQ_LEVELS=[null,
+  {n:'FRONTIER PLATFORM',cost:null,perk:'Docking bay, Command Deck, Observatory and Crew Quarters.'},
+  {n:'EXPANDED HEADQUARTERS',cost:{gold:8000,fe:150,ae:80},perk:'Research Laboratory, 2 extra hangar pads, in-system station navigation.'},
+  {n:'RESEARCH STATION',cost:{gold:20000,fe:300,ae:200,so:80},perk:'Galactic Exchange, Teleportation Hub, storage bays and a comms array.'},
+  {n:'GALACTIC COMMAND',cost:{gold:45000,fe:500,ae:350,so:180,vd:60},perk:'Grand observatory dome, larger bridge, heavy engines for jumps to other star systems.'},
+  {n:'FRONTIER FLAGSHIP',cost:{gold:90000,fe:800,ae:600,so:350,vd:150},perk:'Flagship spine, premium trims, faster and cheaper station travel.'}
+];
+const HQ_MODULES=[
+  {id:'garden',name:'BOTANICAL GARDEN',kind:'craft',lvl:1,cost:{fe:80,ae:60,so:10},icon:'i-leaf',desc:'Glass garden domes on the hull and planters in your quarters. Grows 4 berries + 2 star fruit every 4 minutes.'},
+  {id:'research',name:'RESEARCH WING',kind:'craft',lvl:2,cost:{fe:120,ae:80,so:30},icon:'i-research',desc:'A lab module on the port hull. Produces 1 Research Point every 2 minutes — collect it in the lab.'},
+  {id:'workshop',name:'MANUFACTURING WORKSHOP',kind:'craft',lvl:2,cost:{fe:160,ae:100,so:20},icon:'i-craft',desc:'Fabricator arms on the starboard hull and a fabricator in the Exchange: turn ore into medkits, rations and cells.'},
+  {id:'energy',name:'FUSION ENERGY CORE',kind:'craft',lvl:2,cost:{ae:60,so:60,vd:20},icon:'i-bolt',desc:'A reactor sphere under the hull. Station energy max 150 and twice-as-fast recharge.'},
+  {id:'storage',name:'RESOURCE VAULT',kind:'craft',lvl:3,cost:{fe:150,ae:60},icon:'i-supplies',desc:'Cargo pods under the hull. Store up to 999 of every resource at the lab analysis terminal.'},
+  {id:'tpcore',name:'TELEPORTER CORE',kind:'craft',lvl:3,cost:{fe:100,ae:80,so:40,vd:10},icon:'i-galaxy',desc:'A spire with spinning rings that powers the Teleportation Hub — beam to any outpost with a teleporter, and back.'},
+  {id:'defense',name:'DEFENSE & SENSOR ARRAY',kind:'craft',lvl:4,cost:{fe:200,ae:120,so:60,vd:25},icon:'i-target',desc:'Hull turrets shoot raiders near the station and keep raiders from damaging the hull.'},
+  {id:'lights',name:'LIGHT SHOW PACK',kind:'coin',lvl:1,cost:{gold:8000},icon:'i-bolt',desc:'Unlocks gold, magenta, emerald and crimson station lighting.'},
+  {id:'hullpaint',name:'HULL PAINT PACK',kind:'coin',lvl:1,cost:{gold:10000},icon:'i-wrench',desc:'Unlocks graphite, gold and navy hull finishes.'},
+  {id:'themes',name:'INTERIOR THEMES',kind:'coin',lvl:1,cost:{gold:12000},icon:'i-settings',desc:'Unlocks Midnight, Aurora and Royal Gold interior themes.'},
+  {id:'decor',name:'PREMIUM DECOR',kind:'coin',lvl:2,cost:{gold:15000},icon:'i-leaf',desc:'Plants, an aquarium, a golden statue and lounge furniture across the station.'},
+  {id:'showroom',name:'HANGAR SHOWROOM',kind:'coin',lvl:2,cost:{gold:20000},icon:'i-launch',desc:'Your other rockets parked on the spare hangar pads — walk up to one to switch ships.'},
+  {id:'telescope',name:'GRAND TELESCOPE',kind:'coin',lvl:3,cost:{gold:25000},icon:'i-target',desc:'A huge exterior telescope and a viewing scope in the observatory that reveals anomalies.'},
+  {id:'ring2',name:'SECOND DOCKING RING',kind:'coin',lvl:5,cost:{gold:60000,fe:300,ae:200},icon:'i-orbit',desc:'A second counter-rotating ring and 2 more showroom pads.'}
+];
+const HQ_LIGHTS={cyan:0x5ff3ff,gold:0xffc94d,magenta:0xff5fd2,emerald:0x5dff9a,crimson:0xff4d5e};
+const HQ_HULLS={white:0xdfe6f0,graphite:0x4a5366,gold:0xd9b45a,navy:0x2b3f66};
+const HQ_THEMES={standard:{wall:0xb9c6d8,floor:0x1c2433,acc:null},midnight:{wall:0x2a3346,floor:0x10141f,acc:0xb48cff},aurora:{wall:0xcfe9e4,floor:0x16302b,acc:0x5dff9a},royal:{wall:0x3a2a14,floor:0x1a1208,acc:0xffc94d}};
+const HQ_RECIPES=[
+  {k:'medkit',n:'MEDKIT',c:{fe:8,ae:4}},{k:'ration',n:'SPACE RATION',c:{fe:4,ae:2}},
+  {k:'shieldCell',n:'SHIELD CELL',c:{ae:6,so:2}},{k:'jetCell',n:'JET CELL',c:{fe:4,ae:6}},{k:'outpostKit',n:'OUTPOST KIT',c:{fe:30,ae:15,so:5}}
+];
+const HQ_PAD_Y=1.35,HQ_PAD_Z=-27;
+const HQ={name:'FRONTIER COMMANDER',level:1,sys:'solara',anchor:'TERRA',modules:[],deco:{lights:'cyan',hull:'white',theme:'standard'},energy:100,health:100,log:[],vault:{},gardenAt:0,researchAt:0,yaw:0,docked:false,
+  group:null,ext:null,detail:null,intHangar:null,intRest:null,delta:new V3(),prevPos:new V3(),busy:false,nav:null,dock:null,walk:null,ints:[],walkRects:[],camRects:[],cols:[],
+  camL:new V3(),built:false,met:[],seen:[],rings:[],spin:[],blink:[],engines:[],screens:[],holo:null,turrets:[],light:null,showShips:[],lastGold:null,ctx:{},room:'',screenT:0,defT:0,pet:null,petId:''};
+window.__HQ=HQ;
+const HQBODY={name:'FRONTIER COMMANDER',blurb:'ORBITAL HEADQUARTERS',center:new V3(),delta:new V3(),R:40,kind:'station',landable:false,liquid:false,sys:'solara',
+  nodes:[],pois:[],creatures:[],caves:[],ruins:[],outposts:[],colliders:[],discoverables:[],updaters:[],stormNodes:[],visited:true,groundR:()=>40,heightAt:()=>0,group:null,isHQ:true};
+const AZ=new V3(0,0,1);
+const HQ_DIR=new V3(0.55,0.24,-0.8).normalize();
+function hqEsc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function hqHas(id){return HQ.modules.includes(id);}
+function hqMaxEnergy(){return hqHas('energy')?150:100;}
+function hqIn(){return !!(PL.mode&&PL.mode.startsWith('hq'));}
+function hqAnchorBody(sys,name){sys=sys||HQ.sys;name=name||HQ.anchor;return bodies.find(b=>b.sys===sys&&b.name===name)||bodies.find(b=>b.sys===sys&&b.kind!=='sun'&&b.kind!=='blackhole'&&!b.moon)||bodies[0];}
+function hqOffset(b){return HQ_DIR.clone().multiplyScalar(b.kind==='blackhole'?b.R*6+320:b.R*3.2+260);}
+function hqCostOk(c){for(const k in c){if(k==='gold'){if((INV.gold||0)<c[k])return false;}else if((INV[k]||0)<c[k])return false;}return true;}
+function hqPay(c){for(const k in c){if(k==='gold')INV.gold-=c[k];else INV[k]-=c[k];}updateResHUD();}
+function hqCostTxt(c){return Object.entries(c).map(([k,v])=>`<span class="${(k==='gold'?(INV.gold||0):(INV[k]||0))>=v?'ok':'no'}">${k==='gold'?v.toLocaleString('en-US')+' 🪙':v+' '+k.toUpperCase()}</span>`).join(' · ');}
+
+/* ---------- materials ---------- */
+let hqEnvTex=null;
+function hqEnv(){
+  if(hqEnvTex)return hqEnvTex;
+  try{const c=document.createElement('canvas');c.width=256;c.height=128;const g=c.getContext('2d');
+    const gr=g.createLinearGradient(0,0,0,128);gr.addColorStop(0,'#c9e4ff');gr.addColorStop(0.42,'#5d7aa8');gr.addColorStop(0.5,'#2a2f4a');gr.addColorStop(1,'#0a0a18');g.fillStyle=gr;g.fillRect(0,0,256,128);
+    g.fillStyle='rgba(255,255,255,0.95)';g.fillRect(20,18,60,10);g.fillRect(150,26,80,8);g.fillStyle='rgba(120,220,255,0.7)';g.fillRect(0,58,256,3);g.fillStyle='rgba(255,210,150,0.8)';g.beginPath();g.arc(200,40,12,0,TAU);g.fill();
+    const t=new THREE.CanvasTexture(c);t.mapping=THREE.EquirectangularReflectionMapping;t.colorSpace=THREE.SRGBColorSpace;
+    const pm=new THREE.PMREMGenerator(renderer);hqEnvTex=pm.fromEquirectangular(t).texture;pm.dispose();t.dispose();}catch(e){hqEnvTex=null;}
+  return hqEnvTex;
+}
+function hqMats(){
+  const envM=hqEnv();
+  const hull=HQ_HULLS[HQ.deco.hull]||HQ_HULLS.white,glow=HQ_LIGHTS[HQ.deco.lights]||HQ_LIGHTS.cyan,th=HQ_THEMES[HQ.deco.theme]||HQ_THEMES.standard,acc=th.acc||glow;
+  return {hull,glow,acc,th,
+    metal:new THREE.MeshStandardMaterial({vertexColors:true,metalness:0.5,roughness:0.32,envMap:envM,envMapIntensity:1.25}),
+    dark:new THREE.MeshStandardMaterial({vertexColors:true,metalness:0.6,roughness:0.4,envMap:envM,envMapIntensity:1}),
+    glowM:new THREE.MeshBasicMaterial({color:glow}),
+    accM:new THREE.MeshBasicMaterial({vertexColors:true}),
+    glowV:new THREE.MeshBasicMaterial({vertexColors:true}),
+    win:new THREE.MeshStandardMaterial({color:0x0b1a2e,metalness:0.9,roughness:0.06,emissive:glow,emissiveIntensity:0.45,envMap:envM,envMapIntensity:1.6}),
+    glass:new THREE.MeshStandardMaterial({color:0x9fd8ff,metalness:0.2,roughness:0.05,envMap:envM,envMapIntensity:1.4,transparent:true,opacity:0.18,depthWrite:false,side:THREE.DoubleSide}),
+    wall:new THREE.MeshStandardMaterial({vertexColors:true,metalness:0.15,roughness:0.5,envMap:envM,envMapIntensity:0.9,emissive:0x1c2738,emissiveIntensity:1}),
+    floor:new THREE.MeshStandardMaterial({vertexColors:true,metalness:0.45,roughness:0.3,envMap:envM,envMapIntensity:1.1,emissive:0x0c121c,emissiveIntensity:1}),
+    panel:new THREE.MeshStandardMaterial({color:0xffffff,emissive:0xffffff,emissiveIntensity:0.55,metalness:0,roughness:1}),
+    redF:new THREE.MeshBasicMaterial({color:0xff4d6d,transparent:true,opacity:0.28,depthWrite:false,side:THREE.DoubleSide}),
+    blueF:new THREE.MeshBasicMaterial({color:glow,transparent:true,opacity:0.12,depthWrite:false,side:THREE.DoubleSide,blending:THREE.AdditiveBlending})};
+}
+function hqDispose(obj){if(!obj)return;obj.traverse(o=>{if(o.geometry)o.geometry.dispose();if(o.material){const ms=Array.isArray(o.material)?o.material:[o.material];for(const m of ms){if(m.map&&m.map.isCanvasTexture)m.map.dispose();m.dispose();/* envMap is shared — kept */}}});}
+function hqMesh(parts,mat,outline){const m=new THREE.Mesh(merge(parts),mat);if(outline)addOutline(m,OL_BIG);return m;}
+const hqBox=(x,y,z)=>new THREE.BoxGeometry(x,y,z);
+const hqCyl=(r1,r2,h,s=16,open=false)=>new THREE.CylinderGeometry(r1,r2,h,s,1,open);
+
+/* ---------- 1. EXTERIOR — sleek delta carrier: twin bay prongs, command deck, halo ring, nacelles ---------- */
+function hqSlab(path,D,b,yTop,segs,curveSegs){const s=new THREE.Shape();path(s);const g=new THREE.ExtrudeGeometry(s,{depth:D,bevelEnabled:true,bevelThickness:b,bevelSize:b,bevelSegments:segs,curveSegments:curveSegs,steps:1});g.rotateX(Math.PI/2);g.translate(0,yTop,0);return {g,s};}
+function hqPolyPts(shape,div){const p=shape.getPoints(div).map(v=>new THREE.Vector2(v.x,v.y));if(p.length>2&&p[0].distanceTo(p[p.length-1])<1e-3)p.pop();return p;}
+function hqOffsetPoly(pts,d){
+  let A=0;for(let i=0;i<pts.length;i++){const a=pts[i],b=pts[(i+1)%pts.length];A+=a.x*b.y-b.x*a.y;}const sg=A>0?1:-1;
+  const nrm=i=>{const a=pts[i],b=pts[(i+1)%pts.length],dx=b.x-a.x,dy=b.y-a.y,l=Math.hypot(dx,dy)||1;return new THREE.Vector2(sg*dy/l,-sg*dx/l);};
+  return pts.map((p,i)=>{const n1=nrm((i-1+pts.length)%pts.length),n2=nrm(i),n=n1.clone().add(n2);if(n.lengthSq()<1e-6)n.copy(n2);n.normalize();const k=d/Math.max(0.35,n.dot(n2));return new THREE.Vector2(p.x+n.x*k,p.y+n.y*k);});
+}
+function hqEdges(pts,fn){for(let i=0;i<pts.length;i++){const a=pts[i],b=pts[(i+1)%pts.length],dx=b.x-a.x,dz=b.y-a.y,L=Math.hypot(dx,dz);if(L<0.05)continue;fn(a,b,L,Math.atan2(-dz,dx),(a.x+b.x)/2,(a.y+b.y)/2);}}
+function hqInPoly(pts,x,z){let c=false;for(let i=0,j=pts.length-1;i<pts.length;j=i++){const a=pts[i],b=pts[j];if(((a.y>z)!==(b.y>z))&&(x<(b.x-a.x)*(z-a.y)/(b.y-a.y)+a.x))c=!c;}return c;}
+function hqBuildExterior(M){
+  const L=HQ.level,q=gfxTierIdx,ext=new THREE.Group(),detail=new THREE.Group();ext.add(detail);
+  const P=[],D=[],G=[],cs=[6,8,12,16][q],bs=[2,3,4,6][q],rs=[16,24,36,48][q];
+  const hullC=M.hull,trimC=0x8794a8,darkC=0x2c3444,slate=0x56637a,glow=M.glow,gold=0xffc94d;
+  const glowMesh=(geo,x,y,z,col)=>{const m=new THREE.Mesh(geo,new THREE.MeshBasicMaterial({color:col||glow}));m.position.set(x,y,z);return m;};
+  /* === main delta hull: curved wings, twin forward prongs framing the hangar bay === */
+  const main=hqSlab(s=>{s.moveTo(0,-10);s.lineTo(18,-10);s.lineTo(18,-47);s.lineTo(24,-47);s.bezierCurveTo(32,-40,44,-20,44,4);s.bezierCurveTo(48,26,32,38,0,37);
+    s.bezierCurveTo(-32,38,-48,26,-44,4);s.bezierCurveTo(-44,-20,-32,-40,-24,-47);s.lineTo(-18,-47);s.lineTo(-18,-10);s.closePath();},16,3,13,bs,cs);
+  P.push([main.g,hullC,new M4()]);
+  const cPts=hqPolyPts(main.s,cs),side=hqOffsetPoly(cPts,3.04),sideG=hqOffsetPoly(cPts,3.14),topIn=hqOffsetPoly(cPts,-1.3);
+  const innerNotch=(mx,mz)=>Math.abs(mx)<16.6&&mz>-49.5;
+  /* raised command deck */
+  const deck=hqSlab(s=>{s.moveTo(0,-8);s.bezierCurveTo(14,-8,20,0,21,12);s.bezierCurveTo(22,26,10,31,0,31);s.bezierCurveTo(-10,31,-22,26,-21,12);s.bezierCurveTo(-20,0,-14,-8,0,-8);},2.5,1.5,19,bs,cs);
+  P.push([deck.g,slate,new M4()]);
+  const dPts=hqOffsetPoly(hqPolyPts(deck.s,cs),1.56);
+  hqEdges(dPts,(a,b,len,ang,mx,mz)=>G.push([hqBox(len+0.04,0.22,0.22),glow,Mx(mx,18.2,mz,0,ang,0)]));
+  /* keel under the hull */
+  const keel=hqSlab(s=>{s.moveTo(0,-4);s.bezierCurveTo(16,-4,26,8,24,16);s.bezierCurveTo(22,28,10,33,0,33);s.bezierCurveTo(-10,33,-22,28,-24,16);s.bezierCurveTo(-26,8,-16,-4,0,-4);},3,2,-6,bs,cs);
+  D.push([keel.g,slate,new M4()]);
+  /* arched hangar roof between the prongs + bay floor + landing apron */
+  const arch=new THREE.Shape();arch.moveTo(-17.5,13.2);arch.lineTo(17.5,13.2);arch.lineTo(17.5,15.6);arch.quadraticCurveTo(0,22.5,-17.5,15.6);arch.closePath();
+  const archG=new THREE.ExtrudeGeometry(arch,{depth:37,bevelEnabled:true,bevelThickness:0.8,bevelSize:0.8,bevelSegments:2,curveSegments:cs});archG.translate(0,0,-50.2);
+  P.push([archG,hullC,new M4()]);
+  for(let i=0;i<5;i++)D.push([new THREE.TorusGeometry(17.2,0.35,6,rs,Math.PI),trimC,Mx(0,14.6,-48+i*8.4,0,0,0,1,0.42,1)]);
+  D.push([hqBox(31,5.4,37),darkC,Mx(0,-3.25,-31.5)],[hqBox(29.6,0.3,8),0x3a4252,Mx(0,-0.2,-46)]);
+  for(let i=0;i<4;i++)for(const s of [-1,1])G.push([hqBox(3.6,0.06,0.5),glow,Mx(s*1.5,0,-49+i*2,0,s*0.6,0)]);
+  G.push([hqBox(35.5,0.4,0.4),glow,Mx(0,13.0,-51.15)],[hqBox(30,0.3,0.3),glow,Mx(0,-0.45,-50.15)]);
+  for(const s of [-1,1]){G.push([hqBox(0.4,13.2,0.4),glow,Mx(s*15.2,6.2,-50.2)]);
+    /* prong noses: twin light bars + sensor lens */
+    G.push([hqBox(6,0.35,0.3),glow,Mx(s*21,10.5,-50.15)],[hqBox(6,0.35,0.3),glow,Mx(s*21,1.5,-50.15)]);
+    D.push([hqCyl(1.6,1.6,0.6,20),darkC,Mx(s*21,6,-50.1,Math.PI/2,0,0)]);const lens=glowMesh(new THREE.CircleGeometry(1.1,20),s*21,6,-50.45);lens.rotation.y=Math.PI;ext.add(lens);}
+  /* glowing edge trims along the hull sides and the top rim */
+  hqEdges(sideG,(a,b,len,ang,mx,mz)=>{if(innerNotch(mx,mz))return;G.push([hqBox(len+0.05,0.28,0.28),glow,Mx(mx,-1.3,mz,0,ang,0)],[hqBox(len+0.05,0.28,0.28),glow,Mx(mx,11.3,mz,0,ang,0)]);});
+  hqEdges(topIn,(a,b,len,ang,mx,mz)=>{if(Math.abs(mx)<19&&mz<-11)return;G.push([hqBox(len+0.05,0.06,0.3),L>=5?gold:glow,Mx(mx,16.04,mz,0,ang,0)]);});
+  /* window rows (instanced) */
+  const rows=q>=2?[1.6,5,8.4]:[3,7.4],sp=[7,5.6,4.4,3.6][q],wins=[];
+  hqEdges(side,(a,b,len,ang,mx,mz)=>{if(innerNotch(mx,mz)||mz<-49.5)return;const n=Math.max(1,Math.floor(len/sp));for(let i=0;i<n;i++){const t=(i+0.5)/n;for(const y of rows)wins.push([a.x+(b.x-a.x)*t,y,a.y+(b.y-a.y)*t,ang]);}});
+  if(wins.length){const wm=new THREE.InstancedMesh(hqBox(2.3,1.05,0.24),M.win,wins.length);wins.forEach(([x,y,z,ang],i)=>{_m.compose(_a.set(x,y,z),_q.setFromAxisAngle(AY,ang),_b.set(1,1,1));wm.setMatrixAt(i,_m);});detail.add(wm);}
+  /* armour plating on the top surface (instanced) */
+  {const plN=[30,70,130,200][q],plate=new THREE.InstancedMesh(hqBox(1,0.1,1),new THREE.MeshStandardMaterial({color:0xb4bfce,metalness:0.55,roughness:0.28,envMap:hqEnv(),envMapIntensity:1.2}),plN);
+    let seed=11;const rnd=()=>{seed=(seed*16807)%2147483647;return seed/2147483647;};let k=0,tries=0;
+    while(k<plN&&tries<plN*25){tries++;const x=(rnd()*2-1)*44,z=-48+rnd()*86,w=2+rnd()*5,d=2+rnd()*6;
+      if(Math.abs(x)<23.5&&z>-11.5&&z<33)continue;if(Math.abs(x)<19.5&&z<-10.5)continue;
+      if(!hqInPoly(topIn,x-w/2,z-d/2)||!hqInPoly(topIn,x+w/2,z+d/2)||!hqInPoly(topIn,x-w/2,z+d/2)||!hqInPoly(topIn,x+w/2,z-d/2))continue;
+      _m.compose(_a.set(x,16.05,z),_q.identity(),_b.set(w,1,d));plate.setMatrixAt(k++,_m);}
+    plate.count=k;detail.add(plate);}
+  /* vents and heat sinks on the prongs */
+  for(const s of [-1,1])for(let i=0;i<6;i++)D.push([hqBox(5.5,0.5,0.7),trimC,Mx(s*23.5,16.2,-44+i*1.6)]);
+  /* === command bridge: domed tower with window band, needle spire === */
+  const tw=L>=4?1.2:1;
+  D.push([hqCyl(10.4*tw,11.2*tw,1.2,rs),darkC,Mx(0,20.9,2)]);
+  P.push([hqCyl(9.9*tw,9.9*tw,2.2,rs),hullC,Mx(0,22.1,2)],[new THREE.SphereGeometry(1,rs,Math.max(8,rs/3),0,TAU,0,Math.PI/2),0xeef2f8,Mx(0,23.2,2,0,0,0,9.6*tw,5.4*tw,9.6*tw)]);
+  {const band=new THREE.Mesh(new THREE.CylinderGeometry(10.0*tw,10.0*tw,0.8,rs,1,true),M.win);band.position.set(0,22.3,2);ext.add(band);}
+  G.push([new THREE.TorusGeometry(9.75*tw,0.16,6,rs),L>=5?gold:glow,Mx(0,23.25,2,Math.PI/2,0,0)],[new THREE.TorusGeometry(3.2*tw,0.18,6,rs),glow,Mx(0,23.2+5.1*tw,2,Math.PI/2,0,0)]);
+  const spH=(L>=5?20:14),spB=23.2+5.4*tw;
+  D.push([hqCyl(0.14,0.6,spH,8),trimC,Mx(0,spB+spH/2,2)],[hqCyl(1.2,1.6,1.2,12),darkC,Mx(0,spB+0.4,2)]);
+  for(let i=0;i<3;i++)G.push([new THREE.TorusGeometry(0.9-i*0.18,0.08,4,16),glow,Mx(0,spB+3+i*3.4,2,Math.PI/2,0,0)]);
+  /* dorsal fins with blinking tips */
+  {const fin=new THREE.Shape();fin.moveTo(0,0);fin.lineTo(14,0);fin.lineTo(12.5,3);fin.lineTo(9,11);fin.lineTo(6.5,11.4);fin.closePath();
+    const finG=new THREE.ExtrudeGeometry(fin,{depth:0.7,bevelEnabled:true,bevelThickness:0.2,bevelSize:0.2,bevelSegments:1});finG.translate(0,0,-0.35);finG.rotateY(-Math.PI/2);
+    for(const s of [-1,1]){P.push([finG.clone(),hullC,Mx(s*14,20.2,15,0,0,-s*0.28)]);
+      const tip=glowMesh(new THREE.SphereGeometry(0.45,8,6),s*(14+Math.sin(0.28)*11.3),20.2+Math.cos(0.28)*11.3,22.8,0xff4d5e);ext.add(tip);HQ.blink.push({m:tip,i:-1});}
+    finG.dispose();}
+  /* antennas */
+  D.push([hqCyl(0.12,0.2,6,6),trimC,Mx(-6,23.5,27)],[hqCyl(0.12,0.2,4.5,6),trimC,Mx(6,22.7,27)],[hqCyl(0.1,0.16,3.5,6),trimC,Mx(-3,22.2,-6)]);
+  /* === engines: central exhaust bells + long side nacelles === */
+  const cone=(x,y,z,r,h)=>{const gl=new THREE.Mesh(new THREE.ConeGeometry(r,h,20,1,true),new THREE.MeshBasicMaterial({color:0x7fd4ff,transparent:true,opacity:0,blending:THREE.AdditiveBlending,depthWrite:false}));gl.rotation.x=Math.PI/2;gl.position.set(x,y,z);ext.add(gl);HQ.engines.push(gl);};
+  for(const x of (L>=4?[-16,-8,0,8,16]:[-9,0,9])){P.push([hqCyl(4.3,3.1,5,rs,true),0x9aa6b8,Mx(x,4,41.5,Math.PI/2,0,0)]);D.push([hqCyl(3,3,0.3,rs),0x10141c,Mx(x,4,39.4,Math.PI/2,0,0)],[new THREE.TorusGeometry(4.3,0.35,8,rs),0x5a6478,Mx(x,4,44)]);
+    ext.add(glowMesh(new THREE.CircleGeometry(2.6,rs),x,4,39.6,0x9fe8ff));cone(x,4,49.5,3.3,10);}
+  const nac=(x,y,z,r,len)=>{P.push([new THREE.CapsuleGeometry(r,len,6,rs),hullC,Mx(x,y,z,Math.PI/2,0,0)]);
+    G.push([new THREE.TorusGeometry(r*0.92,r*0.12,6,rs),glow,Mx(x,y,z-len/2-r*0.35)],[hqBox(r*0.16,r*0.1,len*0.75),glow,Mx(x,y+r*0.99,z)],[hqBox(r*0.16,r*0.1,len*0.75),glow,Mx(x,y-r*0.99,z)]);
+    D.push([new THREE.TorusGeometry(r*0.95,r*0.22,8,rs),darkC,Mx(x,y,z+len/2+r*0.5)],[hqBox(r*2.08,r*0.25,len*0.5),slate,Mx(x,y,z+len*0.1)]);cone(x,y,z+len/2+r+4.5,r*0.78,9);};
+  for(const s of [-1,1]){nac(s*55,3,16,3.4,26);D.push([hqBox(8,1.4,9),slate,Mx(s*49.5,3,14)]);G.push([hqBox(8,0.15,0.3),glow,Mx(s*49.5,3.76,14)]);
+    if(L>=4){nac(s*36,-10.5,22,2.6,18);D.push([hqBox(1.4,4.5,7),slate,Mx(s*36,-7.5,22)]);}}
+  /* underside anti-grav emitter */
+  D.push([hqCyl(9,9,0.6,rs),0x1a2030,Mx(0,-11.1,14)]);G.push([new THREE.TorusGeometry(8,0.35,8,rs),glow,Mx(0,-11.25,14,Math.PI/2,0,0)],[new THREE.TorusGeometry(5,0.25,8,rs),glow,Mx(0,-11.25,14,Math.PI/2,0,0)]);
+  /* === halo ring: fixed pylons + rotating habitat band === */
+  const halo=new THREE.Group();halo.position.set(0,-2,-4);ext.add(halo);const spinG=new THREE.Group();halo.add(spinG);HQ.spin.push({g:spinG,ax:'y',s:L>=5?0.06:0.04});
+  const hp=[[new THREE.TorusGeometry(66,2,[8,10,14,16][q],[64,96,140,180][q]),hullC,Mx(0,0,0,Math.PI/2,0,0)],[new THREE.TorusGeometry(66,2.2,4,[64,96,140,180][q]),darkC,Mx(0,0,0,Math.PI/2,0,0,1,1,0.32)]];
+  const hg=[[new THREE.TorusGeometry(68.4,0.2,4,[64,96,140,180][q]),glow,Mx(0,0,0,Math.PI/2,0,0)],[new THREE.TorusGeometry(63.6,0.2,4,[64,96,140,180][q]),glow,Mx(0,0,0,Math.PI/2,0,0)]];
+  if(L>=2)for(const a of [Math.PI/4,Math.PI*0.75,Math.PI*1.25,Math.PI*1.75]){const c=Math.cos(a),s=Math.sin(a);hp.push([new THREE.CapsuleGeometry(2.2,5,4,12),slate,Mx(c*71,0,s*71,0,-a,Math.PI/2)]);hg.push([new THREE.TorusGeometry(2.25,0.25,6,20),glow,Mx(c*74.6,0,s*74.6,0,-a+Math.PI/2,0)]);}
+  spinG.add(hqMesh(hp,M.metal,q>=1));spinG.add(hqMesh(hg,M.glowV,false));
+  {const podN=[12,18,24,32][q],podM=new THREE.MeshStandardMaterial({color:hullC,metalness:0.5,roughness:0.3,envMap:hqEnv(),envMapIntensity:1.2}),pod=new THREE.InstancedMesh(hqBox(4.6,3,7.5),podM,podN),strip=new THREE.InstancedMesh(hqBox(4.75,0.55,6.6),M.win,podN);
+    for(let i=0;i<podN;i++){const a=i/podN*TAU;_m.compose(_a.set(Math.cos(a)*66,0,Math.sin(a)*66),_q.setFromAxisAngle(AY,-a),_b.set(1,1,1));pod.setMatrixAt(i,_m);strip.setMatrixAt(i,_m);}
+    spinG.add(pod);spinG.add(strip);}
+  for(const [x0,x1,z0,z1] of [[47,64.3,-4,-4],[-47,-64.3,-4,-4],[0,0,40,61.8]]){const len=Math.hypot(x1-x0,z1-z0),mx=(x0+x1)/2,mz=(z0+z1)/2,ang=Math.atan2(-(z1-z0),x1-x0);
+    D.push([hqBox(len,1.6,2.4),slate,Mx(mx,-2,mz,0,ang,0)]);G.push([hqBox(len,0.12,0.3),glow,Mx(mx,-1.15,mz,0,ang,0)]);}
+  if(L>=5){const r3=new THREE.Group();r3.position.set(0,-2,-4);r3.rotation.z=-0.2;ext.add(r3);const inner=new THREE.Group();r3.add(inner);
+    inner.add(hqMesh([[new THREE.TorusGeometry(74,0.9,6,[64,96,140,180][q]),trimC,Mx(0,0,0,Math.PI/2,0,0)]],M.metal));inner.add(hqMesh([[new THREE.TorusGeometry(74,1.05,4,[64,96,140,180][q]),gold,Mx(0,0,0,Math.PI/2,0,0,1,1,0.2)]],M.glowV));HQ.spin.push({g:inner,ax:'y',s:-0.05});}
+  /* === LEVEL 3+: comms dishes on the prongs === */
+  if(L>=3)for(const s of [-1,1]){D.push([hqCyl(0.3,0.5,5,8),trimC,Mx(s*24,18.5,-26)]);const dg=new THREE.SphereGeometry(2.8,rs,8,0,TAU,0,Math.PI*0.32);dg.rotateX(-Math.PI/2.3);P.push([dg,0xeef2f8,Mx(s*24,21.4,-26.5)]);G.push([new THREE.SphereGeometry(0.3,8,6),glow,Mx(s*24,22.2,-28.6)]);}
+  /* === LEVEL 4+: grand observatory glass dome === */
+  if(L>=4){const dome=new THREE.Mesh(new THREE.SphereGeometry(8,rs,Math.max(8,rs/3),0,TAU,0,Math.PI/2),M.glass);dome.position.set(0,20.5,21);ext.add(dome);
+    for(let i=0;i<6;i++)D.push([new THREE.TorusGeometry(8,0.16,6,rs,Math.PI),0xc7d0dd,Mx(0,20.5,21,0,i*Math.PI/6,0)]);G.push([new THREE.TorusGeometry(8.1,0.2,6,rs),glow,Mx(0,20.6,21,Math.PI/2,0,0)]);}
+  /* ----- purchased modules (physical) ----- */
+  if(hqHas('garden'))for(const [x,z,r] of [[-31,2,6],[-29,19,5]]){const gd=new THREE.Mesh(new THREE.SphereGeometry(r,rs,Math.max(8,rs/3),0,TAU,0,Math.PI/2),M.glass);gd.position.set(x,16.3,z);ext.add(gd);
+    D.push([hqCyl(r+0.3,r+0.5,0.7,rs),0x5a6478,Mx(x,16.3,z)]);G.push([new THREE.TorusGeometry(r+0.32,0.14,4,rs),0x5dff9a,Mx(x,16.7,z,Math.PI/2,0,0)]);for(let i=0;i<7;i++)P.push([new THREE.ConeGeometry(0.8,2.2+(i%3),6),0x3fbf6a,Mx(x+Math.cos(i)*r*0.5,17.7,z+Math.sin(i)*r*0.5)]);}
+  if(hqHas('research')){P.push([hqCyl(3.2,3.2,12,rs),hullC,Mx(-31,19.6,-20,Math.PI/2,0,0)],[new THREE.SphereGeometry(3.2,rs,10),0xeef2f8,Mx(-31,19.6,-26)],[new THREE.SphereGeometry(3.2,rs,10),0xeef2f8,Mx(-31,19.6,-14)]);
+    D.push([hqBox(1.2,3.6,1.2),trimC,Mx(-31,17.4,-23)],[hqBox(1.2,3.6,1.2),trimC,Mx(-31,17.4,-17)]);G.push([new THREE.TorusGeometry(3.3,0.22,6,rs),glow,Mx(-31,19.6,-22)],[new THREE.TorusGeometry(3.3,0.22,6,rs),glow,Mx(-31,19.6,-18)]);}
+  if(hqHas('workshop')){P.push([hqBox(10,5,12),hullC,Mx(31,18.6,2)]);D.push([hqCyl(0.7,0.7,9,8),trimC,Mx(34,23,0,0,0,0.6)],[hqCyl(0.55,0.55,7,8),trimC,Mx(37,26.5,0,0,0,-0.5)],[hqBox(1.8,1.8,1.8),0xffc94d,Mx(39,28.5,0)]);G.push([hqBox(10.2,0.3,0.3),glow,Mx(31,21.1,-4.1)]);}
+  if(hqHas('energy')){const core=glowMesh(new THREE.SphereGeometry(4.5,rs,12),0,-18,14,M.glow);ext.add(core);D.push([hqCyl(1.2,1.2,5,10),0x5a6478,Mx(0,-13.6,14)]);
+    const er=new THREE.Group();er.position.set(0,-18,14);er.add(hqMesh([[new THREE.TorusGeometry(7,0.5,8,rs),0x8794a8,new M4()],[new THREE.TorusGeometry(8.6,0.35,8,rs),0x8794a8,Mx(0,0,0,Math.PI/2,0,0)]],M.metal));ext.add(er);HQ.spin.push({g:er,ax:'y',s:0.6});}
+  if(hqHas('storage'))for(let i=0;i<10;i++){const s=i<5?-1:1,j=i%5;P.push([hqBox(4.4,3,6),[0xff922b,0x39c6ff,0xffd23f,0xc7d0dd][i%4],Mx(s*(26+(j%2)*8),-7.6,-2+Math.floor(j/2)*9)]);}
+  if(hqHas('tpcore')){D.push([hqCyl(1.4,2.4,12,12),0x5a6478,Mx(30,22,20)]);const core=glowMesh(new THREE.OctahedronGeometry(2.2,0),30,30.5,20,0x9dfcff);ext.add(core);HQ.spin.push({g:core,ax:'y',s:1.4});
+    for(let i=0;i<3;i++){const r=new THREE.Mesh(new THREE.TorusGeometry(3.2+i*1.2,0.18,6,32),M.glowM);r.position.set(30,24.5+i*2.4,20);ext.add(r);HQ.spin.push({g:r,ax:'x',s:0.8+i*0.4});}}
+  if(hqHas('defense'))for(const [x,y,z] of [[-23,16,-42],[23,16,-42],[-28,16,30],[28,16,30],[-22,-6,-30],[22,-6,-30]]){const t=new THREE.Group();t.position.set(x,y,z);const up=y<0?-1:1;
+    t.add(hqMesh([[hqCyl(1.6,2,1.4,12),0x5a6478,Mx(0,up*0.7,0)],[new THREE.SphereGeometry(1.4,12,8),0x8794a8,Mx(0,up*1.6,0)],[hqCyl(0.25,0.25,4,8),0x2a3346,Mx(0,up*1.6,-2,Math.PI/2,0,0)]],M.metal));ext.add(t);HQ.turrets.push(t);}
+  if(hqHas('telescope')){D.push([hqCyl(3.4,3.6,1,rs),0x5a6478,Mx(31,16.5,-20)]);P.push([hqCyl(2.6,3.2,16,rs),0xeef2f8,Mx(31,22,-22,-0.7,0,0)]);G.push([new THREE.TorusGeometry(2.65,0.2,6,rs),glow,Mx(31,27.9,-27.1,-0.7+Math.PI/2,0,0)]);}
+  if(hqHas('ring2')){const r2=new THREE.Group();r2.position.set(0,-2,-4);r2.rotation.z=0.35;ext.add(r2);const inner=new THREE.Group();r2.add(inner);
+    inner.add(hqMesh([[new THREE.TorusGeometry(82,1.8,q>=2?12:8,q>=2?160:80),hullC,Mx(0,0,0,Math.PI/2,0,0)],[new THREE.CapsuleGeometry(2,6,4,12),slate,Mx(82,0,0,0,0,Math.PI/2)],[new THREE.CapsuleGeometry(2,6,4,12),slate,Mx(-82,0,0,0,0,Math.PI/2)]],M.metal,q>=1));
+    inner.add(hqMesh([[new THREE.TorusGeometry(84.1,0.2,4,q>=2?160:80),glow,Mx(0,0,0,Math.PI/2,0,0)]],M.glowV));HQ.spin.push({g:inner,ax:'y',s:-0.07});}
+  /* floating approach guidance lights (chase-blink) */
+  for(let i=0;i<12;i++)for(const s of [-1,1]){const l=glowMesh(new THREE.SphereGeometry(0.45,8,6),s*16,3,-56-i*7,M.glow);detail.add(l);HQ.blink.push({m:l,i});}
+  const beacon=glowMesh(new THREE.SphereGeometry(0.6,8,6),0,spB+spH+0.4,2,0xff4d5e);ext.add(beacon);HQ.blink.push({m:beacon,i:-1});
+  ext.add(hqMesh(P,M.metal,true));ext.add(hqMesh(D,M.dark,false));ext.add(hqMesh(G,M.glowV,false));
+  HQ.detail=detail;return ext;
+}
+
+/* ---------- 2. INTERIOR ---------- */
+const HQ_ROOMS=[
+  {id:'hangar',name:'SHIP HANGAR',x0:-14,x1:14,z0:-42,z1:-14,h:12,lvl:1,doors:{N:[[-3,3]]},open:'S'},
+  {id:'corrA',corr:'z',x0:-3,x1:3,z0:-14,z1:-9,h:5,lvl:1},
+  {id:'hub',name:'COMMAND DECK',x0:-10,x1:10,z0:-9,z1:9,h:9,lvl:1,doors:{S:[[-3,3]],N:[[-3,3]],W:[[-3,3]],E:[[-3,3]]}},
+  {id:'corrL',corr:'x',x0:-15,x1:-10,z0:-3,z1:3,h:5,lvl:2},
+  {id:'lab',name:'RESEARCH LABORATORY',x0:-31,x1:-15,z0:-8,z1:8,h:8,lvl:2,doors:{E:[[-3,3]]}},
+  {id:'corrR',corr:'x',x0:10,x1:15,z0:-3,z1:3,h:5,lvl:3},
+  {id:'exch',name:'GALACTIC EXCHANGE',x0:15,x1:31,z0:-8,z1:8,h:8,lvl:3,doors:{W:[[-3,3]]}},
+  {id:'corrB',corr:'z',x0:-3,x1:3,z0:9,z1:14,h:5,lvl:1},
+  {id:'obs',name:'OBSERVATORY',x0:-12,x1:12,z0:14,z1:30,h:10,lvl:1,doors:{S:[[-3,3]],W:[[19,25]],E:[[19,25]]},glass:'N'},
+  {id:'corrBL',corr:'x',x0:-17,x1:-12,z0:19,z1:25,h:5,lvl:1},
+  {id:'crew',name:'CREW QUARTERS',x0:-31,x1:-17,z0:14,z1:30,h:7,lvl:1,doors:{E:[[19,25]]}},
+  {id:'corrBR',corr:'x',x0:12,x1:17,z0:19,z1:25,h:5,lvl:3},
+  {id:'tp',name:'TELEPORTATION HUB',x0:17,x1:31,z0:14,z1:30,h:8,lvl:3,doors:{W:[[19,25]]}}
+];
+function hqScreen(w,h,draw){
+  const c=document.createElement('canvas');c.width=512;c.height=Math.round(512*h/w);const tex=new THREE.CanvasTexture(c);tex.colorSpace=THREE.SRGBColorSpace;
+  const m=new THREE.Mesh(new THREE.PlaneGeometry(w,h),new THREE.MeshBasicMaterial({map:tex}));const s={mesh:m,c,ctx:c.getContext('2d'),tex,draw};HQ.screens.push(s);s.draw(s);tex.needsUpdate=true;return m;
+}
+function hqScreenHead(s,title){const g=s.ctx,W=s.c.width,H=s.c.height;g.fillStyle='#06101f';g.fillRect(0,0,W,H);g.strokeStyle='#39c6ff';g.lineWidth=6;g.strokeRect(3,3,W-6,H-6);
+  g.fillStyle='#5ff3ff';g.font='bold 30px sans-serif';g.fillText(title,22,44);g.fillStyle='rgba(95,243,255,.25)';g.fillRect(22,56,W-44,3);g.font='bold 22px sans-serif';g.fillStyle='#dff4ff';}
+function hqBuildInterior(M){
+  const L=HQ.level,intH=new THREE.Group(),intR=new THREE.Group(),th=M.th;
+  const W=[],F=[],T=[],Dk=[];
+  HQ.walkRects=[];HQ.camRects=[];HQ.cols=[];HQ.boxes=[];HQ.steps=[];HQ.ints=[];HQ.screens=[];HQ.showShips=[];
+  const wallC=th.wall,floorC=th.floor,trim=M.acc;
+  const wallSeg=(axis,fixed,a,b,h,doors,room)=>{ // axis 'x' => wall runs along x at z=fixed
+    const cuts=(doors||[]).slice().sort((p,q)=>p[0]-q[0]);let cur=a;const segs=[];
+    for(const [d0,d1] of cuts){if(d0>cur)segs.push([cur,d0]);segs.push(null,[d0,d1]);cur=d1;}
+    if(cur<b)segs.push([cur,b]);
+    let door=false;for(const sg of segs){if(sg===null){door=true;continue;}const [s0,s1]=sg,len=s1-s0;if(len<=0.01){door=false;continue;}const mid=(s0+s1)/2;
+      const tgt=room.corr?W:W;
+      if(door){ // lintel over a doorway
+        const hh=h-3.4;if(hh>0.05){if(axis==='x')tgt.push([hqBox(len,hh,0.4),wallC,Mx(mid,3.4+hh/2,fixed)]);else tgt.push([hqBox(0.4,hh,len),wallC,Mx(fixed,3.4+hh/2,mid)]);}
+        if(axis==='x')T.push([hqBox(len,0.18,0.5),trim,Mx(mid,3.45,fixed)]);else T.push([hqBox(0.5,0.18,len),trim,Mx(fixed,3.45,mid)]);
+        door=false;continue;}
+      if(axis==='x'){tgt.push([hqBox(len,h,0.4),wallC,Mx(mid,h/2,fixed)]);T.push([hqBox(len,0.12,0.46),trim,Mx(mid,2.7,fixed)]);}
+      else{tgt.push([hqBox(0.4,h,len),wallC,Mx(fixed,h/2,mid)]);T.push([hqBox(0.46,0.12,len),trim,Mx(fixed,2.7,mid)]);}}
+  };
+  for(const r of HQ_ROOMS){
+    const tgtF=r.id==='hangar'?F:F;const w=r.x1-r.x0,d=r.z1-r.z0,cx=(r.x0+r.x1)/2,cz=(r.z0+r.z1)/2,unlocked=r.lvl<=L;
+    F.push([hqBox(w,0.2,d),floorC,Mx(cx,-0.1,cz)]);
+    W.push([hqBox(w,0.2,d),r.id==='hangar'?0x8a96aa:wallC,Mx(cx,r.h+0.1,cz)]);
+    if(!r.corr){/* ceiling light panels */
+      const nx=Math.max(1,Math.floor(w/7)),nz=Math.max(1,Math.floor(d/7));
+      for(let i=0;i<nx;i++)for(let j=0;j<nz;j++)T.push([hqBox(2.6,0.06,1.2),0xffffff,Mx(r.x0+(i+0.5)*w/nx,r.h-0.04,r.z0+(j+0.5)*d/nz)]);
+      for(const [x0,x1] of [[r.x0+0.6,r.x1-0.6]])T.push([hqBox(x1-x0,0.03,0.12),trim,Mx(cx,0.02,r.z0+0.8)],[hqBox(x1-x0,0.03,0.12),trim,Mx(cx,0.02,r.z1-0.8)]);
+      const dr=r.doors||{};
+      if(r.open!=='S')wallSeg('x',r.z0,r.x0,r.x1,r.h,dr.S,r);
+      if(r.glass==='N'){/* panoramic window wall */Dk.push([hqBox(w,0.6,0.5),0x3a4252,Mx(cx,0.3,r.z1)],[hqBox(w,0.6,0.5),0x3a4252,Mx(cx,r.h-0.3,r.z1)]);
+        for(let i=0;i<=6;i++)Dk.push([hqBox(0.35,r.h,0.45),0x3a4252,Mx(r.x0+i*w/6,r.h/2,r.z1)]);
+        const gl=new THREE.Mesh(new THREE.PlaneGeometry(w,r.h),M.glass);gl.position.set(cx,r.h/2,r.z1);intR.add(gl);}
+      else wallSeg('x',r.z1,r.x0,r.x1,r.h,dr.N,r);
+      wallSeg('z',r.x0,r.z0,r.z1,r.h,dr.W,r);wallSeg('z',r.x1,r.z0,r.z1,r.h,dr.E,r);
+      HQ.walkRects.push({x0:r.x0,x1:r.x1,z0:r.z0,z1:r.z1,ok:unlocked,room:r});
+    }else{
+      if(r.corr==='z'){W.push([hqBox(0.4,r.h,d),wallC,Mx(r.x0,r.h/2,cz)],[hqBox(0.4,r.h,d),wallC,Mx(r.x1,r.h/2,cz)]);T.push([hqBox(0.12,0.06,d),trim,Mx(r.x0+0.3,0.03,cz)],[hqBox(0.12,0.06,d),trim,Mx(r.x1-0.3,0.03,cz)]);
+        HQ.walkRects.push({x0:r.x0,x1:r.x1,z0:r.z0-1.2,z1:r.z1+1.2,ok:unlocked,room:r});}
+      else{W.push([hqBox(w,r.h,0.4),wallC,Mx(cx,r.h/2,r.z0)],[hqBox(w,r.h,0.4),wallC,Mx(cx,r.h/2,r.z1)]);T.push([hqBox(w,0.06,0.12),trim,Mx(cx,0.03,r.z0+0.3)],[hqBox(w,0.06,0.12),trim,Mx(cx,0.03,r.z1-0.3)]);
+        HQ.walkRects.push({x0:r.x0-1.2,x1:r.x1+1.2,z0:r.z0,z1:r.z1,ok:unlocked,room:r});}
+      if(!unlocked){/* locked force field across the corridor */
+        const ff=new THREE.Mesh(r.corr==='z'?new THREE.PlaneGeometry(r.x1-r.x0,r.h):new THREE.PlaneGeometry(r.z1-r.z0,r.h),M.redF);
+        if(r.corr==='z')ff.position.set(cx,r.h/2,r.z0+0.2);else{ff.rotation.y=Math.PI/2;ff.position.set(r.x0<0?r.x1-0.2:r.x0+0.2,r.h/2,cz);}intR.add(ff);
+        const lab=hqScreen(4,1.1,s=>{const g=s.ctx;g.fillStyle='#2a0610';g.fillRect(0,0,512,141);g.fillStyle='#ff9db2';g.font='bold 40px sans-serif';g.fillText('LOCKED — LEVEL '+r.lvl,40,62);g.font='bold 24px sans-serif';g.fillText('Upgrade the station to open',40,108);});
+        lab.position.copy(ff.position);lab.position.y=2.4;lab.rotation.y=ff.rotation.y;if(r.corr==='z')lab.position.z+=0.05;else lab.position.x+=r.x0<0?0.05:-0.05;intR.add(lab);}
+    }
+    HQ.camRects.push({x0:r.x0,x1:r.x1,z0:r.z0,z1:r.z1,h:r.h});
+  }
+  /* ---- HANGAR ---- */
+  const padP=[[hqCyl(4.6,4.8,0.3,32),0x5a6478,Mx(0,0.15,HQ_PAD_Z)],[new THREE.TorusGeometry(4.2,0.12,6,48),trim,Mx(0,0.32,HQ_PAD_Z,Math.PI/2,0,0)]];
+  const pads=[[0,HQ_PAD_Z]];if(L>=2)pads.push([-9,-34],[9,-34]);if(hqHas('ring2'))pads.push([-9,-20],[9,-20]);
+  HQ.steps.push({x:0,z:HQ_PAD_Z,r:4.75,h:0.3});for(const [x,z] of pads.slice(1))HQ.steps.push({x,z,r:3.75,h:0.3});
+  for(const [x,z] of pads.slice(1)){padP.push([hqCyl(3.6,3.8,0.3,28),0x5a6478,Mx(x,0.15,z)],[new THREE.TorusGeometry(3.3,0.1,6,40),trim,Mx(x,0.32,z,Math.PI/2,0,0)]);}
+  Dk.push(...padP.filter(p=>p[1]!==trim));T.push(...padP.filter(p=>p[1]===trim));
+  for(let i=0;i<6;i++)Dk.push([hqBox(1.6,1.4,1.6),0xff922b,Mx(-12,0.7,-40+i*1.9)],[hqBox(1.4,1.2,1.4),0x39c6ff,Mx(12.2,0.6,-38+i*2.2)]);
+  for(const x of [-13.6,13.6])Dk.push([hqBox(0.6,11.6,0.6),0x3a4252,Mx(x,5.8,-41.6)]);
+  Dk.push([hqBox(28,0.8,0.6),0x3a4252,Mx(0,11.6,-41.6)]);
+  const bay=new THREE.Mesh(new THREE.PlaneGeometry(27,11.4),M.blueF);bay.position.set(0,5.8,-41.7);intH.add(bay);
+  hqTerminal(intH,Dk,T,trim,-11.6,-19,Math.PI/2,'SHIP SERVICE · REPAIR & REFIT','hangar',()=>hqUseService());
+  /* showroom ships on spare pads */
+  if(hqHas('showroom')){const others=SKIN.ownedShip.filter(id=>id!==SKIN.ship).slice(0,pads.length-1);
+    others.forEach((id,i)=>{const [x,z]=pads[i+1];const sh=buildShip();dressShip(sh.model,sh.flame,id);sh.flame.visible=false;sh.gear.visible=true;sh.gear.scale.y=1;sh.group.position.set(x,HQ_PAD_Y,z);sh.group.rotation.y=Math.PI;intH.add(sh.group);
+      const sk=SHIP_SKINS.find(s=>s.id===id);HQ.ints.push({x,z,r:3.6,room:'hangar',label:'SWITCH TO '+(sk?sk.name:id),fn:()=>hqSwitchShip(id)});HQ.cols.push({x,z,r:2.8});HQ.showShips.push(sh);});}
+  /* ---- COMMAND DECK ---- */
+  for(const [x,z] of [[-9.4,-8.4],[9.4,-8.4],[-9.4,8.4],[9.4,8.4]])Dk.push([hqBox(1.2,9,1.2),0x3a4252,Mx(x,4.5,z)]);
+  Dk.push([hqCyl(2.4,2.8,1.1,32),0x3a4252,Mx(0,0.55,0)]);T.push([new THREE.TorusGeometry(2.45,0.1,6,48),trim,Mx(0,1.12,0,Math.PI/2,0,0)]);
+  HQ.holo=new THREE.Group();HQ.holo.position.set(0,3.1,0);intR.add(HQ.holo);{const beam=new THREE.Mesh(new THREE.CylinderGeometry(3.3,2.3,2,32,1,true),M.blueF);beam.position.set(0,2.1,0);intR.add(beam);}HQ.ints.push({x:0,z:0,r:3.6,room:'hub',label:'GALAXY HOLO-MAP',fn:()=>{closeModals();mapTab='radar';renderStarMap();openModal('mapModal');}});HQ.cols.push({x:0,z:0,r:2.7});
+  hqTerminal(intR,Dk,T,trim,-5,-6.4,0.66,'NAVIGATION CONSOLE','hub',()=>hqOpen('nav',{bridge:true}));
+  hqTerminal(intR,Dk,T,trim,6.4,4.6,-Math.PI*0.75,'MISSION TERMINAL','hub',()=>{closeModals();journalTab='missions';renderJournalModal();openModal('journalModal');});
+  hqTerminal(intR,Dk,T,trim,-6.4,4.6,Math.PI*0.75,'STATION MANAGEMENT','hub',()=>hqOpen('over',{}));
+  const scA=hqScreen(5.4,3,s=>{hqScreenHead(s,'SYSTEM STATUS');const g=s.ctx;const sys=SYSTEMS.find(x=>x.id===HQ.sys)||SYSTEMS[0];const an=hqAnchorBody();
+    g.fillText('STAR SYSTEM: '+sys.name,22,96);g.fillText('ORBITING: '+an.name,22,130);g.fillText('WORLDS CHARTED: '+bodies.filter(b=>b.visited&&b.landable).length+' / '+bodies.filter(b=>b.landable).length,22,164);
+    g.fillText('STATION ENERGY: '+Math.round(HQ.energy)+' / '+hqMaxEnergy(),22,198);g.fillText('HULL INTEGRITY: '+Math.round(HQ.health)+'%',22,232);g.fillText('LEVEL '+HQ.level+' — '+HQ_LEVELS[HQ.level].n,22,266);});
+  scA.position.set(-6.4,4.6,8.75);scA.rotation.y=Math.PI;intR.add(scA);
+  const scB=hqScreen(5.4,3,s=>{hqScreenHead(s,'GALACTIC EVENTS');const g=s.ctx;let y=96;const line=t=>{g.fillText(t,22,y);y+=34;};
+    line(RAIDER.active?'⚠ RAIDER ACTIVITY IN '+(SYSTEMS.find(x=>x.id===activeSystemId)||{name:''}).name:'NO RAIDER ACTIVITY');
+    line(PL.stormActive?'⚠ SOLAR STORM IN PROGRESS':'SOLAR WEATHER: CALM');
+    line(GALAXY.anomaly?'ANOMALY DETECTED — '+Math.round(GALAXY.anomaly.pos.distanceTo(HQ.group.position))+'m AWAY':'NO ACTIVE ANOMALIES');
+    line('OUTPOSTS: '+GAME.outposts.length+' · TELEPORTERS: '+GAME.outposts.filter(o=>o.teleporter).length);
+    line('COINS: '+(INV.gold||0).toLocaleString('en-US'));});
+  scB.position.set(6.4,4.6,8.75);scB.rotation.y=Math.PI;intR.add(scB);
+  HQ.ints.push({x:6.4,z:7.6,r:2.2,room:'hub',label:'GALACTIC EVENT MONITOR',fn:()=>{closeModals();mapTab='sector';renderStarMap();openModal('mapModal');}});
+  /* ---- RESEARCH LAB ---- */
+  Dk.push([hqBox(10,1.1,2),0x3a4252,Mx(-23,0.55,-6.6)],[hqBox(2,1.1,9),0x3a4252,Mx(-29.8,0.55,1)]);
+  hqTerminal(intR,Dk,T,trim,-23,-5.2,0,'TECH BAY UPGRADES','lab',()=>{closeModals();renderUpgrades();openModal('upgradeModal');});
+  hqTerminal(intR,Dk,T,trim,-28.4,3.5,Math.PI/2,'RESOURCE ANALYSIS & VAULT','lab',()=>hqOpen('res',{lab:true}));
+  hqTerminal(intR,Dk,T,trim,-19,5.6,Math.PI,'RESEARCH PROGRESS','lab',()=>hqOpen('lab',{lab:true}));
+  Dk.push([hqCyl(1.3,1.5,1,24),0x3a4252,Mx(-23,0.5,1.5)]);HQ.labHolo=new THREE.Group();HQ.labHolo.position.set(-23,2.4,1.5);intR.add(HQ.labHolo);
+  HQ.ints.push({x:-23,z:1.5,r:2.6,room:'lab',label:'DISCOVERY ARCHIVE',fn:()=>{closeModals();journalTab='disc';renderJournalModal();openModal('journalModal');}});HQ.cols.push({x:-23,z:1.5,r:1.8});
+  ['fe','ae','so','vd'].forEach((k,i)=>{Dk.push([hqCyl(0.35,0.35,2.4,10),0x3a4252,Mx(-30,1.2,-6+i*1.1)]);T.push([hqCyl(0.26,0.26,1.6,10),(RES_META[k]&&RES_META[k].color)||0xffffff,Mx(-29.75,1.4,-6+i*1.1)]);});
+  /* ---- GALACTIC EXCHANGE ---- */
+  Dk.push([hqBox(9,1.2,2.2),0x3a4252,Mx(23,0.6,-5)]);T.push([hqBox(9,0.12,2.3),trim,Mx(23,1.22,-5)]);
+  hqTerminal(intR,Dk,T,trim,23,-3.4,0,'GALACTIC EXCHANGE','exch',()=>{closeModals();shopTab='exchange';renderShop();openModal('shopModal');});
+  const board=hqScreen(7,3.6,s=>{hqScreenHead(s,'COIN LEDGER');const g=s.ctx;g.fillText('BALANCE: '+(INV.gold||0).toLocaleString('en-US')+' COINS',22,96);let y=134;
+    for(const e of HQ.log.slice(-5).reverse()){g.fillStyle=e.d>=0?'#7dffc4':'#ff9db2';g.fillText((e.d>=0?'+':'')+e.d.toLocaleString('en-US')+'  '+e.w,22,y);y+=32;}});
+  board.position.set(23,4.4,7.75);board.rotation.y=Math.PI;intR.add(board);
+  HQ.ints.push({x:23,z:6.4,r:2.4,room:'exch',label:'MARKET BOARD · BUY & SELL',fn:()=>{closeModals();shopTab='trade';renderShop();openModal('shopModal');}});
+  if(hqHas('workshop')){Dk.push([hqBox(3,3.2,3),0x5a6478,Mx(28.8,1.6,4)],[hqCyl(0.3,0.3,2,8),0x8a96aa,Mx(28.8,3.8,4)]);T.push([hqBox(3.05,0.2,3.05),trim,Mx(28.8,2.4,4)]);
+    HQ.ints.push({x:27,z:4,r:2.4,room:'exch',label:'FABRICATOR',fn:()=>hqOpen('fab',{fab:true})});HQ.cols.push({x:28.8,z:4,r:1.9});}
+  /* ---- OBSERVATORY ---- */
+  for(const x of [-6,0,6])Dk.push([hqBox(3.6,0.8,1.2),0x3a4252,Mx(x,0.4,22)]);
+  hqTerminal(intR,Dk,T,trim,-9,27.5,Math.PI*0.85,'STAR MAP TELESCOPE','obs',()=>{closeModals();mapTab='sector';renderStarMap();openModal('mapModal');});
+  hqTerminal(intR,Dk,T,trim,9,27.5,-Math.PI*0.85,'ANOMALY SCANNER','obs',()=>hqAnomalyScan());
+  if(hqHas('telescope')){Dk.push([hqCyl(0.3,0.5,1.6,10),0x8a96aa,Mx(0,0.8,27)],[hqCyl(0.45,0.6,3,16),0xd9b45a,Mx(0,2.2,27.4,-0.9,0,0)]);HQ.ints.push({x:0,z:26.4,r:2.2,room:'obs',label:'GRAND TELESCOPE',fn:()=>hqAnomalyScan(true)});HQ.cols.push({x:0,z:27,r:1});}
+  /* ---- CREW QUARTERS ---- */
+  Dk.push([hqBox(4,0.7,6.4),0x3a4252,Mx(-28.6,0.35,26.4)],[hqBox(3.6,0.35,5.6),0xdfe6f0,Mx(-28.6,0.85,26.6)],[hqBox(3,0.4,1.2),0x9fb6ff,Mx(-28.6,1.15,28.8)]);
+  HQ.ints.push({x:-27,z:25.5,r:2.8,room:'crew',label:'REST IN BUNK',fn:()=>hqRest()});HQ.cols.push({x:-28.6,z:26.4,r:2.2});
+  Dk.push([hqBox(1.4,4.6,3.6),0x5a6478,Mx(-30.2,2.3,17.5)]);HQ.ints.push({x:-29,z:17.5,r:2.2,room:'crew',label:'WARDROBE · SUITS & STYLE',fn:()=>{closeModals();shopTab='astro';renderShop();openModal('shopModal');}});
+  Dk.push([hqCyl(1,1.2,1.2,20),0x3a4252,Mx(-22,0.6,28)]);const cap=new THREE.Mesh(new THREE.CylinderGeometry(1,1,2.4,20,1,true),M.glass);cap.position.set(-22,2.4,28);intR.add(cap);
+  HQ.petSpot=new V3(-22,1.9,28);HQ.ints.push({x:-22,z:26.6,r:2.2,room:'crew',label:'COMPANION DISPLAY',fn:()=>{closeModals();shopTab='pets';renderShop();openModal('shopModal');}});HQ.cols.push({x:-22,z:28,r:1.3});
+  hqTerminal(intR,Dk,T,trim,-18.6,16,Math.PI*0.25,'ROOM DECOR & STATION STYLE','crew',()=>hqOpen('custom',{}));
+  if(hqHas('garden')){for(let i=0;i<3;i++){Dk.push([hqBox(2.4,0.9,1.4),0x6b5a3e,Mx(-25+i*3,0.45,15.2)]);for(let j=0;j<3;j++)T.push([new THREE.ConeGeometry(0.28,1,6),0x5df2c0,Mx(-25.7+i*3+j*0.7,1.4,15.2)]);}
+    HQ.ints.push({x:-22,z:16.2,r:2.6,room:'crew',label:'HARVEST GARDEN',fn:()=>hqHarvest()});}
+  /* ---- TELEPORTATION HUB ---- */
+  for(const [x,z] of [[21,24],[27,24],[24,18.5]]){HQ.steps.push({x,z,r:2.05,h:0.35});Dk.push([hqCyl(1.9,2.1,0.35,28),0x3a4252,Mx(x,0.17,z)]);T.push([new THREE.TorusGeometry(1.7,0.1,6,40),hqHas('tpcore')?0x9dfcff:0x4a5366,Mx(x,0.4,z,Math.PI/2,0,0)]);
+    if(hqHas('tpcore')){const beam=new THREE.Mesh(new THREE.CylinderGeometry(1.4,1.6,6,24,1,true),M.blueF);beam.position.set(x,3.2,z);intR.add(beam);}}
+  hqTerminal(intR,Dk,T,trim,28.6,16.4,-Math.PI*0.25,'TELEPORT NETWORK','tp',()=>hqOpen('tp',{tp:true}));
+  HQ.ints.push({x:24,z:21,r:4.2,room:'tp',label:'TELEPORTER PADS',fn:()=>hqOpen('tp',{tp:true})});
+  /* ---- PREMIUM DECOR ---- */
+  if(hqHas('decor')){for(const [x,z] of [[-8.4,-7.4],[8.4,-7.4],[-10.6,16],[10.6,16],[-19,28.6]]){Dk.push([hqCyl(0.6,0.45,0.9,12),0x8a6a46,Mx(x,0.45,z)]);T.push([new THREE.SphereGeometry(0.9,10,8),0x3fbf6a,Mx(x,1.6,z)],[new THREE.ConeGeometry(0.5,1.4,6),0x5df2c0,Mx(x,2.3,z)]);}
+    Dk.push([hqBox(4,0.5,1.4),0x3a4252,Mx(-24,0.25,29.1)]);const aq=new THREE.Mesh(hqBox(3.8,2.2,1.2),M.glass);aq.position.set(-24,1.6,29.1);intR.add(aq);for(let i=0;i<5;i++)T.push([new THREE.SphereGeometry(0.16,8,6),[0xff922b,0x39c6ff,0xffd23f][i%3],Mx(-25.4+i*0.7,1.2+(i%3)*0.4,29.1)]);
+    Dk.push([hqCyl(0.8,1,0.6,16),0x3a4252,Mx(0,0.3,17.2)]);T.push([new THREE.CapsuleGeometry(0.45,0.8,4,10),0xffd23f,Mx(0,1.4,17.2)],[new THREE.SphereGeometry(0.42,14,10),0xffd23f,Mx(0,2.4,17.2)]);HQ.cols.push({x:0,z:17.2,r:1.1});
+    Dk.push([hqBox(4.4,0.9,1.6),0x7b2cbf,Mx(-20,0.45,21.4)],[hqBox(4.4,1.2,0.4),0x7b2cbf,Mx(-20,1.2,20.8)]);HQ.cols.push({x:-20,z:21.4,r:1.8});}
+  hqInteriorDetail(Dk,T,trim,M,intR);
+  /* solid furniture / machinery footprints (x0,x1,z0,z1) */
+  for(const b of [[-12.8,-11.2,-40.8,-29.7],[11.5,12.9,-39,-26.2],[-14,-13.2,-42,-40.6],[13.2,14,-42,-40.6],
+    [8.8,10,7.8,9],[-10,-8.8,7.8,9],[8.8,10,-9,-7.8],[-10,-8.8,-9,-7.8],
+    [-28,-18,-7.7,-5.5],[-30.8,-28.8,-3.5,5.5],[-30.5,-29.5,-6.5,-2.2],
+    [18.5,27.5,-6.1,-3.9],
+    [-7.8,-4.2,21.4,22.6],[-1.8,1.8,21.4,22.6],[4.2,7.8,21.4,22.6],[-12,12,29,30],
+    [-30.6,-26.6,23.2,29.6],[-30.9,-29.5,15.7,19.3],[-30.9,-30.1,19.6,23.8],[-26.2,-17.8,14.5,15.9]])HQ.boxes.push({x0:b[0],x1:b[1],z0:b[2],z1:b[3]});
+  if(hqHas('decor')){HQ.boxes.push({x0:-26,x1:-22,z0:28.4,z1:29.8});for(const [x,z] of [[-8.4,-7.4],[8.4,-7.4],[-10.6,16],[10.6,16],[-19,28.6]])HQ.cols.push({x,z,r:0.7});}
+  /* merge static geometry by material */
+  intH.add(hqMesh(F.filter(p=>p[2].elements[14]<-13),M.floor));intR.add(hqMesh(F.filter(p=>p[2].elements[14]>=-13),M.floor));
+  const split=(arr,mat,outl)=>{const a=arr.filter(p=>p[2].elements[14]<-13.5),b=arr.filter(p=>p[2].elements[14]>=-13.5);if(a.length)intH.add(hqMesh(a,mat,outl));if(b.length)intR.add(hqMesh(b,mat,outl));};
+  split(W,M.wall,false);split(Dk,M.dark,false);split(T,M.accM,false);
+  /* interior light that follows the player */
+  if(!HQ.light){HQ.light=new THREE.PointLight(0xfff6ee,0,60,1);scene.add(HQ.light);}
+  return {intH,intR};
+}
+function hqTerminal(group,Dk,T,trim,x,z,rot,label,room,fn){
+  const m=new M4().makeRotationY(rot),place=(px,py,pz)=>new M4().makeTranslation(x,0,z).multiply(m).multiply(new M4().makeTranslation(px,py,pz));
+  Dk.push([hqBox(1.6,1.1,0.9),0x3a4252,place(0,0.55,0)],[hqBox(1.5,0.9,0.12),0x2a3346,place(0,1.4,-0.12).multiply(new M4().makeRotationX(-0.5))]);
+  T.push([hqBox(1.62,0.06,0.92),trim,place(0,1.12,0)]);
+  const scr=new THREE.Mesh(new THREE.PlaneGeometry(1.3,0.7),new THREE.MeshBasicMaterial({color:0x5ff3ff,transparent:true,opacity:0.85}));
+  scr.matrixAutoUpdate=false;scr.matrix.copy(place(0,1.42,-0.05).multiply(new M4().makeRotationX(-0.5)));group.add(scr);
+  const fx=x+Math.sin(rot)*1.6,fz=z+Math.cos(rot)*1.6;
+  HQ.ints.push({x:fx,z:fz,r:2.1,room,label,fn});HQ.cols.push({x,z,r:1});
+}
+
+/* ---------- 2b. INTERIOR MECHANICAL DETAIL ---------- */
+function hqInteriorDetail(Dk,T,trim,M,intR){
+  const q=gfxTierIdx,rib=0x343d4f,pipeA=0x8a96aa,pipeB=0xff922b,pipeC=0x39c6ff,seam=0x0a0e15,rs=[8,10,14,16][q];
+  const sides=r=>{const d=r.doors||{},out=[];
+    if(r.open!=='S')out.push({ax:'x',f:r.z0,a:r.x0,b:r.x1,nx:0,nz:1,doors:d.S||[]});
+    if(r.glass!=='N')out.push({ax:'x',f:r.z1,a:r.x0,b:r.x1,nx:0,nz:-1,doors:d.N||[]});
+    out.push({ax:'z',f:r.x0,a:r.z0,b:r.z1,nx:1,nz:0,doors:d.W||[]});out.push({ax:'z',f:r.x1,a:r.z0,b:r.z1,nx:-1,nz:0,doors:d.E||[]});return out;};
+  const at=(s,t,inw,y)=>s.ax==='x'?[t,y,s.f+s.nz*inw]:[s.f+s.nx*inw,y,t];
+  const box=(s,along,h,dep)=>s.ax==='x'?hqBox(along,h,dep):hqBox(dep,h,along);
+  for(const r of HQ_ROOMS){
+    const w=r.x1-r.x0,d=r.z1-r.z0,cx=(r.x0+r.x1)/2,cz=(r.z0+r.z1)/2,h=r.h;
+    if(r.corr){/* tunnel frames, pipes and floor grate */
+      const alongZ=r.corr==='z',len=alongZ?d:w,n=Math.max(2,Math.round(len/1.7));
+      for(let i=0;i<=n;i++){const t=(alongZ?r.z0:r.x0)+i*len/n;
+        if(alongZ){Dk.push([hqBox(0.35,h,0.4),rib,Mx(r.x0+0.38,h/2,t)],[hqBox(0.35,h,0.4),rib,Mx(r.x1-0.38,h/2,t)],[hqBox(w,0.35,0.4),rib,Mx(cx,h-0.2,t)]);T.push([hqBox(w-1,0.05,0.12),trim,Mx(cx,h-0.4,t)]);}
+        else{Dk.push([hqBox(0.4,h,0.35),rib,Mx(t,h/2,r.z0+0.38)],[hqBox(0.4,h,0.35),rib,Mx(t,h/2,r.z1-0.38)],[hqBox(0.4,0.35,d),rib,Mx(t,h-0.2,cz)]);T.push([hqBox(0.12,0.05,d-1),trim,Mx(t,h-0.4,cz)]);}}
+      for(const [o,rad,col] of [[0.75,0.13,pipeA],[1.1,0.09,pipeC]]){
+        if(alongZ)Dk.push([hqCyl(rad,rad,d+2.4,rs),col,Mx(r.x0+o,h-0.9,cz,Math.PI/2,0,0)],[hqCyl(rad,rad,d+2.4,rs),col,Mx(r.x1-o,h-0.9,cz,Math.PI/2,0,0)]);
+        else Dk.push([hqCyl(rad,rad,w+2.4,rs),col,Mx(cx,h-0.9,r.z0+o,0,0,Math.PI/2)],[hqCyl(rad,rad,w+2.4,rs),col,Mx(cx,h-0.9,r.z1-o,0,0,Math.PI/2)]);}
+      if(alongZ)Dk.push([hqBox(1.6,0.04,d+2.4),seam,Mx(cx,0.02,cz)]);else Dk.push([hqBox(w+2.4,0.04,1.6),seam,Mx(cx,0.02,cz)]);
+      continue;}
+    for(const s of sides(r)){
+      const segs=[];let cur=s.a;
+      for(const [d0,d1] of s.doors.slice().sort((p,q2)=>p[0]-q2[0])){if(d0>cur)segs.push([cur,d0]);cur=d1;
+        for(const e of [d0,d1]){const [x,y,z]=at(s,e,0.35,1.8);Dk.push([box(s,0.55,3.6,0.7),rib,Mx(x,y,z)]);const [gx,gy,gz]=at(s,e+(e===d0?0.31:-0.31),0.71,1.8);T.push([box(s,0.07,3.2,0.05),trim,Mx(gx,gy,gz)]);}
+        const [lx,ly,lz]=at(s,(d0+d1)/2,0.35,3.65);Dk.push([box(s,d1-d0+1.1,0.5,0.7),rib,Mx(lx,ly,lz)]);}
+      if(cur<s.b)segs.push([cur,s.b]);
+      let k=0;
+      for(const [a,b] of segs){const len=b-a;if(len<0.4)continue;
+        const [wx,wy,wz]=at(s,(a+b)/2,0.26,0.55);Dk.push([box(s,len,1.1,0.12),0x2a3346,Mx(wx,wy,wz)]);
+        const n=Math.floor(len/3.6);for(let i=1;i<=n;i++){const t=a+i*len/(n+1),[x,y,z]=at(s,t,0.4,h/2);Dk.push([box(s,0.6,h,0.42),rib,Mx(x,y,z)]);
+          if((k++)%2===0){const [gx,gy,gz]=at(s,t,0.62,h/2+0.4);T.push([box(s,0.08,h-3,0.04),trim,Mx(gx,gy,gz)]);}}}
+      {const [x,y,z]=at(s,(s.a+s.b)/2,0.24,h-0.35);T.push([box(s,s.b-s.a-0.6,0.07,0.05),trim,Mx(x,y,z)]);}
+      if(s.b-s.a>=14){
+        for(const [o,y,rad,col] of [[0.85,h-1.0,0.16,pipeA],[0.9,h-1.45,0.11,s.ax==='x'?pipeB:pipeC]]){const [x,yy,z]=at(s,(s.a+s.b)/2,o,y);
+          Dk.push([hqCyl(rad,rad,s.b-s.a-0.8,rs),col,s.ax==='x'?Mx(x,yy,z,0,0,Math.PI/2):Mx(x,yy,z,Math.PI/2,0,0)]);}
+        const nb=Math.floor((s.b-s.a)/3);for(let i=1;i<nb;i++){const [x,y,z]=at(s,s.a+i*3,0.6,h-1.2);Dk.push([box(s,0.18,0.9,0.8),rib,Mx(x,y,z)]);}}
+    }
+    /* ceiling beams between the light panels + floor plate seams */
+    const nz=Math.max(1,Math.floor(d/7));
+    if(nz>1)for(let j=1;j<nz;j++)Dk.push([hqBox(w-0.4,0.45,0.55),rib,Mx(cx,h-0.25,r.z0+j*d/nz)]);
+    else for(const z of [r.z0+d*0.18,r.z1-d*0.18])Dk.push([hqBox(w-0.4,0.45,0.55),rib,Mx(cx,h-0.25,z)]);
+    for(let x=r.x0+2.5;x<r.x1-0.5;x+=2.5)Dk.push([hqBox(0.05,0.02,d-0.8),seam,Mx(x,0.011,cz)]);
+    for(let z=r.z0+2.5;z<r.z1-0.5;z+=2.5)Dk.push([hqBox(w-0.8,0.02,0.05),seam,Mx(cx,0.011,z)]);
+  }
+  /* --- HANGAR machinery --- */
+  for(const s of [-1,1])Dk.push([hqBox(0.8,0.8,27),rib,Mx(s*10,11.2,-28)]);
+  Dk.push([hqBox(21,0.9,1.2),0xffc94d,Mx(0,10.6,-33)],[hqBox(2.2,1.2,2.2),0x3a4252,Mx(-3,9.7,-33)],[hqCyl(0.05,0.05,3.4,6),0x8a96aa,Mx(-3,7.4,-33)],[hqBox(1.2,0.5,0.4),0xffc94d,Mx(-3,5.5,-33)]);
+  T.push([hqBox(0.3,0.1,0.3),0xff4d5e,Mx(-3,9.05,-33)]);
+  for(const z of [-22.5,-18.8]){Dk.push([hqCyl(1.1,1.1,4,rs),0xdfe6f0,Mx(12.3,2,z)],[hqCyl(1.15,1.15,0.25,rs),0xff922b,Mx(12.3,1.2,z)],[hqCyl(1.15,1.15,0.25,rs),0xff922b,Mx(12.3,3,z)],[new THREE.SphereGeometry(1.1,rs,6,0,TAU,0,Math.PI/2),0xdfe6f0,Mx(12.3,4,z)],[hqCyl(0.12,0.12,7,6),pipeA,Mx(12.3,7.8,z)]);HQ.cols.push({x:12.3,z,r:1.2});}
+  Dk.push([hqCyl(0.9,1.1,0.6,rs),0x3a4252,Mx(-7,0.3,-34)],[hqCyl(0.35,0.35,3,10),0xffc94d,Mx(-7,1.9,-34,0,0,0.35)],[new THREE.SphereGeometry(0.45,10,8),0x3a4252,Mx(-7.5,3.3,-34)],[hqCyl(0.28,0.28,2.4,10),0xffc94d,Mx(-6.6,3.9,-34,0,0,-1.1)],[hqBox(0.5,0.5,0.7),0x3a4252,Mx(-5.6,4.4,-34)]);
+  T.push([hqBox(0.12,0.12,0.3),0xff4d5e,Mx(-5.3,4.4,-34)]);HQ.cols.push({x:-7,z:-34,r:1.2});
+  for(const s of [-1,1])for(const z of [-36,-24]){Dk.push([hqCyl(1.5,1.5,0.3,rs),0x1d2330,Mx(s*13.5,8,z,0,0,Math.PI/2)]);T.push([new THREE.TorusGeometry(1.5,0.08,4,rs),trim,Mx(s*13.33,8,z,0,Math.PI/2,0)]);
+    for(let i=0;i<3;i++)Dk.push([hqBox(0.1,2.6,0.35),rib,Mx(s*13.3,8,z,i*Math.PI/3,0,0)]);}
+  for(let i=0;i<24;i++){const a=i/24*TAU;T.push([hqBox(0.9,0.04,0.35),i%2?0xffd23f:0x151a24,Mx(Math.cos(a)*5.25,0.02,HQ_PAD_Z+Math.sin(a)*5.25,0,-a+Math.PI/2,0)]);}
+  Dk.push([hqBox(0.3,2.6,5),0x2a3346,Mx(-13.5,2.2,-26.5)]);for(let i=0;i<5;i++)T.push([hqBox(0.12,0.9+(i%2)*0.5,0.18),[0xffd23f,0xff922b,0x39c6ff][i%3],Mx(-13.3,2.2,-28.4+i*0.95)]);
+  /* --- COMMAND DECK: ceiling holo emitter, floor ring, server racks --- */
+  Dk.push([new THREE.TorusGeometry(3,0.25,6,rs*2),0x3a4252,Mx(0,8.4,0,Math.PI/2,0,0)],[hqCyl(1.2,1.6,0.6,rs),0x3a4252,Mx(0,8.7,0)]);
+  T.push([new THREE.TorusGeometry(3,0.07,4,rs*2),trim,Mx(0,8.13,0,Math.PI/2,0,0)],[new THREE.TorusGeometry(6.2,0.05,4,rs*3),trim,Mx(0,0.02,0,Math.PI/2,0,0)]);
+  for(const [x,z] of [[-9.4,-8.4],[9.4,-8.4],[-9.4,8.4],[9.4,8.4]])T.push([hqBox(1.25,0.1,1.25),trim,Mx(x,3,z)],[hqBox(1.25,0.1,1.25),trim,Mx(x,6,z)]);
+  for(const sx of [-1,1])for(const z of [-5.6,5.6]){Dk.push([hqBox(1.2,3.4,1.6),0x1d2330,Mx(sx*9.1,1.7,z)]);for(let i=0;i<6;i++)T.push([hqBox(0.05,0.08,1.2),i%3===0?0x5dff9a:0x39c6ff,Mx(sx*8.48,0.8+i*0.45,z)]);HQ.cols.push({x:sx*9.1,z,r:1});}
+  /* --- LAB: specimen tubes, bench colliders --- */
+  for(const x of [-27,-24.6,-22.2]){Dk.push([hqCyl(0.75,0.85,0.5,rs),0x3a4252,Mx(x,0.25,6.6)],[hqCyl(0.75,0.75,0.4,rs),0x3a4252,Mx(x,3.1,6.6)],[hqCyl(0.06,0.06,4.6,6),pipeA,Mx(x,5.6,6.6)]);T.push([hqCyl(0.5,0.5,2.2,rs),0x5df2c0,Mx(x,1.6,6.6)]);
+    const gl=new THREE.Mesh(new THREE.CylinderGeometry(0.7,0.7,2.4,rs,1,true),M.glass);gl.position.set(x,1.7,6.6);intR.add(gl);HQ.cols.push({x,z:6.6,r:0.9});}
+  HQ.cols.push({x:-26,z:-6.7,r:1.2},{x:-20,z:-6.7,r:1.2},{x:-29.8,z:-2.2,r:1.1},{x:-29.8,z:1,r:1.1},{x:-29.8,z:4.2,r:1.1});
+  /* --- EXCHANGE: cargo crates, counter ticker --- */
+  Dk.push([hqBox(1.8,1.2,1.8),0xff922b,Mx(29.7,0.6,-6.6)],[hqBox(1.6,1.1,1.6),0x39c6ff,Mx(29.8,1.75,-6.6)],[hqBox(1.6,1.2,1.6),0xffd23f,Mx(27.9,0.6,-6.9)]);
+  T.push([hqBox(8.6,0.18,0.05),0x5dff9a,Mx(23,0.9,-3.87)]);HQ.cols.push({x:29.2,z:-6.6,r:1.6},{x:20,z:-5,r:1.2},{x:26,z:-5,r:1.2});
+  /* --- OBSERVATORY: window railing, bench colliders --- */
+  Dk.push([hqBox(23,0.08,0.12),pipeA,Mx(0,1.05,29.15)]);for(let x=-11;x<=11;x+=2)Dk.push([hqBox(0.1,1.05,0.1),pipeA,Mx(x,0.52,29.15)]);
+  T.push([hqBox(23,0.02,0.1),trim,Mx(0,0.012,28.5)]);for(const x of [-6,0,6])HQ.cols.push({x,z:22,r:1.5});
+  /* --- CREW QUARTERS: lockers, mess table --- */
+  for(let i=0;i<3;i++){Dk.push([hqBox(0.7,2.4,1.1),0x4a5366,Mx(-30.5,1.2,20.2+i*1.2)]);T.push([hqBox(0.04,0.5,0.06),trim,Mx(-30.13,1.4,20.2+i*1.2)]);}
+  Dk.push([hqCyl(1.2,1.2,0.12,rs),0x4a5366,Mx(-25,0.9,21.5)],[hqCyl(0.15,0.15,0.9,8),0x2a3346,Mx(-25,0.45,21.5)],[hqBox(0.7,0.5,0.7),0x7b2cbf,Mx(-26.7,0.25,21.5)],[hqBox(0.7,0.5,0.7),0x7b2cbf,Mx(-23.3,0.25,21.5)]);
+  T.push([new THREE.TorusGeometry(1.2,0.04,4,rs),trim,Mx(-25,0.96,21.5,Math.PI/2,0,0)]);HQ.cols.push({x:-25,z:21.5,r:1.5});
+  /* --- TELEPORT HUB: ceiling emitters over every pad --- */
+  for(const [x,z] of [[21,24],[27,24],[24,18.5]]){Dk.push([new THREE.TorusGeometry(1.6,0.22,6,rs),0x3a4252,Mx(x,7.5,z,Math.PI/2,0,0)],[hqCyl(0.8,1.2,0.5,rs),0x3a4252,Mx(x,7.75,z)]);T.push([new THREE.TorusGeometry(1.6,0.06,4,rs),hqHas('tpcore')?0x9dfcff:0x4a5366,Mx(x,7.25,z,Math.PI/2,0,0)]);}
+}
+
+
+/* ---------- build / rebuild ---------- */
+function hqRebuild(){
+  const M=hqMats();
+  if(!HQ.group){HQ.group=new THREE.Group();scene.add(HQ.group);HQBODY.group=HQ.group;}
+  const astroIn=!!(astro&&HQ.intRest&&astro.group.parent===HQ.intRest);if(astroIn)HQ.intRest.remove(astro.group);
+  for(const c of HQ.crew||[])if(c.g.parent)c.g.parent.remove(c.g);
+  if(HQ.pet&&HQ.pet.parent)HQ.pet.parent.remove(HQ.pet);
+  for(const s of HQ.showShips||[])if(s.group.parent)s.group.parent.remove(s.group);
+  for(const k of ['ext','intHangar','intRest']){if(HQ[k]){HQ.group.remove(HQ[k]);hqDispose(HQ[k]);HQ[k]=null;}}
+  HQ.rings=[];HQ.spin=[];HQ.blink=[];HQ.engines=[];HQ.turrets=[];HQ.pet=null;HQ.petId='';
+  HQ.ext=hqBuildExterior(M);HQ.group.add(HQ.ext);
+  const {intH,intR}=hqBuildInterior(M);HQ.intHangar=intH;HQ.intRest=intR;HQ.group.add(intH);HQ.group.add(intR);
+  if(astroIn)HQ.intRest.add(astro.group);
+  hqSyncCrew();
+  HQ.built=true;hqPositionNow();
+}
+function hqPositionNow(){
+  const b=hqAnchorBody();HQ.group.position.copy(b.center).add(hqOffset(b));HQ.group.rotation.set(0,HQ.yaw,0);HQ.group.updateMatrixWorld(true);HQ.prevPos.copy(HQ.group.position);
+}
+function hqToWorld(v){return HQ.group.localToWorld(v);}
+function hqShipLocal(pos,q){ship.group.position.copy(pos);HQ.group.localToWorld(ship.group.position);ship.group.quaternion.copy(HQ.group.quaternion).multiply(q);}
+
+/* ---------- 3. DOCKING / LAUNCH ---------- */
+function hqCanDock(){
+  if(!started||PL.mode!=='fly'||!HQ.built||HQ.sys!==activeSystemId||HQ.nav)return false;
+  if(PL.near&&PL.near.landable&&PL.alt<landRange(PL.near))return false;
+  return ship.group.position.distanceTo(HQ.group.position)<340;
+}
+const _hqQ=new Q(),_hqQ2=new Q(),_hqV=new V3(),_hqT=new V3();
+function hqDock(){
+  const p0=HQ.group.worldToLocal(ship.group.position.clone());
+  const pre=p0.z>-80?(()=>{const sx=p0.x>=0?1:-1;return [new V3(sx*Math.max(115,Math.abs(p0.x)),Math.max(28,p0.y*0.5),clamp(p0.z,-60,90)),new V3(sx*95,14,-125)];})():[new V3(p0.x*0.4,8,Math.min(-120,p0.z))];
+  const curve=new THREE.CatmullRomCurve3([p0,...pre,new V3(0,6,-70),new V3(0,4.2,-46),new V3(0,HQ_PAD_Y+1.2,-31),new V3(0,HQ_PAD_Y,HQ_PAD_Z)],false,'centripetal');
+  const qL=_hqQ.copy(HQ.group.quaternion).invert().multiply(ship.group.quaternion).clone();
+  HQ.dock={curve,t:0,dur:clamp(curve.getLength()/40,5,13),q0:qL,turn:0};
+  PL.mode='hqdock';PL.body=HQBODY;PL.speed=0;PL.vel.set(0,0,0);HQ.busy=true;ship.gear.visible=false;
+  SFX.ui();toast('DOCKING CLEARANCE GRANTED — AUTOPILOT ENGAGED');
+}
+function hqLaunch(){
+  if(PL.mode!=='hqlanded')return;
+  const curve=new THREE.CatmullRomCurve3([new V3(0,HQ_PAD_Y,HQ_PAD_Z),new V3(0,HQ_PAD_Y+1.6,-33),new V3(0,4.4,-46),new V3(0,6,-80),new V3(0,7,-125)],false,'centripetal');
+  HQ.dock={curve,t:0,dur:4.6,launch:true};PL.mode='hqlaunch';HQ.busy=true;SFX.warp();toast('LAUNCH SEQUENCE — HANGAR DOORS OPEN');
+}
+function hqUpdateDock(dt){
+  const D=HQ.dock;if(!D)return;
+  if(!D.launch&&D.t>=1){/* turntable spins the ship to face the bay doors */
+    D.turn=Math.min(1,D.turn+dt/1.6);const e=D.turn*D.turn*(3-2*D.turn);
+    _hqQ.setFromAxisAngle(AY,Math.PI*(1-e));hqShipLocal(_hqV.set(0,HQ_PAD_Y,HQ_PAD_Z),_hqQ);
+    ship.gear.visible=true;ship.gear.scale.y=1;ship.flameT=0;
+    if(D.turn>=1){HQ.dock=null;PL.mode='hqlanded';HQ.busy=false;HQ.docked=true;orbit.yaw=0.6;orbit.pitch=0.35;SFX.land();comicPop('DOCKED!','#5ff3ff',50,36);advanceMission('hqDock',1);toast('DOCKED AT '+HQ.name+' — PRESS E TO HOP OUT');saveGame(true);}
+    return;}
+  D.t=Math.min(1,D.t+dt/D.dur);const e=D.t<0.5?2*D.t*D.t:1-Math.pow(-2*D.t+2,2)/2;
+  D.curve.getPointAt(e,_hqV);D.curve.getTangentAt(Math.min(0.999,e+0.001),_hqT);
+  if(!D.launch&&e>0.92)_hqT.lerp(new V3(0,0,1),(e-0.92)/0.08).normalize();
+  _hqQ2.setFromRotationMatrix(setBasis(_m,_a.set(0,0,0),_hqT,AY));
+  if(!D.launch)_hqQ.copy(D.q0).slerp(_hqQ2,Math.min(1,D.t*3));else _hqQ.copy(_hqQ2);
+  hqShipLocal(_hqV,_hqQ);
+  ship.model.rotation.x*=0.9;ship.model.rotation.z*=0.9;
+  if(D.launch){ship.gear.scale.y=Math.max(0.01,1-D.t*4);if(D.t>0.25)ship.gear.visible=false;ship.flameT=0.6+D.t*1.2;}
+  else{ship.flameT=e<0.85?0.7:0.25;if(e>0.7){ship.gear.visible=true;ship.gear.scale.y=Math.min(1,(e-0.7)/0.25);}}
+  if(D.launch&&D.t>=1){HQ.dock=null;HQ.busy=false;HQ.docked=false;PL.mode='fly';PL.body=hqAnchorBody();PL.speed=70;_f.set(0,0,-1).applyQuaternion(ship.group.quaternion);PL.vel.copy(_f).multiplyScalar(70);PL.lookIdle=9;ship.gear.visible=false;toast('CLEAR OF '+HQ.name+' — GOOD HUNTING');saveGame(true);}
+}
+function hqPlaceDocked(){
+  if(!HQ.built)hqRebuild();
+  if(HQ.sys!==activeSystemId)switchActiveSystem(HQ.sys);
+  hqPositionNow();
+  PL.mode='hqlanded';PL.body=HQBODY;PL.speed=0;PL.vel.set(0,0,0);astro.group.visible=false;rover.active=false;HQ.docked=true;HQ.dock=null;HQ.busy=false;
+  _hqQ.identity();hqShipLocal(_hqV.set(0,HQ_PAD_Y,HQ_PAD_Z),_hqQ);ship.gear.visible=true;ship.gear.scale.y=1;orbit.yaw=0.6;orbit.pitch=0.35;HQ.camL.set(8,6,HQ_PAD_Z-8);
+}
+function hqExitShip(){
+  if(PL.mode!=='hqlanded')return;
+  HQ.walk={pos:new V3(3.4,0,HQ_PAD_Z+1),view:new V3(0,0,1),face:new V3(0,0,1),yOff:0,vy:0};
+  HQ.intRest.add(astro.group);astro.group.visible=true;astro.S.rotation.x=0;astro.pitch=0.42;
+  PL.mode='hqwalk';PL.jetFuel=100;SFX.jump();toast('WELCOME ABOARD '+HQ.name+'!');HQ.camL.set(3.4,3,HQ_PAD_Z-4);
+}
+function hqTeleportIn(){
+  if(PL.dead)return;if(!hqHas('tpcore')){toast('BUILD THE TELEPORTER CORE ON YOUR HQ FIRST');return;}
+  closeModals();hqPlaceDocked();
+  HQ.walk={pos:new V3(24,0,21),view:new V3(0,0,-1),face:new V3(0,0,-1),yOff:0,vy:0};
+  HQ.intRest.add(astro.group);astro.group.visible=true;astro.S.rotation.x=0;astro.pitch=0.3;
+  PL.mode='hqwalk';HQ.camL.set(24,3,25);advanceMission('hqTeleport',1);SFX.warp();comicPop('BEAMED UP!','#9dfcff',50,36);toast('⚡ TELEPORTED TO '+HQ.name);saveGame(true);
+}
+function hqBoard(){astro.group.visible=false;PL.mode='hqlanded';orbit.yaw=0.6;orbit.pitch=0.35;SFX.ui();toast('ALL ABOARD!');}
+
+/* ---------- 4. WALKING INSIDE ---------- */
+function hqWalkable(x,z){let ok=false;for(const r of HQ.walkRects){if(!r.ok)continue;if(x>=r.x0+0.62&&x<=r.x1-0.62&&z>=r.z0+0.62&&z<=r.z1-0.62){ok=true;break;}}if(!ok)return false;
+  for(const b of HQ.boxes)if(x>b.x0-0.36&&x<b.x1+0.36&&z>b.z0-0.36&&z<b.z1+0.36)return false;return true;}
+function hqFloorAt(x,z){let h=0;for(const p of HQ.steps)if(p.h>h&&Math.hypot(x-p.x,z-p.z)<p.r)h=p.h;return h;}
+function hqRoomAt(x,z){for(const r of HQ.walkRects){const rm=r.room;if(rm.corr)continue;if(x>=rm.x0&&x<=rm.x1&&z>=rm.z0&&z<=rm.z1)return rm;}return null;}
+function hqUpdateWalk(dt){
+  const A=astro,W=HQ.walk;if(!W)return;
+  W.view.applyAxisAngle(AY,-look.x);A.pitch=clamp((A.pitch||0.3)+look.y,-0.25,1.15);
+  let moving=false;
+  if(!HQ.nav){
+    _r.crossVectors(W.view,AY).normalize();
+    _a.set(0,0,0).addScaledVector(W.view,input.my).addScaledVector(_r,input.mx);const ml=_a.length();
+    if(ml>0.06){moving=true;if(ml>1)_a.multiplyScalar(1/ml);W.face.lerp(_b.copy(_a).normalize(),1-Math.exp(-dt*12)).normalize();
+      const sp=4.8*(input.boost?1.8:1)*(astroBonus()==='speed'?1.25:1);
+      const nx=W.pos.x+_a.x*sp*dt;if(hqWalkable(nx,W.pos.z))W.pos.x=nx;
+      const nz=W.pos.z+_a.z*sp*dt;if(hqWalkable(W.pos.x,nz))W.pos.z=nz;
+      for(const c of HQ.cols){const dx=W.pos.x-c.x,dz=W.pos.z-c.z,d=Math.hypot(dx,dz),rr=c.r+0.35;if(d<rr&&d>1e-4){const nx2=c.x+dx/d*rr,nz2=c.z+dz/d*rr;if(hqWalkable(nx2,nz2)){W.pos.x=nx2;W.pos.z=nz2;}}}
+      const shipD=Math.hypot(W.pos.x,W.pos.z-HQ_PAD_Z);if(shipD<2.6&&shipD>1e-4){W.pos.x=W.pos.x/shipD*2.6;W.pos.z=HQ_PAD_Z+(W.pos.z-HQ_PAD_Z)/shipD*2.6;}
+    }
+    if(PL.jumpQ&&W.yOff<=0.001){W.vy=4.6*(astroBonus()==='jump'?1.3:1);SFX.jump();}
+  }
+  PL.jumpQ=false;
+  if(W.yOff>0||W.vy>0){W.yOff+=W.vy*dt;W.vy-=9.5*dt;if(W.yOff<=0){W.yOff=0;W.vy=0;}}
+  {const fl=hqFloorAt(W.pos.x,W.pos.z);W.ground=W.ground===undefined?fl:lerp(W.ground,fl,1-Math.exp(-dt*20));}
+  A.group.position.set(W.pos.x,W.ground+W.yOff,W.pos.z);A.group.quaternion.setFromRotationMatrix(setBasis(_m,_a.set(0,0,0),W.face,AY));
+  const air=W.yOff>0.01;A.phase=(A.phase||0)+dt*(moving?(input.boost?15:10.5):0);SFX.step(dt,moving&&!air,input.boost);
+  const sw=moving&&!air?Math.sin(A.phase)*0.85:0,k=1-Math.exp(-dt*14);
+  A.legL.rotation.x=lerp(A.legL.rotation.x,air?0.5:sw,k);A.legR.rotation.x=lerp(A.legR.rotation.x,air?-0.3:-sw,k);
+  A.armL.rotation.x=lerp(A.armL.rotation.x,air?-2.4:-sw*0.8,k);A.armR.rotation.x=lerp(A.armR.rotation.x,air?-2.4:sw*0.8,k);
+  A.S.position.y=moving&&!air?Math.abs(Math.sin(A.phase))*0.035:0;
+  const rm=hqRoomAt(W.pos.x,W.pos.z);HQ.room=rm?rm.name:'CORRIDOR';
+  if(rm&&!HQ.seen.includes(rm.id)){HQ.seen.push(rm.id);advanceMission('hqRoom',1);}
+  let best=null,bd=1e9;for(const it of HQ.ints){const r=HQ_ROOMS.find(x=>x.id===it.room);if(r&&r.lvl>HQ.level)continue;const d=Math.hypot(W.pos.x-it.x,W.pos.z-it.z);if(d<it.r&&d<bd){bd=d;best=it;}}
+  {let nc=null,nd=1e9;for(const c of HQ.crew){if(!c.g.parent)continue;const d=Math.hypot(W.pos.x-c.g.position.x,W.pos.z-c.g.position.z);if(d<2.1&&d<nd){nd=d;nc=c;}}
+    if(nc&&(!best||nd<bd)){const cc=nc;best={label:'TALK TO '+cc.def.name,fn:()=>hqTalk(cc)};}}
+  PL.hqInt=best;HQ.nearShip=Math.hypot(W.pos.x,W.pos.z-HQ_PAD_Z)<3.6;
+}
+function hqInteract(){if(PL.hqInt){SFX.ui();PL.hqInt.fn();return true;}if(HQ.nearShip){hqBoard();return true;}return false;}
+
+/* ---------- 5. CAMERA ---------- */
+function hqCamInside(p,margin){for(const r of HQ.camRects){if(p.x>=r.x0+margin&&p.x<=r.x1-margin&&p.z>=r.z0+margin&&p.z<=r.z1-margin&&p.y>0.3&&p.y<r.h-0.3)return true;}return false;}
+function hqCamera(dt,snap){
+  const m=PL.mode;
+  if(HQ.nav&&HQ.nav.cine){const c=HQ.group.position,ang=HQ.nav.camA+uTime.value*0.08,dist=250;_a.set(c.x+Math.cos(ang)*dist,c.y+80,c.z+Math.sin(ang)*dist);
+    camera.position.lerp(_a,snap||HQ.nav.snap?1:1-Math.exp(-dt*2.5));HQ.nav.snap=false;camera.up.set(0,1,0);camera.lookAt(c);camera.fov=lerp(camera.fov,baseFov,1-Math.exp(-dt*3));return;}
+  if(m==='hqdock'||m==='hqlaunch'){
+    _f.set(0,0,-1).applyQuaternion(ship.group.quaternion);_u.set(0,1,0).applyQuaternion(HQ.group.quaternion);
+    _a.copy(ship.group.position).addScaledVector(_f,-12).addScaledVector(_u,4.2);camera.position.lerp(_a,snap?1:1-Math.exp(-dt*4));
+    camera.up.copy(_u);camera.lookAt(_b.copy(ship.group.position).addScaledVector(_f,6));camera.fov=lerp(camera.fov,baseFov,1-Math.exp(-dt*3));return;}
+  let tgtL,lookL;
+  if(m==='hqlanded'){orbit.yaw-=look.x;orbit.pitch=clamp(orbit.pitch+look.y,0.06,1.2);
+    const r=11;tgtL=_hqV.set(Math.sin(orbit.yaw)*Math.cos(orbit.pitch)*r,HQ_PAD_Y+Math.sin(orbit.pitch)*r,HQ_PAD_Z+Math.cos(orbit.yaw)*Math.cos(orbit.pitch)*r);
+    tgtL.x=clamp(tgtL.x,-13.3,13.3);tgtL.y=clamp(tgtL.y,0.8,11.2);tgtL.z=clamp(tgtL.z,-41.4,-14.6);lookL=_hqT.set(0,HQ_PAD_Y+0.4,HQ_PAD_Z);}
+  else{const W=HQ.walk||{pos:new V3(0,0,HQ_PAD_Z),view:new V3(0,0,1),yOff:0},A=astro,p=A.pitch||0.3;
+    _f.copy(W.view).multiplyScalar(Math.cos(p)).addScaledVector(AY,-Math.sin(p));
+    lookL=_hqT.set(W.pos.x,(W.ground||0)+W.yOff+1.05,W.pos.z);tgtL=_hqV.copy(lookL).addScaledVector(_f,-5.4).addScaledVector(AY,0.6);
+    if(!hqCamInside(tgtL,0.7)){for(let s=0.95;s>=0.1;s-=0.05){_a.copy(lookL).lerp(tgtL,s);if(hqCamInside(_a,0.7)){tgtL.copy(_a);tgtL.y+=(1-s)*2.6;break;}}}
+    {const rm=hqRoomAt(tgtL.x,tgtL.z);tgtL.y=Math.min(tgtL.y,(rm?rm.h:5)-0.6);}}
+  HQ.camL.lerp(tgtL,snap?1:1-Math.exp(-dt*12));
+  camera.position.copy(HQ.camL);HQ.group.localToWorld(camera.position);
+  _u.set(0,1,0).applyQuaternion(HQ.group.quaternion);camera.up.copy(_u);
+  _b.copy(lookL);HQ.group.localToWorld(_b);camera.lookAt(_b);camera.fov=lerp(camera.fov,baseFov,1-Math.exp(-dt*3));
+}
+
+/* ---------- 6. HUD ---------- */
+function hqHUDText(){const m=PL.mode;locEl.textContent=HQ.name;
+  subEl.textContent=m==='hqwalk'?(HQ.room||'ABOARD')+' · LV.'+HQ.level:m==='hqlanded'?'DOCKED · SHIP HANGAR':m==='hqdock'?'DOCKING · AUTOPILOT':m==='hqlaunch'?'LAUNCHING':'ABOARD';
+  if(HQ.nav)subEl.textContent=HQ.nav.kind==='jump'?'HYPERSPACE JUMP IN PROGRESS':'STATION UNDER WAY · '+Math.round(HQ.nav.t/HQ.nav.dur*100)+'%';}
+function hqHUDButtons(){const m=PL.mode;
+  if(HQ.nav||m==='hqdock'||m==='hqlaunch'){setBtn(bLand,m==='hqlaunch'?'LIFTOFF':'DOCKING',false,true);setBtn(bExit,'EXIT',true);setBtn(bBoost,'BOOST',true);setBtn(bMine,'MINE',true);setPrompt(HQ.nav?'STATION IN TRANSIT — HOLD ON!':'');return;}
+  if(m==='hqlanded'){setBtn(bLand,'LAUNCH',false);setBtn(bExit,'EXIT',false,false,true);setBtn(bBoost,'BOOST',true);setBtn(bMine,'MINE',true);setPrompt(`${key('E')}HOP OUT · ${key('L')}LAUNCH`);return;}
+  const canE=!!PL.hqInt||HQ.nearShip;setBtn(bLand,'JUMP',false);setBtn(bExit,PL.hqInt?'USE':'ENTER',false,!canE,canE);setBtn(bBoost,'RUN',false);setBtn(bMine,'MINE',true);
+  if(PL.hqInt)setPrompt(`${key('E')}${PL.hqInt.label}`);else if(HQ.nearShip)setPrompt(`${key('E')}CLIMB ABOARD YOUR SHIP`);else setPrompt('');}
+function hqAct(kind){
+  const m=PL.mode;
+  if(kind==='land'&&m==='fly'&&hqCanDock()){hqDock();return true;}
+  if(!hqIn())return false;
+  if(HQ.nav||m==='hqdock'||m==='hqlaunch')return true;
+  if(m==='hqlanded'){if(kind==='exit')hqExitShip();else hqLaunch();return true;}
+  if(m==='hqwalk'){if(kind==='exit')hqInteract();else PL.jumpQ=true;return true;}
+  return true;
+}
+let hqTagEl=null;
+function hqUpdateTag(){
+  if(!hqTagEl){hqTagEl=document.createElement('div');hqTagEl.className='capTag hqTag';hqTagEl.innerHTML='<b class="mpArr"></b><svg class="ic"><use href="#i-station"/></svg><span></span>';markersEl.appendChild(hqTagEl);}
+  const show=started&&HQ.built&&PL.mode==='fly'&&HQ.sys===activeSystemId&&!modalOpen;
+  if(!show){hqTagEl.style.display='none';return;}
+  const d=ship.group.position.distanceTo(HQ.group.position);if(d<160){hqTagEl.style.display='none';return;}
+  const t=HQ.name+' '+(d>=1000?(d/1000).toFixed(1)+'k':Math.round(d)+'m');const sp=hqTagEl.querySelector('span');if(sp.textContent!==t)sp.textContent=t;
+  placeScreenTag(hqTagEl,_hqV.copy(HQ.group.position).add(_hqT.set(0,40,0)));
+}
+
+/* ---------- 7. PER-FRAME ---------- */
+function updateHQ(dt){
+  if(!HQ.built){if(typeof scene==='undefined'||!ship)return;hqRebuild();}
+  const vis=HQ.sys===activeSystemId;HQ.group.visible=vis;
+  /* travel */
+  if(HQ.nav)hqUpdateNav(dt);
+  else if(vis){const b=hqAnchorBody();HQ.group.position.copy(b.center).add(hqOffset(b));HQ.group.rotation.y=HQ.yaw;}
+  HQ.group.updateMatrixWorld(true);
+  HQ.delta.subVectors(HQ.group.position,HQ.prevPos);if(HQ.delta.lengthSq()>1e6)HQ.delta.set(0,0,0);HQ.prevPos.copy(HQ.group.position);
+  HQBODY.center.copy(HQ.group.position);HQBODY.delta.copy(HQ.delta);HQBODY.name=HQ.name;HQBODY.sys=HQ.sys;
+  if(!vis){if(document.body.classList.contains('hqIn'))document.body.classList.remove('hqIn');hqUpdateTag();return;}
+  const t=uTime.value,inside=hqIn();
+  if(document.body.classList.contains('hqIn')!==inside)document.body.classList.toggle('hqIn',inside);
+  for(const r of HQ.rings)r.g.rotation.z+=dt*r.s*(HQ.level>=5?1.4:1);
+  for(const s of HQ.spin)s.g.rotation[s.ax]+=dt*s.s;
+  for(const b of HQ.blink){const on=b.i<0?(Math.sin(t*4)>0.6):(Math.floor(t*6)%12===b.i);b.m.visible=b.i<0?on:true;if(b.i>=0)b.m.scale.setScalar(on?1.8:0.8);}
+  const camD=camera.position.distanceTo(HQ.group.position);
+  if(HQ.detail)HQ.detail.visible=camD<1800||inside;
+  {const showExt=!(PL.mode==='hqwalk'||PL.mode==='hqlanded')||!!HQ.nav;if(HQ.ext.visible!==showExt)HQ.ext.visible=showExt;}
+  HQ.intRest.visible=inside;HQ.intHangar.visible=inside||camD<700;
+  const glowT=HQ.nav?1:(PL.mode==='hqlaunch'?0.4:0.12);for(const e of HQ.engines){e.material.opacity=lerp(e.material.opacity,glowT*0.75,1-Math.exp(-dt*2));e.scale.set(1,1+(HQ.nav?0.6+Math.sin(t*20)*0.08:0),1);}
+  if(HQ.holo&&inside)hqUpdateHolo(t);
+  if(HQ.labHolo&&inside){HQ.labHolo.rotation.y+=dt*0.8;if(HQ.labHolo.children.length!==Math.min(8,1+Math.floor(DISCOVERIES.length/3))){while(HQ.labHolo.children.length){const c=HQ.labHolo.children.pop();c.geometry.dispose();c.material.dispose();}const n=Math.min(8,1+Math.floor(DISCOVERIES.length/3));for(let i=0;i<n;i++){const o=new THREE.Mesh(new THREE.OctahedronGeometry(0.28,0),new THREE.MeshBasicMaterial({color:[0x5ff3ff,0xffd23f,0xc77dff,0x5dff9a][i%4],transparent:true,opacity:0.85}));const a=i/n*TAU;o.position.set(Math.cos(a)*1.1,Math.sin(i*1.7)*0.4,Math.sin(a)*1.1);HQ.labHolo.add(o);}}}
+  if(HQ.light){const li=inside?2.4:0;if(HQ.light.intensity!==li)HQ.light.intensity=li;if(inside){const W=HQ.walk;_hqV.set(W&&PL.mode==='hqwalk'?W.pos.x:0,6.5,W&&PL.mode==='hqwalk'?W.pos.z:HQ_PAD_Z);HQ.light.position.copy(HQ.group.localToWorld(_hqV));}}
+  if(inside){HQ.screenT-=dt;if(HQ.screenT<=0){HQ.screenT=1.5;for(const s of HQ.screens){s.draw(s);s.tex.needsUpdate=true;}}hqUpdatePetDisplay(dt);hqUpdateCrew(dt);}
+  /* energy, garden, research, coin ledger */
+  HQ.energy=Math.min(hqMaxEnergy(),HQ.energy+dt*(hqHas('energy')?0.2:0.1));
+  if(HQ.lastGold===null)HQ.lastGold=INV.gold||0;
+  {const g=INV.gold||0,d=g-HQ.lastGold;if(d!==0){const last=HQ.log[HQ.log.length-1],now=Date.now(),w=d>0?'EARNED':'SPENT';
+    if(last&&last.w===w&&now-last.t<4000)last.d+=d,last.t=now;else HQ.log.push({t:now,d,w});if(HQ.log.length>30)HQ.log.splice(0,HQ.log.length-30);HQ.lastGold=g;}}
+  /* defense grid and raider strafing */
+  if(RAIDER.active&&PL.mode==='fly'&&ship.group.position.distanceTo(HQ.group.position)<900){
+    if(hqHas('defense')){HQ.defT-=dt;if(HQ.defT<=0){HQ.defT=0.9;const r=RAIDER.list.find(x=>!x.dead&&x.group.position.distanceTo(HQ.group.position)<900);
+      if(r){const tw=HQ.turrets[Math.floor(Math.random()*HQ.turrets.length)];if(tw){const wp=tw.getWorldPosition(new V3());hqBeam(wp,r.group.position.clone());tw.lookAt(r.group.position);}damageRaider(r,2);}}}
+    else HQ.health=Math.max(10,HQ.health-dt*0.6);}
+  /* ships may not fly through the hull */
+  if(PL.mode==='fly'){const p=HQ.group.worldToLocal(_hqV.copy(ship.group.position));
+    if(Math.abs(p.x)<48&&p.y>-12&&p.y<22&&p.z>-51&&p.z<41){const dx=48-Math.abs(p.x),dyT=22-p.y,dyB=p.y+12,dzF=p.z+51,dzB=41-p.z,mn=Math.min(dx,dyT,dyB,dzF,dzB);
+      if(mn===dx)p.x=Math.sign(p.x||1)*48;else if(mn===dyT)p.y=22;else if(mn===dyB)p.y=-12;else if(mn===dzF)p.z=-51;else p.z=41;
+      ship.group.position.copy(HQ.group.localToWorld(p));PL.speed*=0.4;PL.vel.multiplyScalar(0.3);if(uTime.value-(HQ.bumpT||-9)>2){HQ.bumpT=uTime.value;toast('PROXIMITY ALERT — USE DOCK [L] TO ENTER THE HANGAR');}}}
+  hqUpdateTag();
+}
+let hqBeamM=null,hqBeamT=0;
+function hqBeam(a,b){if(!hqBeamM){hqBeamM=new THREE.Line(new THREE.BufferGeometry().setFromPoints([new V3(),new V3(0,1,0)]),new THREE.LineBasicMaterial({color:0xff4d6d}));hqBeamM.frustumCulled=false;scene.add(hqBeamM);}
+  hqBeamM.geometry.setFromPoints([a,b]);hqBeamM.visible=true;clearTimeout(hqBeamT);hqBeamT=setTimeout(()=>{hqBeamM.visible=false;},180);SFX.ui();}
+function hqUpdateHolo(t){
+  const H=HQ.holo,sysB=bodies.filter(b=>b.sys===HQ.sys&&b.kind!=='sun'&&!b.moon);
+  if(H.userData.sys!==HQ.sys||H.children.length===0){while(H.children.length){const c=H.children.pop();c.geometry&&c.geometry.dispose();c.material&&c.material.dispose();}
+    H.userData.sys=HQ.sys;const star=new THREE.Mesh(new THREE.SphereGeometry(0.32,14,10),new THREE.MeshBasicMaterial({color:0xffe08a}));H.add(star);
+    const maxR=Math.max(1,...sysB.map(b=>b.orbitR||1));H.userData.k=3.2/maxR;H.userData.dots=[];
+    for(const b of sysB){const r=(b.orbitR||1)*H.userData.k;const ring=new THREE.Mesh(new THREE.TorusGeometry(r,0.014,4,72),new THREE.MeshBasicMaterial({color:0x5ff3ff,transparent:true,opacity:0.45}));ring.rotation.x=Math.PI/2;H.add(ring);
+      const dot=new THREE.Mesh(new THREE.SphereGeometry(b===hqAnchorBody()?0.2:0.13,12,8),new THREE.MeshBasicMaterial({color:new THREE.Color(b.color||'#9dfcff')}));H.add(dot);H.userData.dots.push({b,dot});}
+    const me=new THREE.Mesh(new THREE.OctahedronGeometry(0.16,0),new THREE.MeshBasicMaterial({color:0xffd23f}));H.add(me);H.userData.me=me;}
+  const sys=SYSTEMS.find(s=>s.id===HQ.sys)||SYSTEMS[0],k=H.userData.k;
+  for(const {b,dot} of H.userData.dots){dot.position.set((b.center.x-sys.origin.x)*k,(b.center.y-sys.origin.y)*k*0.3,(b.center.z-sys.origin.z)*k);}
+  if(H.userData.me)H.userData.me.position.set((HQ.group.position.x-sys.origin.x)*k,0.25,(HQ.group.position.z-sys.origin.z)*k);
+  H.rotation.y=t*0.05;
+}
+function hqUpdatePetDisplay(dt){
+  const pid=(typeof SHOP2!=='undefined'&&SHOP2.eq.pet)||'';
+  if(HQ.petId!==pid){if(HQ.pet){HQ.intRest.remove(HQ.pet);}HQ.pet=null;HQ.petId=pid;if(pid&&typeof buildPet==='function'){HQ.pet=buildPet(pid);HQ.pet.position.copy(HQ.petSpot);HQ.intRest.add(HQ.pet);}}
+  if(HQ.pet){HQ.pet.rotation.y+=dt*0.8;HQ.pet.position.y=HQ.petSpot.y+Math.sin(uTime.value*2)*0.1;}
+}
+/* ---------- 4b. CREW — NPC astronauts living aboard ---------- */
+const HQ_CREW=[
+  {name:'CHIEF ENGINEER VOSS',skin:1,lvl:1,speed:1.6,work:true,pts:[[-9.8,-19],[-8.5,-30],[-9,-38.5],[5.5,-38],[9.5,-31],[7,-20]],
+    lines:['Your ship is in good hands — I tune the docking clamps myself.',()=>'Hull integrity is at '+Math.round(HQ.health)+'%. Repair it from Station Management if it drops.','Upgrade the station and I get more landing pads to play with!']},
+  {name:'NAV OFFICER IKARA',skin:2,lvl:1,speed:1.5,work:true,pts:[[-4,-4.9],[-7.5,0],[-5,3.4],[5,3.4],[7.5,0],[4.5,-4.5]],
+    lines:[()=>HQ.level<2?'We can move the station once it reaches Level 2. Big jumps need Level 4 engines.':'Course plotting is ready — use the Navigation Console when you want to move us.',()=>'Station energy: '+Math.round(HQ.energy)+' of '+hqMaxEnergy()+'.','The holo-map shows every world in our current system.']},
+  {name:'STARGAZER ODE',skin:5,lvl:1,speed:1.2,work:false,pts:[[-8.1,26],[8.1,26],[3,19.5],[-3,19.5]],
+    lines:['Look out the window — that glow is a whole world waiting for you.','The anomaly scanner pings when something strange appears in this system.','A grand telescope would let me see so much further…']},
+  {name:'QUARTERMASTER BRIX',skin:6,lvl:1,speed:1.4,work:true,pts:[[-27.4,17.5],[-21,18],[-25,24.5],[-20,26.6]],
+    lines:['Take a rest in your bunk any time — it restores your health.',()=>hqHas('garden')?'The garden grows fresh berries every few minutes.':'Build a Botanical Garden and I will keep you fed with fresh fruit.','Your wardrobe has every suit you own.']},
+  {name:'CADET PIP',skin:0,lvl:1,speed:2.0,work:false,pingpong:true,pts:[[6,-19],[0,-16],[0,-11.5],[0,-7.6],[4.6,-4.4],[7.4,0],[4.6,4.2],[0,7.6],[0,11.5],[0,15.2],[-6,16.5],[-11,22],[-14.5,22],[-18.5,24.5]],
+    lines:['First week on the station! The corridors all connect to the Command Deck.','I heard the Exchange opens at Level 3!','Is it true you landed on every planet in the system?']},
+  {name:'DR. LUMEN',skin:3,lvl:2,speed:1.3,work:true,pts:[[-23,-3.6],[-26.8,3.5],[-19,4],[-25.5,-0.4]],
+    lines:[()=>hqHas('research')?'The Research Wing is producing points — collect them at my terminal.':'Build the Research Wing and this lab will generate Research Points.','Every discovery you scan ends up in our archive hologram.','Tech Bay upgrades are installed right here.']},
+  {name:'TRADER QUILL',skin:4,lvl:3,speed:1.4,work:true,pts:[[23,-1.8],[26.5,2],[23,6],[19,2.5]],
+    lines:[()=>'Your balance is '+(INV.gold||0).toLocaleString('en-US')+' coins. The ledger tracks every coin you earn or spend.','Prices on the market board change with demand — sell high!',()=>hqHas('workshop')?'The fabricator turns ore into medkits and cells.':'A Manufacturing Workshop would let us fabricate supplies here.']},
+  {name:'PORTER ZEN',skin:7,lvl:3,speed:1.3,work:true,pts:[[27.5,17.5],[24,26.8],[19.5,21]],
+    lines:[()=>hqHas('tpcore')?'Teleporter core online — step up to the network terminal.':'Build the Teleporter Core and these pads come alive.','Any outpost with a teleporter can beam you straight back here.']}
+];
+HQ.crew=[];
+function hqSyncCrew(){
+  const ids=(typeof ASTRO_SKINS!=='undefined'?ASTRO_SKINS:[]).map(s=>s.id),cap=[4,6,8,8][gfxTierIdx];let n=0;
+  for(const def of HQ_CREW){if(def.lvl>HQ.level||n>=cap)continue;n++;let c=HQ.crew.find(x=>x.def===def);
+    if(!c){const A=buildAstro();if(ids.length){try{dressAstro({S:A.S,armL:A.armL,armR:A.armR,legL:A.legL,legR:A.legR},ids[def.skin%ids.length]);}catch(e){}}
+      A.group.visible=true;if(A.tool)A.tool.visible=false;const p=def.pts[0];A.group.position.set(p[0],0,p[1]);
+      c={def,A,g:A.group,wp:Math.min(1,def.pts.length-1),dirn:1,wait:Math.random()*3,face:new V3(0,0,1),phase:Math.random()*6,stuck:0,line:0,talkT:0};HQ.crew.push(c);}
+    if(c.g.parent!==HQ.intRest)HQ.intRest.add(c.g);}
+}
+function hqTalk(c){c.talkT=5;if(!HQ.met.includes(c.def.name)){HQ.met.push(c.def.name);advanceMission('hqCrew',1);}const L=c.def.lines,l=L[c.line%L.length];c.line++;SFX.ui();toast(c.def.name+': '+(typeof l==='function'?l():l));}
+function hqUpdateCrew(dt){
+  if(!HQ.crew.length)return;const W=HQ.walk,pp=W&&PL.mode==='hqwalk'?W.pos:null;
+  const steer=(gp,ox,oz,rr,k0)=>{const dx=gp.x-ox,dz=gp.z-oz,od=Math.hypot(dx,dz);if(od<rr&&od>1e-3){const k=(rr-od)/rr*k0;_hqV.x+=dx/od*k-dz/od*k*0.5;_hqV.z+=dz/od*k+dx/od*k*0.5;}};
+  for(const c of HQ.crew){if(!c.g.parent)continue;const g=c.g,A=c.A,def=c.def;let moving=false;
+    if(c.talkT>0){c.talkT-=dt;if(pp){_hqT.set(pp.x-g.position.x,0,pp.z-g.position.z);if(_hqT.lengthSq()>0.01)c.face.lerp(_hqT.normalize(),1-Math.exp(-dt*6)).normalize();}}
+    else if(c.wait>0)c.wait-=dt;
+    else{const tp=def.pts[c.wp],dx=tp[0]-g.position.x,dz=tp[1]-g.position.z,dist=Math.hypot(dx,dz);
+      if(dist<0.35){c.wait=2+Math.random()*4;c.stuck=0;
+        if(def.pingpong){if(c.wp+c.dirn<0||c.wp+c.dirn>=def.pts.length)c.dirn*=-1;c.wp+=c.dirn;c.wait=Math.random()<0.25?2+Math.random()*3:0.05;}else c.wp=(c.wp+1)%def.pts.length;}
+      else{_hqV.set(dx/dist,0,dz/dist);
+        for(const o of HQ.cols)steer(g.position,o.x,o.z,o.r+0.9,2.2);
+        steer(g.position,0,HQ_PAD_Z,4.2,2.2);
+        for(const o2 of HQ.crew)if(o2!==c)steer(g.position,o2.g.position.x,o2.g.position.z,1.1,0.9);
+        const block=pp&&Math.hypot(g.position.x-pp.x,g.position.z-pp.z)<1.0;
+        _hqV.y=0;_hqV.normalize();
+        if(!block){const sp=def.speed||1.6,nx=g.position.x+_hqV.x*sp*dt,nz=g.position.z+_hqV.z*sp*dt;let ok=true;
+          if(hqWalkable(nx,nz)){g.position.x=nx;g.position.z=nz;}else if(hqWalkable(nx,g.position.z))g.position.x=nx;else if(hqWalkable(g.position.x,nz))g.position.z=nz;else ok=false;
+          if(ok){moving=true;c.face.lerp(_hqV,1-Math.exp(-dt*8)).normalize();}}
+        c.stuck=moving?Math.max(0,c.stuck-dt):c.stuck+dt;if(c.stuck>3){c.stuck=0;c.wp=(c.wp+1)%def.pts.length;}}}
+    g.position.y=lerp(g.position.y,hqFloorAt(g.position.x,g.position.z),1-Math.exp(-dt*20));
+    g.quaternion.setFromRotationMatrix(setBasis(_m,_a.set(0,0,0),c.face,AY));
+    c.phase+=dt*(moving?9:0);const sw=moving?Math.sin(c.phase)*0.75:0,k=1-Math.exp(-dt*12),work=!moving&&c.wait>0&&def.work;
+    A.legL.rotation.x=lerp(A.legL.rotation.x,sw,k);A.legR.rotation.x=lerp(A.legR.rotation.x,-sw,k);
+    A.armL.rotation.x=lerp(A.armL.rotation.x,work?-1.2+Math.sin(uTime.value*6+c.phase)*0.25:-sw*0.7,k);
+    A.armR.rotation.x=lerp(A.armR.rotation.x,work?-1.1+Math.cos(uTime.value*5+c.phase)*0.25:sw*0.7,k);
+    A.S.position.y=moving?Math.abs(Math.sin(c.phase))*0.03:Math.sin(uTime.value*1.6+c.phase)*0.008;
+  }
+}
+
+function updateHQMode(dt){
+  const m=PL.mode;ship.flameT=0;
+  if(m==='hqdock'||m==='hqlaunch'){hqUpdateDock(dt);return;}
+  _hqQ.identity();hqShipLocal(_hqV.set(0,HQ_PAD_Y,HQ_PAD_Z),_hqQ);ship.gear.visible=true;ship.gear.scale.y=1;
+  if(m==='hqwalk')hqUpdateWalk(dt);
+  PL.local.subVectors(ship.group.position,HQ.group.position);
+}
+
+/* ---------- 8. STATION FLIGHT ---------- */
+function hqNavCost(kind){const l5=HQ.level>=5;return kind==='jump'?{energy:l5?40:70,res:l5?{so:20,vd:8}:{so:40,vd:15}}:{energy:l5?10:20,res:{}};}
+function hqStartNav(kind,sysId,bodyName){
+  if(HQ.nav||!hqIn()||PL.mode==='hqdock'||PL.mode==='hqlaunch')return;
+  const c=hqNavCost(kind);
+  if(kind==='local'&&HQ.level<2){toast('STATION NAVIGATION NEEDS LEVEL 2');return;}
+  if(kind==='jump'){if(HQ.level<4){toast('INTER-SYSTEM JUMPS NEED LEVEL 4 HEAVY ENGINES');return;}const sys=SYSTEMS.find(s=>s.id===sysId);if(!sys||UPGRADES.ship.lvl<sys.reqHyper){toast('HYPERDRIVE TOO WEAK FOR THAT SYSTEM — UPGRADE IT IN THE TECH BAY');return;}
+    if(HQ.health<25){toast('HULL TOO DAMAGED TO JUMP — REPAIR AT STATION MANAGEMENT');return;}if(!hqCostOk(c.res)){toast('NOT ENOUGH SO / VD FOR THE JUMP');return;}}
+  if(HQ.energy<c.energy){toast('NOT ENOUGH STATION ENERGY ('+Math.round(HQ.energy)+'/'+c.energy+')');return;}
+  HQ.energy-=c.energy;if(kind==='jump'){hqPay(c.res);HQ.health=Math.max(10,HQ.health-8);}
+  const dur=(kind==='jump'?9:12)*(HQ.level>=5?0.7:1);
+  HQ.nav={kind,toSys:sysId,toBody:bodyName,t:0,dur,from:HQ.group.position.clone(),fromYaw:HQ.yaw,cine:true,snap:true,camA:Math.random()*TAU,warped:false};
+  HQ.busy=true;closeModals();SFX.warp();toast(kind==='jump'?'HEAVY ENGINES SPOOLING — HYPERSPACE JUMP IN 3s':'ENGINES ONLINE — SETTING COURSE FOR '+bodyName);
+}
+function hqUpdateNav(dt){
+  const N=HQ.nav;N.t+=dt;const k=Math.min(1,N.t/N.dur);
+  if(N.kind==='local'){
+    const tb=hqAnchorBody(HQ.sys,N.toBody),to=_hqV.copy(tb.center).add(hqOffset(tb));const e=k*k*(3-2*k);
+    HQ.group.position.lerpVectors(N.from,to,e);HQ.group.position.y+=Math.sin(e*Math.PI)*60;
+    const dir=_hqT.subVectors(to,N.from);const tgtYaw=Math.atan2(-dir.x,-dir.z);HQ.yaw=lerp(N.fromYaw,tgtYaw,Math.min(1,k*3)*(1-sstep(0.85,1,k)))+(sstep(0.85,1,k))*N.fromYaw*0;HQ.group.rotation.y=HQ.yaw;
+    if(k>=1){HQ.anchor=N.toBody;HQ.yaw=HQ.group.rotation.y;advanceMission('hqNav',1);hqNavDone('ARRIVED IN ORBIT OF '+N.toBody);}
+  }else{
+    if(N.t<2.5){HQ.group.position.copy(N.from);}
+    else if(!N.warped){N.warped=true;const wfx=$('warpFx');wfx.classList.add('on');setTimeout(()=>wfx.classList.remove('on'),1100);
+      if(N.toSys!==activeSystemId)switchActiveSystem(N.toSys);HQ.sys=N.toSys;HQ.anchor=N.toBody;N.camA=Math.random()*TAU;N.snap=true;}
+    else{const tb=hqAnchorBody(N.toSys,N.toBody),to=_hqT.copy(tb.center).add(hqOffset(tb));const kk=sstep(2.5,N.dur,N.t);_f.set(0,0,-1).applyAxisAngle(AY,HQ.yaw);
+      HQ.group.position.copy(to).addScaledVector(_f,(1-kk)*(1-kk)*900);}
+    if(N.t>=N.dur){advanceMission('hqNav',1);advanceMission('hqJump',1);}
+    if(N.t>=N.dur)hqNavDone('JUMP COMPLETE — WELCOME TO '+(SYSTEMS.find(s=>s.id===HQ.sys)||{name:''}).name);
+  }
+}
+function hqNavDone(msg){HQ.nav=null;HQ.busy=false;hqPositionNow();HQ.camL.copy(PL.mode==='hqwalk'&&HQ.walk?HQ.walk.pos:new V3(8,6,HQ_PAD_Z-8));HQ.camL.y=3;
+  if(HQ.holo)HQ.holo.userData.sys=null;SFX.discover();comicPop('ARRIVED!','#5ff3ff',50,34);toast(msg);saveGame(true);}
+
+/* ---------- 9. TERMINAL ACTIONS ---------- */
+function hqUseService(){PL.shield=100;PL.jetFuel=100;if(UPGRADES)toast('SHIP SERVICED — SHIELDS & FUEL RESTORED');SFX.upgrade();closeModals();shopTab='ship';renderShop();openModal('shopModal');}
+function hqRest(){PL.hp=100;PL.shield=100;PL.food=Math.min(100,PL.food+10);SFX.upgrade();comicPop('RESTED!','#5dff9a',50,36);toast('YOU FEEL FULLY RESTED — HEALTH RESTORED');}
+function hqHarvest(){if(!hqHas('garden'))return;const left=HQ.gardenAt+240000-Date.now();if(left>0){toast('GARDEN STILL GROWING — READY IN '+Math.ceil(left/1000)+'s');return;}
+  INV.berry=(INV.berry||0)+4;INV.fruit=(INV.fruit||0)+2;HQ.gardenAt=Date.now();updateResHUD();SFX.coin();comicPop('+4 🍓 +2 🍐','#5dff9a',50,36);toast('GARDEN HARVESTED');advanceMission('hqHarvest',1);saveGame(true);}
+function hqResearchPending(){if(!hqHas('research'))return 0;return Math.min(30,Math.floor((Date.now()-HQ.researchAt)/120000));}
+function hqAnomalyScan(big){const a=GALAXY.anomaly;
+  if(a){const d=Math.round(a.pos.distanceTo(HQ.group.position));toast('ANOMALY DETECTED '+d+'m FROM THE STATION'+(a.scanned?' (ALREADY SCANNED)':' — FLY OUT AND SCAN IT [C]'));}
+  else toast(big?'GRAND TELESCOPE: NO ANOMALIES IN RANGE — CHECK BACK SOON':'NO ANOMALIES DETECTED IN THIS SYSTEM');SFX.scan();}
+function hqSwitchShip(id){if(!SKIN.ownedShip.includes(id))return;SKIN.ship=id;dressShip(ship.model,ship.flame,id);saveGame(true);hqRebuild();toast('NOW FLYING: '+((SHIP_SKINS.find(s=>s.id===id)||{}).name||id));SFX.upgrade();}
+function hqJumpTo(){
+  if(hqIn()){toast('YOU ARE ALREADY ABOARD');return;}
+  const sys=SYSTEMS.find(s=>s.id===HQ.sys);if(HQ.sys!==activeSystemId&&sys&&UPGRADES.ship.lvl<sys.reqHyper){toast('YOUR HYPERDRIVE CANNOT REACH '+sys.name);return;}
+  if(PL.mode!=='fly'&&PL.mode!=='landed'){toast('BOARD YOUR SHIP FIRST');return;}
+  const b=hqAnchorBody(),inter=b.sys!==activeSystemId;closeModals();triggerHyperspaceTransition(b,inter);
+  setTimeout(()=>{hqPositionNow();const p=HQ.group.localToWorld(new V3(0,8,-190));ship.group.position.copy(p);ship.group.quaternion.copy(HQ.group.quaternion);PL.speed=10;PL.vel.set(0,0,0);toast('HQ DEAD AHEAD — PRESS L TO DOCK');},inter?720:320);
+}
+function hqSyncMissions(){
+  const vals={hqLevel:HQ.level-1,hqModule:HQ.modules.length,hqCrew:HQ.met.length,hqRoom:HQ.seen.length};
+  for(const t in vals){let ch=false;for(const m of MISSIONS){if(m.type===t&&!m.done&&vals[t]>m.prog){m.prog=Math.min(m.goal,vals[t]);ch=true;}}if(ch)advanceMission(t,0);}
+}
+function hqPurchase(id){
+  const md=HQ_MODULES.find(m=>m.id===id);if(!md||hqHas(id))return;
+  if(HQ.level<md.lvl){toast('NEEDS STATION LEVEL '+md.lvl);return;}if(!hqCostOk(md.cost)){toast('NOT ENOUGH '+(md.kind==='coin'?'COINS':'RESOURCES'));return;}
+  hqPay(md.cost);HQ.modules.push(id);if(id==='garden')HQ.gardenAt=Date.now();if(id==='research')HQ.researchAt=Date.now();if(id==='energy')HQ.energy=Math.min(150,HQ.energy+20);
+  SFX.craft&&SFX.craft();SFX.upgrade();comicPop(md.kind==='coin'?'PURCHASED!':'CONSTRUCTED!','#5ff3ff',50,34);toast(md.name+(md.kind==='coin'?' PURCHASED':' CONSTRUCTED')+' — NOW ON YOUR STATION');hqRebuild();hqSyncMissions();saveGame(true);hqRender();
+}
+function hqLevelUp(){
+  if(HQ.level>=5)return;const c=HQ_LEVELS[HQ.level+1].cost;if(!hqCostOk(c)){toast('NOT ENOUGH COINS OR RESOURCES');return;}
+  hqPay(c);HQ.level++;hqRebuild();hqSyncMissions();saveGame(true);SFX.discover();closeModals();
+  playCinematic('FRONTIER COMMANDER','LEVEL '+HQ.level+' — '+HQ_LEVELS[HQ.level].n,HQ_LEVELS[HQ.level].perk,true);
+}
+
+/* ---------- 10. MANAGEMENT UI ---------- */
+(function(){
+  const css=document.createElement('style');css.textContent=`
+#hqModal{z-index:34}#hqModal .mCard{width:min(980px,96vw)}
+.hqBar{height:10px;border-radius:6px;background:rgba(255,255,255,.08);overflow:hidden;margin:4px 0 8px}.hqBar i{display:block;height:100%;border-radius:6px}
+.hqCost .ok{color:#7dffc4}.hqCost .no{color:#ff9db2}.hqCost{font-family:var(--sans);font-size:12px;font-weight:800;line-height:1.6}
+.hqIcon{width:56px;height:56px;border-radius:14px;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at 40% 35%,rgba(95,243,255,.35),rgba(8,18,38,.9));border:1px solid rgba(95,243,255,.4);flex:0 0 auto}
+.hqIcon .ic{width:30px;height:30px;color:#9dfcff}.hqHead{display:flex;gap:10px;align-items:center}
+.hqTag{border-color:#5ff3ff!important;background:rgba(8,18,38,.88)!important;color:#c8f2ff!important}.hqTag .ic{width:14px;height:14px;margin-right:4px;vertical-align:-2px;color:#5ff3ff}.hqTag .mpArr{border-left-color:#5ff3ff!important}
+body.hqIn #markers>*{visibility:hidden!important}body.hqIn #bScan{display:none!important}
+.hqList{font-family:var(--sans);font-size:12.5px;font-weight:700;line-height:1.7}.hqSw{display:inline-block;width:14px;height:14px;border-radius:4px;vertical-align:-2px;margin-right:6px;border:1px solid rgba(255,255,255,.4)}
+#hqName{font-family:var(--display);font-size:20px;letter-spacing:.06em;padding:6px 10px;border-radius:10px;border:1px solid rgba(95,243,255,.5);background:#0b1730;color:#dff4ff;width:min(320px,60vw)}`;
+  document.head.appendChild(css);
+  const m=document.createElement('div');m.id='hqModal';m.className='modal';
+  m.innerHTML=`<div class="mCard"><div class="mHead"><h2><svg class="ic"><use href="#i-station"/></svg> <span id="hqTitle">FRONTIER COMMANDER</span></h2><button class="hudBtn" id="hqClose" style="background:var(--pop);color:#fff" aria-label="Close"><svg class="ic"><use href="#i-close"/></svg></button></div>
+  <div class="mTabs" id="hqTabs"></div><div class="mBody"><div class="uGrid" id="hqGrid"></div></div></div>`;
+  document.body.appendChild(m);
+})();
+let hqTab='over';
+function hqOpen(tab,ctx){HQ.ctx=ctx||{};hqTab=tab||'over';SFX.init&&SFX.init();hqRender();openModal('hqModal');}
+function hqTabsList(){const t=[['over','i-station','OVERVIEW'],['build','i-wrench','CONSTRUCTION'],['custom','i-settings','CUSTOMIZE'],['nav','i-orbit','NAVIGATION'],['tp','i-galaxy','TELEPORT']];
+  if(HQ.ctx.lab)t.push(['res','i-supplies','RESOURCES'],['lab','i-research','RESEARCH']);if(HQ.ctx.fab)t.push(['fab','i-craft','FABRICATOR']);return t;}
+function hqRender(){
+  $('hqTitle').textContent=HQ.name;
+  $('hqTabs').innerHTML=hqTabsList().map(([id,ic,n])=>`<button class="tabBtn${hqTab===id?' active':''}" data-hqtab="${id}"><svg class="ic"><use href="#${ic}"/></svg> ${n}</button>`).join('');
+  const g=$('hqGrid');const card=(head,body,btns,eq)=>`<div class="uCard${eq?' equipped':''}"><div>${head}<div class="uDesc" style="margin-top:6px">${body}</div></div>${btns?`<div style="display:flex;gap:6px;flex-wrap:wrap">${btns}</div>`:''}</div>`;
+  const full=t=>`<div style="grid-column:1/-1">${t}</div>`;let h='';
+  const aboard=hqIn(),sysName=id=>(SYSTEMS.find(s=>s.id===id)||{name:id}).name;
+  if(hqTab==='over'){
+    const nx=HQ.level<5?HQ_LEVELS[HQ.level+1]:null;
+    h+=card(`<div class="uTitle"><span>STATION</span><span class="uLvl">LV.${HQ.level}/5</span></div>`,`<input id="hqName" maxlength="24" value="${hqEsc(HQ.name)}"> <button class="uBtn" data-act="rename" style="width:auto;margin-top:6px">RENAME</button><br><b>${HQ_LEVELS[HQ.level].n}</b> — orbiting <b>${hqEsc(HQ.anchor)}</b> in <b>${sysName(HQ.sys)}</b>.<br>${HQ_LEVELS[HQ.level].perk}`,aboard?'':`<button class="uBtn sky" data-act="jumpto">JUMP TO HQ</button>`);
+    h+=card(`<div class="uTitle"><span>${nx?'UPGRADE TO LV.'+(HQ.level+1):'MAX LEVEL'}</span><span class="uLvl">${nx?nx.n:'FLAGSHIP'}</span></div>`,nx?`${nx.perk}<div class="hqCost" style="margin-top:6px">${hqCostTxt(nx.cost)}</div>`:'Your headquarters is a fully operational Frontier Flagship.',nx?`<button class="uBtn buy" data-act="levelup" ${hqCostOk(nx.cost)?'':'disabled'}>UPGRADE STATION</button>`:'');
+    const rep=Math.ceil(100-HQ.health),repC={fe:rep,ae:Math.ceil(rep/2)};
+    h+=card(`<div class="uTitle"><span>STATUS</span><span class="uLvl">${Math.round(HQ.health)}% HULL</span></div>`,`HULL INTEGRITY<div class="hqBar"><i style="width:${HQ.health}%;background:linear-gradient(90deg,#ff4d6d,#5dff9a)"></i></div>ENERGY ${Math.round(HQ.energy)} / ${hqMaxEnergy()}<div class="hqBar"><i style="width:${HQ.energy/hqMaxEnergy()*100}%;background:linear-gradient(90deg,#39c6ff,#9dfcff)"></i></div>Energy recharges over time${hqHas('energy')?' (fusion core: 2× speed)':''}. Hull wears on jumps and under raider fire${hqHas('defense')?' — defense grid active':''}.`,rep>0?`<button class="uBtn" data-act="repair" ${hqCostOk(repC)?'':'disabled'}>REPAIR · ${repC.fe} FE + ${repC.ae} AE</button>`:'');
+    const fac=HQ_ROOMS.filter(r=>!r.corr).map(r=>`${r.lvl<=HQ.level?'✓':'🔒'} ${r.name}${r.lvl>HQ.level?' (LV.'+r.lvl+')':''}`).concat(HQ.modules.map(id=>'✓ '+(HQ_MODULES.find(m=>m.id===id)||{name:id}).name));
+    h+=card(`<div class="uTitle"><span>FACILITIES</span><span class="uLvl">${HQ.modules.length} MODULES</span></div>`,`<div class="hqList">${fac.join('<br>')}</div>`,'');
+    const ships=[(SHIP_SKINS.find(s=>s.id===SKIN.ship)||{name:SKIN.ship}).name+(HQ.docked||aboard?' — MAIN PAD':' — OUT FLYING')].concat(hqHas('showroom')?SKIN.ownedShip.filter(i=>i!==SKIN.ship).slice(0,HQ.level>=2?(hqHas('ring2')?4:2):0).map(i=>(SHIP_SKINS.find(s=>s.id===i)||{name:i}).name+' — SHOWROOM PAD'):[]);
+    h+=card(`<div class="uTitle"><span>DOCKED SHIPS</span><span class="uLvl">${HQ.level>=2?(hqHas('ring2')?5:3):1} PADS</span></div>`,`<div class="hqList">${ships.map(hqEsc).join('<br>')}</div>`,'');
+    const ops=GAME.outposts.map(o=>{ensureOutpostDefaults(o);const b=bodies.find(x=>x.name===o.body);return `${o.teleporter&&hqHas('tpcore')?'🟢':'⚪'} ${hqEsc(o.body)} · ${sysName(b?b.sys:'')} · ${o.teleporter?(hqHas('tpcore')?'CONNECTED':'TELEPORTER READY — BUILD THE TELEPORTER CORE'):'NO TELEPORTER'}`;});
+    h+=card(`<div class="uTitle"><span>CONNECTED OUTPOSTS</span><span class="uLvl">${GAME.outposts.filter(o=>o.teleporter).length}</span></div>`,`<div class="hqList">${ops.join('<br>')||'No outposts yet — build one from the BUILD menu on any planet.'}</div>`,'');
+    h+=card(`<div class="uTitle"><span>COIN LEDGER</span><span class="uLvl">${(INV.gold||0).toLocaleString('en-US')} 🪙</span></div>`,`<div class="hqList">${HQ.log.slice(-8).reverse().map(e=>`<span style="color:${e.d>=0?'#7dffc4':'#ff9db2'}">${e.d>=0?'+':''}${e.d.toLocaleString('en-US')}</span> ${e.w} · ${new Date(e.t).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}`).join('<br>')||'No transactions recorded yet.'}</div>`,'');
+  }else if(hqTab==='build'){
+    h+=full(`<div class="uDesc">Coin purchases add cosmetic structures. Crafted modules use your ore and unlock real station functions. Everything appears on the station as soon as it is built.</div>`);
+    for(const md of HQ_MODULES){const own=hqHas(md.id),lock=HQ.level<md.lvl,ok=hqCostOk(md.cost);
+      h+=card(`<div class="hqHead"><div class="hqIcon"><svg class="ic"><use href="#${md.icon}"/></svg></div><div class="uTitle" style="flex:1"><span>${md.name}</span><span class="uLvl">${md.kind==='coin'?'COINS':'CRAFT'} · LV.${md.lvl}</span></div></div>`,`${md.desc}<div class="hqCost" style="margin-top:6px">${own?'<span class="ok">✓ BUILT</span>':hqCostTxt(md.cost)}</div>`,own?`<button class="uBtn" disabled>✓ INSTALLED</button>`:`<button class="uBtn ${md.kind==='coin'?'buy':''}" data-act="buy" data-id="${md.id}" ${(!lock&&ok)?'':'disabled'}>${lock?'NEEDS STATION LV.'+md.lvl:ok?(md.kind==='coin'?'PURCHASE':'CONSTRUCT'):'NOT ENOUGH '+(md.kind==='coin'?'COINS':'RESOURCES')}</button>`,own);}
+  }else if(hqTab==='custom'){
+    const opt=(group,map,pack)=>Object.keys(map).map((k,i)=>{const free=i===0,own=free||hqHas(pack),on=HQ.deco[group]===k;const col=group==='theme'?(map[k].acc||HQ_LIGHTS.cyan):map[k];
+      return `<button class="uBtn${on?' buy':''}" style="width:auto" data-act="deco" data-g="${group}" data-v="${k}" ${own?'':'disabled'}><span class="hqSw" style="background:#${(col>>>0).toString(16).padStart(6,'0')}"></span>${k.toUpperCase()}${own?'':' 🔒'}</button>`;}).join('');
+    h+=card(`<div class="uTitle"><span>STATION LIGHTING</span><span class="uLvl">${hqHas('lights')?'PACK OWNED':'BUY LIGHT SHOW PACK'}</span></div>`,'Glow strips, ring lights, runway lights and hologram tint.',opt('lights',HQ_LIGHTS,'lights'));
+    h+=card(`<div class="uTitle"><span>HULL PAINT</span><span class="uLvl">${hqHas('hullpaint')?'PACK OWNED':'BUY HULL PAINT PACK'}</span></div>`,'Repaint the entire exterior hull.',opt('hull',HQ_HULLS,'hullpaint'));
+    h+=card(`<div class="uTitle"><span>INTERIOR THEME</span><span class="uLvl">${hqHas('themes')?'PACK OWNED':'BUY INTERIOR THEMES'}</span></div>`,'Walls, floors and accent lighting inside every room.',opt('theme',HQ_THEMES,'themes'));
+    h+=card(`<div class="uTitle"><span>DECORATIONS</span><span class="uLvl">${hqHas('decor')?'INSTALLED':'NOT OWNED'}</span></div>`,hqHas('decor')?'Plants, aquarium, golden statue and lounge furniture are installed.':'Buy PREMIUM DECOR in the Construction tab (needs station level 2).','');
+  }else if(hqTab==='nav'){
+    const bridge=aboard&&HQ.ctx.bridge,lc=hqNavCost('local'),jc=hqNavCost('jump');
+    h+=full(`<div class="uDesc">${bridge?`Station energy <b>${Math.round(HQ.energy)}/${hqMaxEnergy()}</b> · Hull <b>${Math.round(HQ.health)}%</b>. In-system moves cost ${lc.energy} energy (needs LV.2). Jumps to other unlocked systems cost ${jc.energy} energy + ${jc.res.so} SO + ${jc.res.vd} VD (needs LV.4).`:'Station navigation is controlled from the <b>Navigation Console</b> on the Command Deck. Board the station to set a course.'}</div>`);
+    for(const b of bodies.filter(x=>x.sys===HQ.sys&&x.kind!=='sun'&&x.name!==HQ.anchor)){const can=bridge&&HQ.level>=2&&HQ.energy>=lc.energy&&!HQ.nav;
+      h+=card(`<div class="uTitle"><span>${hqEsc(b.name)}${b.moon?' (MOON)':''}</span><span class="uLvl">${sysName(b.sys)}</span></div>`,hqEsc(b.blurb||''),`<button class="uBtn sky" data-act="nav" data-k="local" data-s="${b.sys}" data-b="${hqEsc(b.name)}" ${can?'':'disabled'}>${HQ.level<2?'NEEDS LV.2':'SET COURSE · '+lc.energy+' ENERGY'}</button>`);}
+    for(const s of SYSTEMS.filter(x=>x.id!==HQ.sys)){const tb=hqAnchorBody(s.id,'__');const ok=UPGRADES.ship.lvl>=s.reqHyper,can=bridge&&HQ.level>=4&&ok&&HQ.energy>=jc.energy&&hqCostOk(jc.res)&&HQ.health>=25&&!HQ.nav;
+      h+=card(`<div class="uTitle"><span>${s.name}</span><span class="uLvl">${ok?'UNLOCKED':'HYPERDRIVE LV.'+s.reqHyper}</span></div>`,`Jump the whole station to orbit ${hqEsc(tb.name)}.`,`<button class="uBtn void" data-act="nav" data-k="jump" data-s="${s.id}" data-b="${hqEsc(tb.name)}" ${can?'':'disabled'}>${!ok?'LOCKED SYSTEM':HQ.level<4?'NEEDS LV.4':'JUMP · '+jc.energy+' EN + '+jc.res.so+' SO + '+jc.res.vd+' VD'}</button>`);}
+  }else if(hqTab==='tp'){
+    const here=aboard&&HQ.ctx.tp,core=hqHas('tpcore');
+    h+=full(`<div class="uDesc">${!core?'Build the <b>TELEPORTER CORE</b> (Construction tab, station LV.3) to power the hub.':here?'Choose a destination. Your ship is beamed down with you, and outposts can send you straight back here.':'Use the teleporter pads in the <b>Teleportation Hub</b> aboard the station.'}</div>`);
+    const list=GAME.outposts.map(o=>ensureOutpostDefaults(o));
+    for(const o of list){const b=bodies.find(x=>x.name===o.body),can=here&&core&&o.teleporter;
+      h+=card(`<div class="uTitle"><span>${hqEsc(o.body)} OUTPOST</span><span class="uLvl">${sysName(b?b.sys:'')}</span></div>`,`HQ → ${sysName(b?b.sys:'')} → ${hqEsc(o.body)} · LV.${o.lvl} · <b style="color:${o.teleporter?'#7dffc4':'#ff9db2'}">${o.teleporter?'TELEPORTER ONLINE':'NO TELEPORTER — build one at the outpost base'}</b>`,`<button class="uBtn sky" data-act="tp" data-id="${o.id}" ${can?'':'disabled'}>TELEPORT</button>`);}
+    if(!list.length)h+=full(`<div class="uDesc">No outposts yet. Land on a planet, open BUILD and place an outpost, then build its teleporter.</div>`);
+  }else if(hqTab==='res'){
+    const vault=hqHas('storage');
+    for(const k of STORE_KEYS){const meta=RES_META[k]||{label:k.toUpperCase()},v=HQ.vault[k]||0,have=INV[k]||0;
+      h+=card(`<div class="uTitle"><span>${meta.label||k.toUpperCase()}</span><span class="uLvl">PACK ${have}${vault?' · VAULT '+v+'/999':''}</span></div>`,'',vault?`<button class="uBtn" data-act="dep" data-k="${k}" ${have>0&&v<999?'':'disabled'}>STORE 50</button><button class="uBtn sky" data-act="wd" data-k="${k}" ${v>0?'':'disabled'}>TAKE 50</button>`:'');}
+    if(!vault)h=full(`<div class="uDesc">Build the <b>RESOURCE VAULT</b> (station LV.3) to store up to 999 of every resource here.</div>`)+h;
+  }else if(hqTab==='lab'){
+    const p=hqResearchPending();
+    h+=card(`<div class="uTitle"><span>RESEARCH WING</span><span class="uLvl">${hqHas('research')?'ONLINE':'NOT BUILT'}</span></div>`,hqHas('research')?`Produces 1 Research Point every 2 minutes (stores up to 30). Ready now: <b>${p} RP</b>. You have ${INV.rp||0} RP.`:'Construct the RESEARCH WING (station LV.2) to generate Research Points.',hqHas('research')?`<button class="uBtn buy" data-act="rp" ${p>0?'':'disabled'}>COLLECT ${p} RP</button>`:'');
+    h+=card(`<div class="uTitle"><span>DISCOVERIES</span><span class="uLvl">${DISCOVERIES.length}</span></div>`,`Catalogued finds across the galaxy. Worlds charted: ${bodies.filter(b=>b.visited&&b.landable).length}/${bodies.filter(b=>b.landable).length}.`,`<button class="uBtn sky" data-act="journal">OPEN ARCHIVE</button>`);
+  }else if(hqTab==='fab'){
+    for(const r of HQ_RECIPES){const ok=hqCostOk(r.c);h+=card(`<div class="uTitle"><span>${r.n}</span><span class="uLvl">HAVE ${INV[r.k]||0}</span></div>`,`<div class="hqCost">${hqCostTxt(r.c)}</div>`,`<button class="uBtn buy" data-act="fab" data-k="${r.k}" ${ok&&hqHas('workshop')?'':'disabled'}>FABRICATE</button>`);}
+  }
+  g.innerHTML=h;
+}
+$('hqClose').addEventListener('click',e=>{e.stopPropagation();closeModals();});
+$('hqTabs').addEventListener('click',e=>{const b=e.target.closest('[data-hqtab]');if(!b)return;hqTab=b.dataset.hqtab;hqRender();});
+$('hqGrid').addEventListener('click',e=>{const b=e.target.closest('[data-act]');if(!b||b.disabled)return;const a=b.dataset.act;
+  if(a==='rename'){const v=String($('hqName').value||'').replace(/[<>]/g,'').trim().slice(0,24).toUpperCase();if(v){HQ.name=v;toast('STATION RENAMED: '+v);saveGame(true);if(HQ.screens)HQ.screenT=0;}}
+  else if(a==='levelup')hqLevelUp();
+  else if(a==='repair'){const rep=Math.ceil(100-HQ.health),c={fe:rep,ae:Math.ceil(rep/2)};if(!hqCostOk(c))return;hqPay(c);HQ.health=100;SFX.upgrade();toast('HULL FULLY REPAIRED');saveGame(true);}
+  else if(a==='jumpto')hqJumpTo();
+  else if(a==='buy')hqPurchase(b.dataset.id);
+  else if(a==='deco'){HQ.deco[b.dataset.g]=b.dataset.v;hqRebuild();saveGame(true);SFX.ui();}
+  else if(a==='nav'){hqStartNav(b.dataset.k,b.dataset.s,b.dataset.b);return;}
+  else if(a==='tp'){const o=GAME.outposts.find(x=>x.id===b.dataset.id);if(o&&o.teleporter&&hqHas('tpcore')&&hqIn()){HQ.docked=false;astro.group.visible=false;HQ.walk=null;PL.hqInt=null;PL.mode='landed';teleportToOutpost(o);advanceMission('hqTeleport',1);}return;}
+  else if(a==='dep'||a==='wd'){const k=b.dataset.k;if(a==='dep'){const n=Math.min(50,INV[k]||0,999-(HQ.vault[k]||0));if(n<=0)return;INV[k]-=n;HQ.vault[k]=(HQ.vault[k]||0)+n;}else{const n=Math.min(50,HQ.vault[k]||0);if(n<=0)return;HQ.vault[k]-=n;INV[k]=(INV[k]||0)+n;}updateResHUD();saveGame(true);SFX.ui();}
+  else if(a==='rp'){const p=hqResearchPending();if(p<=0)return;INV.rp=(INV.rp||0)+p;HQ.researchAt=Date.now();updateResHUD();SFX.coin();toast('+'+p+' RESEARCH POINTS');saveGame(true);}
+  else if(a==='journal'){closeModals();journalTab='disc';renderJournalModal();openModal('journalModal');return;}
+  else if(a==='fab'){const r=HQ_RECIPES.find(x=>x.k===b.dataset.k);if(!r||!hqCostOk(r.c)||!hqHas('workshop'))return;hqPay(r.c);INV[r.k]=(INV[r.k]||0)+1;updateResHUD();SFX.craft&&SFX.craft();toast(r.n+' FABRICATED');saveGame(true);}
+  hqRender();});
+$('btnHQ').addEventListener('click',e=>{e.stopPropagation();if(!started)return;hqOpen('over',{});});
+
+/* ---------- 11. SAVE / LOAD ---------- */
+function hqSaveData(){return {name:HQ.name,level:HQ.level,sys:HQ.sys,anchor:HQ.anchor,modules:HQ.modules.slice(),deco:Object.assign({},HQ.deco),energy:Math.round(HQ.energy),health:Math.round(HQ.health),log:HQ.log.slice(-30),vault:Object.assign({},HQ.vault),gardenAt:HQ.gardenAt,researchAt:HQ.researchAt,yaw:HQ.yaw,docked:hqIn(),met:HQ.met.slice(),seen:HQ.seen.slice()};}
+function hqLoad(d){
+  if(!d||typeof d!=='object')return;
+  HQ.name=String(d.name||'FRONTIER COMMANDER').slice(0,24);HQ.level=clamp(+d.level||1,1,5);
+  if(SYSTEMS.some(s=>s.id===d.sys))HQ.sys=d.sys;if(bodies.some(b=>b.name===d.anchor&&b.sys===HQ.sys))HQ.anchor=d.anchor;else HQ.anchor=hqAnchorBody(HQ.sys,'__').name;
+  HQ.modules=Array.isArray(d.modules)?d.modules.filter(id=>HQ_MODULES.some(m=>m.id===id)):[];
+  HQ.deco=Object.assign({lights:'cyan',hull:'white',theme:'standard'},d.deco||{});if(!HQ_LIGHTS[HQ.deco.lights])HQ.deco.lights='cyan';if(!HQ_HULLS[HQ.deco.hull])HQ.deco.hull='white';if(!HQ_THEMES[HQ.deco.theme])HQ.deco.theme='standard';
+  HQ.energy=clamp(+d.energy||0,0,150);HQ.health=clamp(d.health===undefined?100:+d.health,0,100);HQ.log=Array.isArray(d.log)?d.log.slice(-30):[];HQ.vault=d.vault&&typeof d.vault==='object'?d.vault:{};
+  HQ.gardenAt=+d.gardenAt||Date.now();HQ.researchAt=+d.researchAt||Date.now();HQ.yaw=+d.yaw||0;HQ.lastGold=null;HQ.met=Array.isArray(d.met)?d.met.slice(0,20):[];HQ.seen=Array.isArray(d.seen)?d.seen.slice(0,20):[];
+  setTimeout(hqSyncMissions,0);
+  if(HQ.built)hqRebuild();
+  if(d.docked)setTimeout(()=>{if(started)hqPlaceDocked();},60);
+}
+HQ.api={dock:hqDock,launch:hqLaunch,exit:hqExitShip,buy:hqPurchase,levelUp:hqLevelUp,nav:hqStartNav,tpIn:hqTeleportIn,open:hqOpen,jumpTo:hqJumpTo,canDock:hqCanDock,save:saveGame,load:loadGame,teleportToOutpost,interact:hqInteract,rebuild:hqRebuild};
+// HQ-END
 
 // SHOP2-BEGIN
 /* ===== SHOP 2.0 — new rocket & suit shapes, GEAR, STYLE, PETS, BOOSTS ===== */
@@ -8859,7 +9836,7 @@ const _mpV=new V3(),_mpQ=new Q();
 function mpName(){let n='';try{n=localStorage.getItem('cosmic_hop_mp_name')||'';}catch(_){}if(!n){n='Pilot-'+Math.floor(1000+Math.random()*9000);try{localStorage.setItem('cosmic_hop_mp_name',n);}catch(_){}}return n;}
 const mpClean=n=>String(n||'').replace(/[^\p{L}\p{N} _\-.]/gu,'').trim().slice(0,14)||'Pilot';
 function mpRefBody(){
-  if(PL.mode!=='fly'&&PL.body)return PL.body;
+  if(PL.mode!=='fly'&&PL.body)return PL.body.isHQ?hqAnchorBody():PL.body;
   if(PL.near&&PL.alt<PL.near.R*2.5+400)return PL.near;
   return bodies.find(b=>b.sys===activeSystemId&&(b.kind==='sun'||b.kind==='blackhole'))||PL.near||bodies[0];
 }
